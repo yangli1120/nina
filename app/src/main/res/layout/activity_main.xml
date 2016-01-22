@@ -3,21 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="crazysheep.io.nina.MainActivity">
 
-    <com.twitter.sdk.android.core.identity.TwitterLoginButton
-        android:id="@+id/login_btn"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_centerHorizontal="true"
-        app:layout_widthPercent="80%"
-        app:layout_marginTopPercent="40%"/>
 
-    <TextView
-        android:id="@+id/username_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        app:layout_marginTopPercent="60%" />
 </android.support.percent.PercentRelativeLayout>

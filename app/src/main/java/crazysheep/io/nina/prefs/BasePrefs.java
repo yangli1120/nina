@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
  */
 public class BasePrefs {
 
-    public static String PREFS_NAME = "material_music";
+    public static String PREFS_NAME = "nina";
 
     private Context mContext;
     private SharedPreferences mSharedPrefs;
@@ -37,7 +37,7 @@ public class BasePrefs {
         }
     }
 
-    public void clear() {
+    public final void clear() {
         mSharedPrefs.edit().clear().apply();
     }
 

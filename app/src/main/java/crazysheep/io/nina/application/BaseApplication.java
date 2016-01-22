@@ -3,6 +3,7 @@ package crazysheep.io.nina.application;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -29,5 +30,7 @@ public class BaseApplication extends Application {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_KEY,
                 Constants.TWITTER_SECRET);
         Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
+        // init stetho
+        Stetho.initializeWithDefaults(this);
     }
 }
