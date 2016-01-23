@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#9bfade</color>
-    <color name="colorPrimaryDark">#1b8b69</color>
+    <color name="colorPrimaryDark">#59e6bc</color>
     <color name="colorAccent">#32b991</color>
 
     <!-- day theme color -->

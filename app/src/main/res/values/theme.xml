@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Day" parent="AppTheme">
+    <style name="AppTheme.Day" parent="AppTheme.Base">
         <item name="color_text_primary">@color/color_day_text_primary</item>
         <item name="color_text_secondary">@color/color_day_text_secondary</item>
     </style>

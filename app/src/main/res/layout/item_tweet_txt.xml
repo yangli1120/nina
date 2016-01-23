@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.ms.square.android.expandabletextview.ExpandableTextView
+        android:id="@id/tweet_content_etv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:maxCollapsedLines="7">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_14"
+            android:textColor="?color_text_primary"/>
+    </com.ms.square.android.expandabletextview.ExpandableTextView>
+</merge>

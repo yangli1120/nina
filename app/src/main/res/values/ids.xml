@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="appbar" type="id"/>
+    <item name="toolbar" type="id" />
+    <item name="data_rv" type="id" />
+
+    <!-- timeline item -->
+    <item name="author_avatar_iv" type="id" />
+    <item name="author_name_tv" type="id" />
+    <item name="time_tv" type="id" />
+    <item name="tweet_content_etv" type="id" />
+    <item name="tweet_content_fl" type="id" />
+    <item name="action_reply_ll" type="id" />
+    <item name="action_reply_iv" type="id" />
+    <item name="action_retweet_ll" type="id" />
+    <item name="action_retweet_iv" type="id" />
+    <item name="action_retweet_count_tv" type="id" />
+    <item name="action_like_ll" type="id" />
+    <item name="action_like_iv" type="id" />
+    <item name="action_like_count_tv" type="id" />
+</resources>
