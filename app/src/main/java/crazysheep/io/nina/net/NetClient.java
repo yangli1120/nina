@@ -1,7 +1,6 @@
 package crazysheep.io.nina.net;
 
 import android.app.Application;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.facebook.stetho.okhttp.StethoInterceptor;
@@ -12,8 +11,6 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 
-import crazysheep.io.nina.prefs.UserPrefs;
-import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -38,7 +35,16 @@ public class NetClient {
                         @Override
                         public Response intercept(Chain chain) throws IOException {
                             Request request = chain.request().newBuilder()
-                                    .addHeader("Authorization", authBuilder(application))
+                                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                                    .addHeader("User-Agent", "OAuth gem v0.4.4")
+                                    .addHeader("Host", "api.twitter.com")
+                                    // how to generate twitter REST api's authorization?
+                                    // see{@link http://soupkodjou.com/implementing-twitter-oauth-in-java-step-by-step/6/}
+                                    .addHeader("Authorization",
+                                            RequestHeaderHelper.builderAuth(application,
+                                                    chain.request().method(),
+                                                    chain.request().urlString(),
+                                                    null))
                                     .build();
 
                             return chain.proceed(request);
@@ -56,32 +62,6 @@ public class NetClient {
             }
 
         return mRetrofit;
-    }
-
-    /*
-    * such like:
-    * Authorization: OAuth oauth_consumer_key="OK4Jokq5amNT6NIASXA0rIUiI", oauth_nonce="5ca1ff6c549b765783795c5baf75d2f2", oauth_signature="NUQdUVamvXbc8sNU5K78sm32GGQ%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1453557047", oauth_token="3301250162-M6evawbslQqtCfUGN2BHBLsIwE07DeK4xekbSXu", oauth_version="1.0"
-    * */
-    private static String authBuilder(@NonNull Context context) {
-        UserPrefs userPrefs = new UserPrefs(context);
-        StringBuilder sb = new StringBuilder(" OAuth ");
-        sb.append("oauth_consumer_key=")
-                .append("\"OK4Jokq5amNT6NIASXA0rIUiI\"")
-                .append(", oauth_consumer_secret=")
-                .append("\"uv2jOCK3GbsFwOhN7gpgIJHwFvksz59GlxQgWXw56VIy9ZVRr1\"")
-                .append(", oauth_token=")
-                .append("\"")
-                .append(userPrefs.getAuthToken())
-                .append("\"")
-                .append(", oauth_token_secret=")
-                .append("\"")
-                .append(userPrefs.getSecret())
-                .append("\"")
-                .append(", oauth_version=\"1.0\"");
-
-        L.d("Authorization: " + sb.toString());
-
-        return sb.toString();
     }
 
 }

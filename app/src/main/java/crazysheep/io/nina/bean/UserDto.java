@@ -74,7 +74,7 @@ public class UserDto implements BaseDto, Parcelable {
         }
     * */
 
-    @SerializedName("profile_sidebar_border_color")
+    @SerializedName("profile_sidebar_fill_color")
     public String profile_sidebar_fill_color;
     @SerializedName("profile_sidebar_border_color")
     public String profile_sidebar_border_color;

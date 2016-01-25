@@ -72,7 +72,7 @@ public class TimelineFragment extends BaseFragment {
 
         mUserPrefs = new UserPrefs(getActivity());
         mTweetsCall = mRetrofit.create(ApiService.class).getUserTimeline(
-                null, mUserPrefs.getUsername(), null, 50, null);
+                null, mUserPrefs.getUsername(), null, 20, null);
     }
 
     private void initUI() {
