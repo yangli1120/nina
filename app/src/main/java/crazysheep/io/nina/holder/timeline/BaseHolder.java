@@ -17,6 +17,8 @@ import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.TimeUtils;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * base viewholder for timeline, implements base layout
@@ -25,8 +27,9 @@ import crazysheep.io.nina.utils.DebugHelper;
  */
 public abstract class BaseHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.author_avatar_iv) ImageView avatarIv;
+    @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
     @Bind(R.id.author_name_tv) TextView authorNameTv;
+    @Bind(R.id.author_screen_name_tv) TextView authorScreenNameTv;
     @Bind(R.id.time_tv) TextView timeTv;
     @Bind(R.id.tweet_content_fl) FrameLayout contentFl;
     @Bind(R.id.action_reply_ll) View replyLl;
@@ -62,11 +65,14 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
         Glide.clear(avatarIv);
         // start current request
         Glide.with(mContext)
-                .load(tweetDto.user.profile_image_url)
+                .load(tweetDto.user.profile_image_url_https)
                 .into(avatarIv);
 
-        authorNameTv.setText(tweetDto.user.screen_name);
-        timeTv.setText(tweetDto.created_at);
+        authorNameTv.setText(tweetDto.user.name);
+        authorScreenNameTv.setText(mContext.getString(R.string.screen_name,
+                tweetDto.user.screen_name));
+        timeTv.setText(TimeUtils.formatTimestamp(mContext,
+                TimeUtils.getTimeFromDate(tweetDto.created_at.trim())));
 
         /* content layout should be render by sub-holder */
 

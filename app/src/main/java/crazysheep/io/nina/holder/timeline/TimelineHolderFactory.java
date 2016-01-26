@@ -18,14 +18,14 @@ public class TimelineHolderFactory {
      * create view holder
      * */
     @SuppressWarnings("unchecked")
-    public static <T extends BaseHolder> T createHolder(@NonNull ViewGroup parent, int viewType) {
+    public static <T extends BaseHolder> T createHolder(@NonNull ViewGroup itemRoot, int viewType) {
         switch (viewType) {
             case TYPE_TXT: {
-                return (T) new TxtHolder(parent, parent.getContext());
+                return (T) new TxtHolder(itemRoot, itemRoot.getContext());
             }
 
             default:
-                return (T) new TxtHolder(parent, parent.getContext());
+                return (T) new TxtHolder(itemRoot, itemRoot.getContext());
         }
     }
 

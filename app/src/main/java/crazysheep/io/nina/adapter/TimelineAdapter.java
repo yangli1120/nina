@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.holder.timeline.BaseHolder;
 import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
@@ -23,7 +24,8 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
 
     @Override
     protected T onCreateHolder(ViewGroup parent, int viewType) {
-        return TimelineHolderFactory.createHolder(parent, viewType);
+        ViewGroup itemRoot = (ViewGroup)mInflater.inflate(R.layout.item_timeline_base, parent, false);
+        return TimelineHolderFactory.createHolder(itemRoot, viewType);
     }
 
     @Override

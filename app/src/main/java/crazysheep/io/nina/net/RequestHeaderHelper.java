@@ -24,7 +24,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import crazysheep.io.nina.prefs.UserPrefs;
-import crazysheep.io.nina.utils.L;
 
 /**
  * helper for build twitter api request
@@ -55,8 +54,6 @@ public class RequestHeaderHelper {
                 ApiConstants.NINA_CONSUMER_SECRET);
         String authorizationStr = authorization.getAuthorizationHeader(getRequestUrl(url), method,
                 getQuerysFromUrl(url), userPrefs.getAuthToken(), userPrefs.getSecret(), false);
-
-        L.d("Authorization: " + authorizationStr);
 
         // trim is very important, see{@link https://github.com/square/retrofit/issues/1153}
         return authorizationStr.trim();

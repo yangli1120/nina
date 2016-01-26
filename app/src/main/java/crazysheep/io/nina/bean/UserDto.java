@@ -80,8 +80,6 @@ public class UserDto implements BaseDto, Parcelable {
     public String profile_sidebar_border_color;
     @SerializedName("profile_background_tile")
     public boolean profile_background_tile;
-    @SerializedName("profile_image_url")
-    public String profile_image_url;
     @SerializedName("created_at")
     public String created_at;
     @SerializedName("location")
@@ -130,14 +128,14 @@ public class UserDto implements BaseDto, Parcelable {
     public String description;
     @SerializedName("default_profile_image")
     public boolean default_profile_image;
-    @SerializedName("profile_background_image_url")
-    public String profile_background_image_url;
     @SerializedName("statuses_count")
     public int statuses_count;
     @SerializedName("friends_count")
     public int friends_count;
     @SerializedName("show_all_inline_media")
     public boolean show_all_inline_media;
+    @SerializedName("name")
+    public String name;
     @SerializedName("screen_name")
     public String screen_name;
 

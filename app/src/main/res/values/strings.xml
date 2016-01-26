@@ -3,4 +3,15 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="screen_name">\@%s</string>
+    <string name="time_just_now">just now</string>
+    <string name="time_month">%smonth</string>
+    <string name="time_month_s">%smonths</string>
+    <string name="time_day">%sday</string>
+    <string name="time_day_s">%sdays</string>
+    <string name="time_hour">%shour</string>
+    <string name="time_hour_s">%shours</string>
+    <string name="time_min">%smin</string>
+    <string name="time_min_s">%smins</string>
 </resources>

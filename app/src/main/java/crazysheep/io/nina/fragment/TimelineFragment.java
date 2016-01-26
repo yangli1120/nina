@@ -42,6 +42,7 @@ public class TimelineFragment extends BaseFragment {
     private UserPrefs mUserPrefs;
 
     @Nullable
+    @SuppressWarnings("unchecked")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,8 +53,6 @@ public class TimelineFragment extends BaseFragment {
         mTweetsCall.enqueue(new retrofit.Callback<List<TweetDto>>() {
             @Override
             public void onResponse(Response<List<TweetDto>> response, Retrofit retrofit) {
-                L.d(response.toString());
-
                 mAdapter.setData(response.body());
             }
 

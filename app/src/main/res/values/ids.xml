@@ -8,6 +8,7 @@
     <!-- timeline item -->
     <item name="author_avatar_iv" type="id" />
     <item name="author_name_tv" type="id" />
+    <item name="author_screen_name_tv" type="id" />
     <item name="time_tv" type="id" />
     <item name="tweet_content_etv" type="id" />
     <item name="tweet_content_fl" type="id" />
