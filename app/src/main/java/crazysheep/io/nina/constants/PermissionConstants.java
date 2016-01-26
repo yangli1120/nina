@@ -6,4 +6,6 @@ package crazysheep.io.nina.constants;
  * Created by crazysheep on 16/1/21.
  */
 public class PermissionConstants {
+
+    public static final int RC_EXTERNAL_STORAGE = 100; // request read & write external storage
 }

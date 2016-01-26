@@ -23,7 +23,7 @@ public class BaseFragment extends Fragment {
 
         TAG = getClass().getSimpleName();
 
-        mRetrofit = NetClient.getInstance(getActivity().getApplication());
+        mRetrofit = NetClient.getInstance();
     }
 
 }

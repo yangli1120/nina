@@ -30,7 +30,7 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
 
     @Override
     public void onBindViewHolder(T holder, int position) {
-        holder.bindData(getItem(position));
+        holder.bindData(position, getItem(position));
     }
 
     @Override

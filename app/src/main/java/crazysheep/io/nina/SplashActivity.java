@@ -1,9 +1,12 @@
 package crazysheep.io.nina;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.twitter.sdk.android.core.Callback;
@@ -12,13 +15,17 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.constants.PermissionConstants;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit.Response;
 import retrofit.Retrofit;
 import rx.Observable;
@@ -39,14 +46,15 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
         mUserPrefs = new UserPrefs(this);
         initUI();
 
-        if(mUserPrefs.isLogin())
-            goMain();
+        requestStorage();
     }
 
     private void initUI() {
@@ -123,4 +131,33 @@ public class SplashActivity extends BaseActivity {
                 });
     }
 
+    @AfterPermissionGranted(PermissionConstants.RC_EXTERNAL_STORAGE)
+    private void requestStorage() {
+        String[] pers = new String[] {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+        if(EasyPermissions.hasPermissions(this, pers)) {
+            if(mUserPrefs.isLogin())
+                goMain();
+        } else {
+            EasyPermissions.requestPermissions(this, null, PermissionConstants.RC_EXTERNAL_STORAGE,
+                    pers);
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(List<String> perms) {
+        super.onPermissionsGranted(perms);
+
+        if(mUserPrefs.isLogin())
+            goMain();
+    }
+
+    @Override
+    public void onPermissionsDenied(List<String> perms) {
+        super.onPermissionsDenied(perms);
+
+        finish();
+    }
 }

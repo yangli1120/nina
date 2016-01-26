@@ -19,6 +19,7 @@ import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.net.ApiService;
+import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.L;
 import retrofit.Call;
@@ -37,7 +38,7 @@ public class TimelineFragment extends BaseFragment {
 
     private TimelineAdapter mAdapter;
 
-    private Call<List<TweetDto>> mTweetsCall;
+    private Call<List<TweetDto>> mHomeTimelineCall;
 
     private UserPrefs mUserPrefs;
 
@@ -50,7 +51,7 @@ public class TimelineFragment extends BaseFragment {
         ButterKnife.bind(this, contentView);
 
         initUI();
-        mTweetsCall.enqueue(new retrofit.Callback<List<TweetDto>>() {
+        mHomeTimelineCall.enqueue(new retrofit.Callback<List<TweetDto>>() {
             @Override
             public void onResponse(Response<List<TweetDto>> response, Retrofit retrofit) {
                 mAdapter.setData(response.body());
@@ -70,8 +71,8 @@ public class TimelineFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         mUserPrefs = new UserPrefs(getActivity());
-        mTweetsCall = mRetrofit.create(ApiService.class).getUserTimeline(
-                null, mUserPrefs.getUsername(), null, 20, null);
+        mHomeTimelineCall = mRetrofit.create(ApiService.class).getHomeTimeline(
+                HttpCache.CacheConfig.CACHE_IF_HIT, 50);
     }
 
     private void initUI() {

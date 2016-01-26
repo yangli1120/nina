@@ -59,7 +59,7 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
     /**
      * base holder implement common ui, sub-holder implement itself ui
      * */
-    public void bindData(@NonNull TweetDto tweetDto) {
+    public void bindData(int position, @NonNull TweetDto tweetDto) {
         /* top header */
         // cancel before image load request if need
         Glide.clear(avatarIv);

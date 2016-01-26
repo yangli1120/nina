@@ -20,4 +20,13 @@ public class DebugHelper {
         if(BuildConfig.DEBUG)
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
+
+    /**
+     * normal log
+     * */
+    public static void log(@NonNull String msg) {
+        if(BuildConfig.DEBUG)
+            android.util.Log.d(DebugHelper.class.getSimpleName(), msg);
+    }
+
 }

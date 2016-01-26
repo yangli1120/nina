@@ -31,8 +31,8 @@ public class TxtHolder extends BaseHolder {
     }
 
     @Override
-    public void bindData(@NonNull TweetDto tweetDto) {
-        super.bindData(tweetDto);
+    public void bindData(int position, @NonNull TweetDto tweetDto) {
+        super.bindData(position, tweetDto);
 
         txtEtv.setText(tweetDto.text);
     }

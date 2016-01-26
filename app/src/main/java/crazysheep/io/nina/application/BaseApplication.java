@@ -18,11 +18,15 @@ import io.fabric.sdk.android.Fabric;
  */
 public class BaseApplication extends Application {
 
+    private static BaseApplication mContext;
+
     public static final String TAG = "nina";
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mContext = this;
 
         // init logger
         Logger.init(TAG);
@@ -33,4 +37,9 @@ public class BaseApplication extends Application {
         // init stetho
         Stetho.initializeWithDefaults(this);
     }
+
+    public static Application getAppContext() {
+        return mContext;
+    }
+
 }
