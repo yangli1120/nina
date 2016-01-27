@@ -3,7 +3,7 @@ package crazysheep.io.nina.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import crazysheep.io.nina.net.NetClient;
+import crazysheep.io.nina.net.HttpClient;
 import retrofit.Retrofit;
 
 /**
@@ -23,7 +23,7 @@ public class BaseFragment extends Fragment {
 
         TAG = getClass().getSimpleName();
 
-        mRetrofit = NetClient.getInstance();
+        mRetrofit = HttpClient.getInstance();
     }
 
 }

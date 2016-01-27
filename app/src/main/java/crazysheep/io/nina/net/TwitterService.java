@@ -14,7 +14,7 @@ import retrofit.http.Query;
  *
  * Created by crazysheep on 16/1/23.
  */
-public interface ApiService {
+public interface TwitterService {
 
     /**
      * @param cacheType See {@link CacheConfig}

@@ -17,7 +17,7 @@ import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.net.ApiService;
+import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.DebugHelper;
@@ -39,7 +39,7 @@ public class TimelineFragment extends BaseFragment {
 
     private TimelineAdapter mAdapter;
 
-    private ApiService mHttp;
+    private TwitterService mHttp;
 
     @Nullable
     @SuppressWarnings("unchecked")
@@ -59,7 +59,7 @@ public class TimelineFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mHttp = mRetrofit.create(ApiService.class);
+        mHttp = mRetrofit.create(TwitterService.class);
     }
 
     private void initUI() {

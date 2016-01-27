@@ -50,8 +50,8 @@ public class RequestHeaderHelper {
             @NonNull String url, Map<String, String> requestBodyForm) {
         UserPrefs userPrefs = new UserPrefs(context);
 
-        Authorization authorization = new Authorization(ApiConstants.NINA_CONSUMER_KEY,
-                ApiConstants.NINA_CONSUMER_SECRET);
+        Authorization authorization = new Authorization(HttpConstants.NINA_CONSUMER_KEY,
+                HttpConstants.NINA_CONSUMER_SECRET);
         String authorizationStr = authorization.getAuthorizationHeader(getRequestUrl(url), method,
                 getQuerysFromUrl(url), userPrefs.getAuthToken(), userPrefs.getSecret(), false);
 
@@ -73,17 +73,17 @@ public class RequestHeaderHelper {
 
         Map<String, String> authMap = new HashMap<>();
         // consumer key
-        authMap.put(ApiConstants.OAUTH_CONSUMER_KEY, ApiConstants.NINA_CONSUMER_KEY);
+        authMap.put(HttpConstants.OAUTH_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_KEY);
         // nonce
-        authMap.put(ApiConstants.OAUTH_NONCE, auth_nonce);
+        authMap.put(HttpConstants.OAUTH_NONCE, auth_nonce);
         // signature method
-        authMap.put(ApiConstants.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
+        authMap.put(HttpConstants.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
         // timestamp
-        authMap.put(ApiConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
+        authMap.put(HttpConstants.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
         // token
-        authMap.put(ApiConstants.OAUTH_TOKEN, token);
+        authMap.put(HttpConstants.OAUTH_TOKEN, token);
         // version
-        authMap.put(ApiConstants.OAUTH_VERSION, "1.0");
+        authMap.put(HttpConstants.OAUTH_VERSION, "1.0");
 
         return sortToListMap(authMap);
     }
@@ -141,7 +141,7 @@ public class RequestHeaderHelper {
 
     private static String generateSignKey(@NonNull String tokenSecret) {
         return new StringBuilder()
-                .append(ApiConstants.NINA_CONSUMER_SECRET)
+                .append(HttpConstants.NINA_CONSUMER_SECRET)
                 .append("&")
                 .append(tokenSecret)
                 .toString()

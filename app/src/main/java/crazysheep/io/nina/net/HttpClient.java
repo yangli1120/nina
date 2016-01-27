@@ -24,15 +24,15 @@ import retrofit.Retrofit;
  *
  * Created by crazysheep on 16/1/22.
  */
-public class NetClient {
+public class HttpClient {
 
     private static Retrofit mRetrofit;
 
-    private NetClient() {}
+    private HttpClient() {}
 
     public static Retrofit getInstance() {
         if(Utils.isNull(mRetrofit))
-            synchronized (NetClient.class) {
+            synchronized (HttpClient.class) {
                 if (Utils.isNull(mRetrofit)) {
                     OkHttpClient okHttpClient = new OkHttpClient();
                     // config timeout
@@ -49,7 +49,7 @@ public class NetClient {
                     okHttpClient.networkInterceptors().add(new StethoInterceptor());
 
                     mRetrofit = new Retrofit.Builder()
-                            .baseUrl(ApiConstants.BASE_URL)
+                            .baseUrl(HttpConstants.BASE_URL)
                             .addConverterFactory(GsonConverterFactory.create())
                             .client(okHttpClient)
                             .build();
@@ -68,7 +68,7 @@ public class NetClient {
             Request.Builder reqBuilder = chain.request().newBuilder();
             reqBuilder.addHeader("Content-Type", "application/x-www-form-urlencoded")
                     .addHeader("User-Agent", "OAuth gem v0.4.4")
-                    .addHeader("Host", ApiConstants.HOST_NAME)
+                    .addHeader("Host", HttpConstants.HOST_NAME)
                     // how to generate twitter REST api's authorization?
                     // see{@link http://soupkodjou.com/implementing-twitter-oauth-in-java-step-by-step/6/}
                     .addHeader("Authorization",

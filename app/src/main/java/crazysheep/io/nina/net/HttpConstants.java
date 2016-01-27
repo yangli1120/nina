@@ -5,7 +5,7 @@ package crazysheep.io.nina.net;
  *
  * Created by crazysheep on 16/1/22.
  */
-public class ApiConstants {
+public class HttpConstants {
 
     public static final String BASE_URL = "https://api.twitter.com/1.1/";
     public static final String HOST_NAME = "api.twitter.com";
