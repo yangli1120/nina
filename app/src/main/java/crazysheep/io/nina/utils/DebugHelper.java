@@ -13,6 +13,8 @@ import crazysheep.io.nina.BuildConfig;
  */
 public class DebugHelper {
 
+    public static final String TAG = DebugHelper.class.getSimpleName();
+
     /**
      * show a toast
      * */
@@ -26,7 +28,7 @@ public class DebugHelper {
      * */
     public static void log(@NonNull String msg) {
         if(BuildConfig.DEBUG)
-            android.util.Log.d(DebugHelper.class.getSimpleName(), msg);
+            android.util.Log.i(TAG, msg);
     }
 
 }
