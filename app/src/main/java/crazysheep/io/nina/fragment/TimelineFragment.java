@@ -19,6 +19,7 @@ import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.net.ApiService;
 import crazysheep.io.nina.net.HttpCache;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
@@ -75,27 +76,34 @@ public class TimelineFragment extends BaseFragment {
                 requestTimeline(true);
             }
         });
+        mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                // TODO load next page tweets
+                DebugHelper.toast(getActivity(), "start load more");
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
     private void requestTimeline(boolean force) {
         int cacheType = force ? HttpCache.CacheConfig.CACHE_NO : HttpCache.CacheConfig.CACHE_IF_HIT;
 
-        DebugHelper.log("request force: " + force);
-        mHttp.getHomeTimeline(cacheType, 50).enqueue(new retrofit.Callback<List<TweetDto>>() {
+        mHttp.getHomeTimeline(cacheType, 50).enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onResponse(Response<List<TweetDto>> response, Retrofit retrofit) {
-                DebugHelper.log("request done: " + response.toString());
-                mTimelineRv.setRefreshing(false);
-
+            public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
                 mAdapter.setData(response.body());
+                mTimelineRv.setEnableLoadMore(true);
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                mTimelineRv.setRefreshing(false);
-
+            public void onFailed(Throwable t) {
                 L.d(t.toString());
+            }
+
+            @Override
+            public void onDone() {
+                mTimelineRv.setRefreshing(false);
             }
         });
     }
