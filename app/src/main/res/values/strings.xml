@@ -14,4 +14,6 @@
     <string name="time_hour_s">%shours</string>
     <string name="time_min">%smin</string>
     <string name="time_min_s">%smins</string>
+
+    <string name="err_load_failed">load failed</string>
 </resources>

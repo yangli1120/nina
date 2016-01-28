@@ -1,6 +1,5 @@
 package crazysheep.io.nina.fragment;
 
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +16,6 @@ import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.DebugHelper;
@@ -32,20 +30,16 @@ import retrofit.Retrofit;
  *
  * Created by crazysheep on 16/1/22.
  */
-public class TimelineFragment extends BaseFragment {
+public class TimelineFragment extends BaseNetworkFragment {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) SwipeRecyclerView mTimelineRv;
 
     private TimelineAdapter mAdapter;
 
-    private TwitterService mHttp;
-
     @Nullable
-    @SuppressWarnings("unchecked")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
         View contentView = inflater.inflate(R.layout.fragment_timeline, container, false);
         ButterKnife.bind(this, contentView);
 
@@ -53,13 +47,6 @@ public class TimelineFragment extends BaseFragment {
         requestTimeline(false);
 
         return contentView;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mHttp = mRetrofit.create(TwitterService.class);
     }
 
     private void initUI() {
@@ -98,6 +85,7 @@ public class TimelineFragment extends BaseFragment {
 
             @Override
             public void onFailed(Throwable t) {
+                showError();
                 L.d(t.toString());
             }
 
@@ -108,4 +96,8 @@ public class TimelineFragment extends BaseFragment {
         });
     }
 
+    @Override
+    protected void onErrorClick() {
+        requestTimeline(false);
+    }
 }

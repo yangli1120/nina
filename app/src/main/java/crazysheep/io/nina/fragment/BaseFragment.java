@@ -15,15 +15,11 @@ public class BaseFragment extends Fragment {
 
     public static String TAG = BaseFragment.class.getSimpleName();
 
-    protected Retrofit mRetrofit;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TAG = getClass().getSimpleName();
-
-        mRetrofit = HttpClient.getInstance();
     }
 
 }
