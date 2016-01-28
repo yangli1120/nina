@@ -55,18 +55,18 @@ public class HttpCache {
 
         public static final int DEFAULT_CACHE_FRESH_DURATION = 5 * 60; // cache fresh time is 5 minutes
 
-        public static final int CACHE_NO = -1; // response from network only, not cache
+        public static final int CACHE_NETWORK = -1; // response from network only, not cache
         public static final int CACHE_IF_HIT = 0; // if hit cache, response from cache, otherwise from network
         public static final int CACHE_FORCE = 1; // response only from cache, not network
 
         /**
          * make cache control from cacheType
          *
-         * @param cacheType CACHE_NO, CACHE_IF_HIT or CACHE_FORE.
+         * @param cacheType CACHE_NETWORK, CACHE_IF_HIT or CACHE_FORE.
          * */
         public static CacheControl getCacheControl(int cacheType) {
             switch (cacheType) {
-                case CACHE_NO: {
+                case CACHE_NETWORK: {
                     return CacheControl.FORCE_NETWORK;
                 }
 

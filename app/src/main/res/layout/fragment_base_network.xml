@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                style="@style/Widget.AppCompat.ProgressBar"/>
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar"/>
             <TextView
                 android:id="@id/_base_network_ft_loading_msg_tv"
                 android:layout_width="wrap_content"

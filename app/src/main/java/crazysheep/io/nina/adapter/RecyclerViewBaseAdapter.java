@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import crazysheep.io.nina.utils.Utils;
+
 /**
  * base adapter for RecyclerView
  *
@@ -51,6 +53,13 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
             mItems = new ArrayList<>();
 
         notifyDataSetChanged();
+    }
+
+    public void addData(List<DT> moreItems) {
+        if(!Utils.isNull(moreItems)) {
+            mItems.addAll(moreItems);
+            notifyDataSetChanged();
+        }
     }
 
     public List<DT> getData() {

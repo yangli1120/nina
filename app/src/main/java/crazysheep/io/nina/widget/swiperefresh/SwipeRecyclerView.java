@@ -72,6 +72,15 @@ public class SwipeRecyclerView extends SwipeRefreshBase<RecyclerView> {
         }
     };
 
+    @Override
+    public void setRefreshing(boolean refresh) {
+        super.setRefreshing(refresh);
+
+        // when start a new refresh action, reset mOldLoadMoreLastItemPos
+        // that mean we can previous load more action
+        mOldLoadMoreLastItemPos = -1;
+    }
+
     public void setEnableLoadMore(boolean enableLoadMore) {
         if(enableLoadMore)
             getRefreshableView().addOnScrollListener(mScrollListener);

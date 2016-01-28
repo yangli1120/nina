@@ -18,7 +18,6 @@ import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
@@ -31,6 +30,8 @@ import retrofit.Retrofit;
  * Created by crazysheep on 16/1/22.
  */
 public class TimelineFragment extends BaseNetworkFragment {
+
+    private static final int PAGE_SIZE = 20; // tweet count every request
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) SwipeRecyclerView mTimelineRv;
@@ -67,37 +68,60 @@ public class TimelineFragment extends BaseNetworkFragment {
             @Override
             public void onLoadMore() {
                 // TODO load next page tweets
-                DebugHelper.toast(getActivity(), "start load more");
+                requestTimelineNextPage();
             }
         });
     }
 
     @SuppressWarnings("unchecked")
     private void requestTimeline(boolean force) {
-        int cacheType = force ? HttpCache.CacheConfig.CACHE_NO : HttpCache.CacheConfig.CACHE_IF_HIT;
+        int cacheType = force ? HttpCache.CacheConfig.CACHE_NETWORK
+                : HttpCache.CacheConfig.CACHE_IF_HIT;
 
-        mHttp.getHomeTimeline(cacheType, 50).enqueue(new NiceCallback<List<TweetDto>>() {
-            @Override
-            public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
-                mAdapter.setData(response.body());
-                mTimelineRv.setEnableLoadMore(true);
-            }
+        mHttp.getHomeTimeline(cacheType, null, PAGE_SIZE)
+                .enqueue(new NiceCallback<List<TweetDto>>() {
+                    @Override
+                    public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+                        mAdapter.setData(response.body());
+                        mTimelineRv.setEnableLoadMore(true);
+                    }
 
-            @Override
-            public void onFailed(Throwable t) {
-                showError();
-                L.d(t.toString());
-            }
+                    @Override
+                    public void onFailed(Throwable t) {
+                        showError();
+                        L.d(t.toString());
+                    }
 
-            @Override
-            public void onDone() {
-                mTimelineRv.setRefreshing(false);
-            }
-        });
+                    @Override
+                    public void onDone() {
+                        mTimelineRv.setRefreshing(false);
+                    }
+                });
+    }
+
+    // load more
+    @SuppressWarnings("unchecked")
+    private void requestTimelineNextPage() {
+        TweetDto oldestTweetDto = (TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1);
+
+        mHttp.getHomeTimeline(HttpCache.CacheConfig.CACHE_NETWORK, oldestTweetDto.id, PAGE_SIZE)
+                .enqueue(new NiceCallback<List<TweetDto>>() {
+                    @Override
+                    public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+                        mAdapter.addData(response.body());
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                        showError();
+                        L.d(t.toString());
+                    }
+                });
     }
 
     @Override
     protected void onErrorClick() {
         requestTimeline(false);
     }
+
 }

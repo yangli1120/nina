@@ -30,6 +30,7 @@ public interface TwitterService {
     @GET("statuses/home_timeline.json")
     Call<List<TweetDto>> getHomeTimeline(
             @Header(CacheConfig.PARAM_CACHE_CONTROL) int cacheType,
+            @Query("max_id") Long maxId,
             @Query("count") Integer count);
 
 }
