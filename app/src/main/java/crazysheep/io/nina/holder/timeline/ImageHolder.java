@@ -1,6 +1,5 @@
 package crazysheep.io.nina.holder.timeline;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -27,8 +26,8 @@ public class ImageHolder extends BaseHolder implements GridGalleryLayout.OnChild
     @Bind(R.id.tweet_gallery_ggl) GridGalleryLayout imgsGgl;
     @Bind(R.id.tweet_content_tv) TextView contentTv;
 
-    public ImageHolder(@NonNull ViewGroup view, @NonNull Context context) {
-        super(view, context);
+    public ImageHolder(@NonNull ViewGroup view) {
+        super(view);
         ButterKnife.bind(this, view);
 
         // init imgsGgl's height reply to screen width

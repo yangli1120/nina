@@ -1,6 +1,5 @@
 package crazysheep.io.nina.holder.timeline;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,8 +18,8 @@ public class TxtHolder extends BaseHolder {
 
     @Bind(R.id.tweet_content_tv) TextView txtEtv;
 
-    public TxtHolder(@NonNull ViewGroup parent, @NonNull Context context) {
-        super(parent, context);
+    public TxtHolder(@NonNull ViewGroup parent) {
+        super(parent);
         ButterKnife.bind(this, parent);
     }
 

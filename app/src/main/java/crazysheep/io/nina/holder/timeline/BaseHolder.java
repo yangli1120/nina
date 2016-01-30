@@ -44,15 +44,16 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
     protected Context mContext;
     protected TweetDto mTweetDto;
 
-    public BaseHolder(@NonNull ViewGroup parent, @NonNull Context context) {
+    public BaseHolder(@NonNull ViewGroup parent) {
         super(parent);
-        View contentView = LayoutInflater.from(context).inflate(getContentViewRes(), parent, false);
+        View contentView = LayoutInflater.from(parent.getContext())
+                .inflate(getContentViewRes(), parent, false);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         contentFl = ButterKnife.findById(parent, R.id.tweet_content_fl);
         contentFl.addView(contentView, params);
 
-        mContext = context;
+        mContext = parent.getContext();
     }
 
     public abstract int getContentViewRes();

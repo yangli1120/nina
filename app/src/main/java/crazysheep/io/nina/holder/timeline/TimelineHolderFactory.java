@@ -27,15 +27,15 @@ public class TimelineHolderFactory {
     public static <T extends BaseHolder> T createHolder(@NonNull ViewGroup itemRoot, int viewType) {
         switch (viewType) {
             case TYPE_TXT: {
-                return (T) new TxtHolder(itemRoot, itemRoot.getContext());
+                return (T) new TxtHolder(itemRoot);
             }
 
             case TYPE_IMAGE: {
-                return (T) new ImageHolder(itemRoot, itemRoot.getContext());
+                return (T) new ImageHolder(itemRoot);
             }
 
             default:
-                return (T) new TxtHolder(itemRoot, itemRoot.getContext());
+                return (T) new TxtHolder(itemRoot);
         }
     }
 
