@@ -2,20 +2,26 @@ package crazysheep.io.nina.widget.imagegroup;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import crazysheep.io.nina.BuildConfig;
+
 /**
- * grid gallery widget for tweet
+ * grid gallery widget for tweet timeline
  *
  * Created by crazysheep on 16/1/28.
  */
-public class GridGalleryLayout extends ViewGroup {
+public class GridGalleryLayout extends ViewGroup implements View.OnClickListener {
 
     ///////////////////////////// listener for child recycler ///////////////////////
 
@@ -36,9 +42,13 @@ public class GridGalleryLayout extends ViewGroup {
         void onDetach(int position, ImageView view);
     }
 
+    public interface OnChildClickListener {
+        void onClick(int position, ImageView view);
+    }
+
     /////////////////////////////////////////////////////////////////////////////////
 
-    private final int DIVIDE_SPACE = InnerUtils.dp2Px(getContext(), 1); // margin 1dp between items
+    private final int DIVIDE_SPACE = InnerUtils.dp2Px(getContext(), 2); // margin 2dp between items
 
     // contain a ImageView pool for recycler use
     private static List<ImageView> mAllGalleryIvs = new ArrayList<>();
@@ -48,7 +58,10 @@ public class GridGalleryLayout extends ViewGroup {
     // one tweet max images count is 4
     private static final int MAX_COUNT = 4;
 
-    private OnChildLifeListener mListener;
+    private OnChildLifeListener mOnLifeListener;
+    private OnChildClickListener mOnClickListener;
+
+    private Paint mPaint = new Paint();
 
     public GridGalleryLayout(Context context) {
         super(context);
@@ -76,13 +89,21 @@ public class GridGalleryLayout extends ViewGroup {
     }
 
     private void init() {
+        mPaint.setTextSize(InnerUtils.dp2Px(getContext(), 14));
+        mPaint.setColor(Color.BLACK);
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeWidth(InnerUtils.dp2Px(getContext(), 2));
         // add one child by default
         if(!attachReuseChild(0))
             attachNewChild(0);
     }
 
     public void setOnChildLifeListener(OnChildLifeListener listener) {
-        mListener = listener;
+        mOnLifeListener = listener;
+    }
+
+    public void setOnChildClickListener(OnChildClickListener listener) {
+        mOnClickListener = listener;
     }
 
     /**
@@ -101,21 +122,31 @@ public class GridGalleryLayout extends ViewGroup {
                 notifyChildAttached(position, (ImageView) getChildAt(position));
             }
         } else if(getChildCount() > count) {
-            int removeCount = getChildCount() - count;
+            // notify exist child attach
+            for(int pos = 0; pos < count; pos++)
+                notifyChildAttached(pos, (ImageView)getChildAt(pos));
             // remove excess child
-            for(int position = getChildCount() - 1
-                ; getChildCount() - position <= removeCount; position--) {
+            for(int position = getChildCount() - 1; position > count - 1; position--) {
                 detachChild(position);
             }
             requestLayout();
+            invalidate();
         } else if(getChildCount() < count) {
+            // notify exist child attach
+            for(int pos = 0; pos < getChildCount(); pos++)
+                notifyChildAttached(pos, (ImageView)getChildAt(pos));
             // add more child
-            for(int position = getChildCount() - 1; position < count; position++) {
+            for(int position = getChildCount(); position < count; position++) {
                 if(!attachReuseChild(position))
                     attachNewChild(position);
             }
+            invalidate();
             requestLayout();
         }
+
+        // update child imageview's click listener
+        for(int pos = 0; pos < getChildCount(); pos++)
+            getChildAt(pos).setOnClickListener(this);
     }
 
     @Override
@@ -136,22 +167,38 @@ public class GridGalleryLayout extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         // layout child
         for(int position = 0; position < getChildCount(); position++)
-            layoutChild(position, l, t, r, b);
+            layoutChild(position, 0, 0, r - l, b - t);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        // for debug
+        if(BuildConfig.DEBUG)
+            canvas.drawText("child count: " + getChildCount(), 50, 50, mPaint);
     }
 
     private void layoutChild(int position, int l, int t, int r, int b) {
+        int top = t;
+        int left = l;
         int right = r;
         int bottom = b;
         if(getChildCount() == 2) {
-            right = position == 0 ? halfSize(r - l) : r;
+            right = position == 0 ? l + halfSize(r - l) : r;
+            left = position == 0 ? l : r - halfSize(r - l);
         } else if(getChildCount() == 3) {
-            right = position == 0 ? halfSize(r - l) : r;
-            bottom = position == 1 ? halfSize(b - t) : b;
+            right = position == 0 ? l + halfSize(r - l) : r;
+            left = position == 0 ? l : r - halfSize(r - l);
+            top = position == 2 ? b - halfSize(b - t) : t;
+            bottom = position == 1 ? t + halfSize(b - t) : b;
         } else if(getChildCount() == 4) {
-            right = position % 2 == 0 ? halfSize(r - l) : r;
-            bottom = position < 2 ? halfSize(b - t) : b;
+            right = position % 2 == 0 ? l + halfSize(r - l) : r;
+            left = position % 2 == 0 ? l : r - halfSize(r - l);
+            bottom = position < 2 ? t + halfSize(b - t) : b;
+            top = position < 2 ? t : b - halfSize(b - t);
         }
-        getChildAt(position).layout(l, t, right, bottom);
+        getChildAt(position).layout(left, top, right, bottom);
     }
 
     private int measureChildWidth(int position, int widthMeasureSpec) {
@@ -223,13 +270,27 @@ public class GridGalleryLayout extends ViewGroup {
     }
 
     private void notifyChildAttached(int position, ImageView child) {
-        if(mListener != null)
-            mListener.onAttach(position, child);
+        if(mOnLifeListener != null)
+            mOnLifeListener.onAttach(position, child);
     }
 
     private void notifyChildDetached(int position, ImageView child) {
-        if(mListener != null)
-            mListener.onDetach(position, child);
+        if(mOnLifeListener != null)
+            mOnLifeListener.onDetach(position, child);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(mOnClickListener != null)
+            mOnClickListener.onClick(indexOfChild(v), (ImageView) v);
+    }
+
+    /**
+     * if GridGalleryLayout not use, should release ImageViews pool
+     * */
+    public static void release() {
+        mAllGalleryIvs.clear();
+        mUsedMap.clear();
     }
 
 }

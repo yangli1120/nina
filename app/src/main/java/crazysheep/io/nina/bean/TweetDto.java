@@ -116,6 +116,8 @@ public class TweetDto implements BaseDto, Parcelable {
     public String created_at;
     @SerializedName("text")
     public String text;
+    @SerializedName("extended_entities")
+    public TweetEntitiesDto extended_entities;
     @SerializedName("retweet_count")
     public int retweet_count;
     @SerializedName("id")

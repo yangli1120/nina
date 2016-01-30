@@ -10,7 +10,7 @@ import android.util.TypedValue;
  *
  * Created by crazysheep on 16/1/27.
  */
-class SwipeRefreshUtils {
+class InnerUtils {
 
     /**
      * transform dp to px

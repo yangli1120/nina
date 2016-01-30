@@ -32,6 +32,8 @@ import retrofit.Retrofit;
 public class TimelineFragment extends BaseNetworkFragment {
 
     private static final int PAGE_SIZE = 20; // tweet count every request
+    private static final int NEXT_PAGE_SIZE = PAGE_SIZE + 1; // because twitter api will also return
+                                                             // max_id tweet
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) SwipeRecyclerView mTimelineRv;
@@ -67,7 +69,6 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                // TODO load next page tweets
                 requestTimelineNextPage();
             }
         });
@@ -104,10 +105,12 @@ public class TimelineFragment extends BaseNetworkFragment {
     private void requestTimelineNextPage() {
         TweetDto oldestTweetDto = (TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1);
 
-        mHttp.getHomeTimeline(HttpCache.CacheConfig.CACHE_NETWORK, oldestTweetDto.id, PAGE_SIZE)
+        mHttp.getHomeTimeline(HttpCache.CacheConfig.CACHE_NETWORK, oldestTweetDto.id,
+                        NEXT_PAGE_SIZE)
                 .enqueue(new NiceCallback<List<TweetDto>>() {
                     @Override
                     public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+                        response.body().remove(0); // remove repeat one
                         mAdapter.addData(response.body());
                     }
 

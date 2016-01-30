@@ -17,8 +17,7 @@ import android.widget.ProgressBar;
 public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<T> {
 
-    private static final int ITEM_TYPE_NORMAL = 0;
-    private static final int ITEM_TYPE_LOAD_MORE = 1;
+    private static final int ITEM_TYPE_LOAD_MORE = -9527;
 
     private boolean isEnableLoadMore = false;
 
@@ -81,22 +80,23 @@ public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
     @SuppressWarnings("unchecked")
     @Override
     public T onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(viewType == ITEM_TYPE_NORMAL)
-            return (T) mAdapter.onCreateViewHolder(parent, viewType);
-        else
+        if(viewType == ITEM_TYPE_LOAD_MORE)
             return (T) new LoadMoreViewHolder(createLoadMoreItemView());
+        else
+            return (T) mAdapter.createViewHolder(parent, viewType);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(T holder, int position) {
-        if(getItemViewType(position) == ITEM_TYPE_NORMAL)
+        if(getItemViewType(position) != ITEM_TYPE_LOAD_MORE)
             mAdapter.onBindViewHolder(holder, position);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == getItemCount() - 1 ? ITEM_TYPE_LOAD_MORE : ITEM_TYPE_NORMAL;
+        return position == getItemCount() - 1
+                ? ITEM_TYPE_LOAD_MORE : mAdapter.getItemViewType(position);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         FrameLayout loadMoreRoot = new FrameLayout(mContext);
         RecyclerView.LayoutParams parentParams = new RecyclerView.LayoutParams(
                 RecyclerView.LayoutParams.MATCH_PARENT,
-                SwipeRefreshUtils.dp2Px(mContext, 56) // load more item 56 dp height
+                InnerUtils.dp2Px(mContext, 56) // load more item 56 dp height
         );
         loadMoreRoot.setLayoutParams(parentParams);
         ProgressBar progressBar = new ProgressBar(mContext);

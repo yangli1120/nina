@@ -5,13 +5,19 @@
     <item name="toolbar" type="id" />
     <item name="data_rv" type="id" />
 
+    <!-- timeline view holder -->
+    <item name="view_holder_txt" type="id" />
+    <item name="view_holder_image" type="id" />
+    <item name="view_holder_gif" type="id" />
     <!-- timeline item -->
     <item name="author_avatar_iv" type="id" />
     <item name="author_name_tv" type="id" />
     <item name="author_screen_name_tv" type="id" />
     <item name="time_tv" type="id" />
-    <item name="tweet_content_etv" type="id" />
     <item name="tweet_content_fl" type="id" />
+    <item name="tweet_gallery_ggl" type="id" />
+    <item name="tweet_content_tv" type="id" />
+
     <item name="action_reply_ll" type="id" />
     <item name="action_reply_iv" type="id" />
     <item name="action_retweet_ll" type="id" />

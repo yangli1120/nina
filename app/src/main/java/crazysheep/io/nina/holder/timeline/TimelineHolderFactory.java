@@ -3,7 +3,9 @@ package crazysheep.io.nina.holder.timeline;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
+import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.utils.Utils;
 
 /**
  * timeline holder factory
@@ -12,7 +14,11 @@ import crazysheep.io.nina.bean.TweetDto;
  */
 public class TimelineHolderFactory {
 
-    public static final int TYPE_TXT = 1;
+    private static final String MEDIA_TYPE_PHOTO = "photo";
+
+    public static final int TYPE_TXT = R.id.view_holder_txt;
+    public static final int TYPE_IMAGE = R.id.view_holder_image;
+    public static final int TYPE_GIF = R.id.view_holder_image;
 
     /**
      * create view holder
@@ -24,6 +30,10 @@ public class TimelineHolderFactory {
                 return (T) new TxtHolder(itemRoot, itemRoot.getContext());
             }
 
+            case TYPE_IMAGE: {
+                return (T) new ImageHolder(itemRoot, itemRoot.getContext());
+            }
+
             default:
                 return (T) new TxtHolder(itemRoot, itemRoot.getContext());
         }
@@ -33,6 +43,11 @@ public class TimelineHolderFactory {
      * parse view holder type from tweet data
      * */
     public static int getViewType(@NonNull TweetDto tweetDto) {
+        if(!Utils.isNull(tweetDto.extended_entities)
+                && !Utils.isNull(tweetDto.extended_entities.media)
+                && MEDIA_TYPE_PHOTO.equals(tweetDto.extended_entities.media.get(0).type))
+            return TYPE_IMAGE;
+
         return TYPE_TXT;
     }
 

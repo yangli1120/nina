@@ -77,7 +77,7 @@ public class SwipeRecyclerView extends SwipeRefreshBase<RecyclerView> {
         super.setRefreshing(refresh);
 
         // when start a new refresh action, reset mOldLoadMoreLastItemPos
-        // that mean we can previous load more action
+        // that mean we cancel previous load more action
         mOldLoadMoreLastItemPos = -1;
     }
 

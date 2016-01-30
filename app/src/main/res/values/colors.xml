@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#2bb78e</color>
     <color name="colorAccent">#32b991</color>
 
+    <color name="place_holder_bg">#e1e8ed</color>
     <!-- day theme color -->
     <color name="color_day_text_primary">#878787</color>
     <color name="color_day_text_secondary">#c0c0c0</color>

@@ -3,8 +3,7 @@ package crazysheep.io.nina.holder.timeline;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
-
-import com.ms.square.android.expandabletextview.ExpandableTextView;
+import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -12,13 +11,13 @@ import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
 
 /**
- * txt tweet
+ * txt type tweet
  *
  * Created by crazysheep on 16/1/23.
  */
 public class TxtHolder extends BaseHolder {
 
-    @Bind(R.id.tweet_content_etv) ExpandableTextView txtEtv;
+    @Bind(R.id.tweet_content_tv) TextView txtEtv;
 
     public TxtHolder(@NonNull ViewGroup parent, @NonNull Context context) {
         super(parent, context);
@@ -36,4 +35,5 @@ public class TxtHolder extends BaseHolder {
 
         txtEtv.setText(tweetDto.text);
     }
+
 }

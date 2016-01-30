@@ -42,6 +42,7 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.action_like_count_tv) TextView likeCountTv;
 
     protected Context mContext;
+    protected TweetDto mTweetDto;
 
     public BaseHolder(@NonNull ViewGroup parent, @NonNull Context context) {
         super(parent);
@@ -60,6 +61,8 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
      * base holder implement common ui, sub-holder implement itself ui
      * */
     public void bindData(int position, @NonNull TweetDto tweetDto) {
+        mTweetDto = tweetDto;
+
         /* top header */
         // cancel before image load request if need
         Glide.clear(avatarIv);
