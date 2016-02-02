@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="240dp"
     android:orientation="vertical"
-    android:background="?colorAccent">
-</LinearLayout>
+    android:background="@drawable/nav_header_bg">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@id/avatar_iv"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="36dp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:id="@id/user_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_19"
+            android:textColor="@android:color/white"/>
+        <TextView
+            android:id="@id/user_screen_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_14"
+            android:textColor="@color/white_grey_light"/>
+    </LinearLayout>
+</android.support.percent.PercentFrameLayout>

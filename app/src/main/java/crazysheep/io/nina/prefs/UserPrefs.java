@@ -14,6 +14,8 @@ public class UserPrefs extends BasePrefs {
     public static final String PREFS_NAME = "nina.user";
 
     public static final String KEY_USER_NAME = "key_user_name";
+    public static final String KEY_USER_SCREEN_NAME = "key_user_screen_name";
+    public static final String KEY_USER_AVATAR = "key_user_avatar";
     public static final String KEY_ID = "key_id";
     public static final String KEY_SECRET = "key_secret";
     public static final String KEY_AUTH_TOKEN = "key_auth_token";
@@ -28,6 +30,22 @@ public class UserPrefs extends BasePrefs {
 
     public final String getUsername() {
         return getString(KEY_USER_NAME, null);
+    }
+
+    public final void setUserScreenName(String screenName) {
+        setString(KEY_USER_SCREEN_NAME, screenName);
+    }
+
+    public final String getUserScreenName() {
+        return getString(KEY_USER_SCREEN_NAME, null);
+    }
+
+    public final void setUserAvatar(String avatarUrl) {
+        setString(KEY_USER_AVATAR, avatarUrl);
+    }
+
+    public final String getUserAvatar() {
+        return getString(KEY_USER_AVATAR, null);
     }
 
     public final void setId(long id) {
@@ -56,7 +74,7 @@ public class UserPrefs extends BasePrefs {
 
     public boolean isLogin() {
         return !TextUtils.isEmpty(getAuthToken()) && !TextUtils.isEmpty(getSecret())
-                && !TextUtils.isEmpty(getUsername()) && getId() > 0;
+                && !TextUtils.isEmpty(getUserScreenName()) && getId() > 0;
     }
 
 }

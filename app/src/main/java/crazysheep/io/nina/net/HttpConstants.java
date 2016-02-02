@@ -10,6 +10,12 @@ public class HttpConstants {
     public static final String BASE_URL = "https://api.twitter.com/1.1/";
     public static final String HOST_NAME = "api.twitter.com";
 
+    ////////////////////// http status code ///////////////////////////////
+
+    public static final int CODE_200 = 200; // every thing is OK
+    public static final int code_404 = 404; // Not Found
+    public static final int code_403 = 403; // Forbidden
+
     ////////////////////// twitter api request header params //////////////////////////
 
     // generate at twitter offical website

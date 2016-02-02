@@ -3,6 +3,7 @@ package crazysheep.io.nina.net;
 import java.util.List;
 
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import retrofit.Call;
 import retrofit.http.GET;
@@ -17,6 +18,8 @@ import retrofit.http.Query;
 public interface TwitterService {
 
     /**
+     * get user timeline
+     *
      * @param cacheType See {@link CacheConfig}
      * */
     @GET("statuses/user_timeline.json")
@@ -27,10 +30,25 @@ public interface TwitterService {
             @Query("max_id") Long maxId
     );
 
+    /**
+     * get user home timeline
+     * */
     @GET("statuses/home_timeline.json")
     Call<List<TweetDto>> getHomeTimeline(
             @Header(CacheConfig.PARAM_CACHE_CONTROL) int cacheType,
             @Query("max_id") Long maxId,
             @Query("count") Integer count);
+
+    /**
+     * get target user's profile info
+     * */
+    @GET("users/show")
+    Call<UserDto> getUserInfo(@Query("screen_name") String screenName);
+
+    /**
+     * verify if account is credential
+     * */
+    @GET("account/verify_credentials")
+    void getUserVerify(@Query("include_email") String email);
 
 }

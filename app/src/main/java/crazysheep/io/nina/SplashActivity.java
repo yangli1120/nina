@@ -82,7 +82,7 @@ public class SplashActivity extends BaseActivity {
                         + ", token: " + result.data.getAuthToken().token
                         + ", secret: " + result.data.getAuthToken().secret);
 
-                mUserPrefs.setUsername(result.data.getUserName());
+                mUserPrefs.setUserScreenName(result.data.getUserName());
                 mUserPrefs.setId(result.data.getId());
                 mUserPrefs.setAuthToken(result.data.getAuthToken().token);
                 mUserPrefs.setSecret(result.data.getAuthToken().secret);

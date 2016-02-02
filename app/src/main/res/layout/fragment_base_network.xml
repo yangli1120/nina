@@ -31,9 +31,19 @@
                 android:textColor="?color_text_primary"/>
         </LinearLayout>
     </FrameLayout>
-    <ViewStub
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@id/_base_network_ft_error_stub"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout="@layout/layout_network_error"/>
+        android:visibility="gone"
+        android:background="@android:color/white">
+
+        <TextView
+            android:id="@id/_base_network_ft_error_msg_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/text_14"
+            android:textColor="?color_text_primary"/>
+    </FrameLayout>
 </FrameLayout>

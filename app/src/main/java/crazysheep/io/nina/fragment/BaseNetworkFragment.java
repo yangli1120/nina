@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -31,7 +30,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
     private FrameLayout mContentFl;
     private FrameLayout mLoadingFl;
     private TextView mLoadingMsgTv;
-    private ViewStub mErrorVs;
+    private FrameLayout mErrorFl;
     private TextView mErrorMsgTv;
 
     protected TwitterService mHttp;
@@ -50,7 +49,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
         mContentFl = ButterKnife.findById(rootView, R.id._base_network_ft_content_fl);
         mLoadingFl = ButterKnife.findById(rootView, R.id._base_network_ft_loading_fl);
         mLoadingMsgTv = ButterKnife.findById(rootView, R.id._base_network_ft_loading_msg_tv);
-        mErrorVs = ButterKnife.findById(rootView, R.id._base_network_ft_error_stub);
+        mErrorFl = ButterKnife.findById(rootView, R.id._base_network_ft_error_stub);
         mErrorMsgTv = ButterKnife.findById(rootView, R.id._base_network_ft_error_msg_tv);
 
         View contentView = onCreateView(inflater, container);
@@ -82,7 +81,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
     protected final void showLoading(String loadingMsg) {
         mCurState = STATE_LOADING;
 
-        mErrorVs.setVisibility(View.GONE);
+        mErrorFl.setVisibility(View.GONE);
 
         mLoadingFl.setVisibility(View.VISIBLE);
         if(!TextUtils.isEmpty(loadingMsg))
@@ -104,14 +103,14 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
 
         mLoadingFl.setVisibility(View.GONE);
 
-        mErrorVs.setVisibility(View.VISIBLE);
+        mErrorFl.setVisibility(View.VISIBLE);
         mErrorMsgTv.setText(!TextUtils.isEmpty(err) ? err : getString(R.string.err_load_failed));
     }
 
     protected final void hideError() {
         mCurState = STATE_IDLE;
 
-        mErrorVs.setVisibility(View.GONE);
+        mErrorFl.setVisibility(View.GONE);
     }
 
     /* invoke when click error msg TextView */

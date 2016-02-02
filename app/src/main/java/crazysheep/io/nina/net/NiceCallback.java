@@ -1,5 +1,6 @@
 package crazysheep.io.nina.net;
 
+import crazysheep.io.nina.utils.Utils;
 import retrofit.Response;
 import retrofit.Retrofit;
 
@@ -12,7 +13,13 @@ public abstract class NiceCallback<T> implements retrofit.Callback<T> {
 
     @Override
     public void onResponse(Response<T> response, Retrofit retrofit) {
-        onRespond(response, retrofit);
+        if(response.code() == HttpConstants.CODE_200)
+            onRespond(response, retrofit);
+        else
+            onFailed(new Throwable("request failed, status code: " + response.code()
+                    + ", response header: " + response.headers().toString()
+                    + ", response body: " + (Utils.isNull(response.body())
+                            ? null : response.body().toString())));
         onDone();
     }
 
