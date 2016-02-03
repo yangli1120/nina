@@ -120,7 +120,8 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
                 ActivityUtils.start(mContext,
                         ActivityUtils.prepare(mContext, ProfileActivity.class)
                                 .putExtra(BundleConstants.EXTRA_USER_SCREEN_NAME,
-                                        mTweetDto.user.screen_name));
+                                        mTweetDto.user.screen_name)
+                                .putExtra(BundleConstants.EXTRA_USER_NAME, mTweetDto.user.name));
             }break;
         }
     }

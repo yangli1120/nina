@@ -4,6 +4,15 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <dimen name="final_image_width">32dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="profile_avatar_big_width">80dp</dimen>
+
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_10">10dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+
     <!-- text size -->
     <dimen name="text_56">56sp</dimen>
     <dimen name="text_14">14sp</dimen>

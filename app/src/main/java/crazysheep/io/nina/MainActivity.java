@@ -147,7 +147,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         ActivityUtils.start(getActivity(),
                                 ActivityUtils.prepare(getActivity(), ProfileActivity.class)
                                         .putExtra(BundleConstants.EXTRA_USER_SCREEN_NAME,
-                                                mUserPrefs.getUserScreenName()));
+                                                mUserPrefs.getUserScreenName())
+                                        .putExtra(BundleConstants.EXTRA_USER_NAME,
+                                                mUserPrefs.getUsername()));
                     }
                 });
             }break;

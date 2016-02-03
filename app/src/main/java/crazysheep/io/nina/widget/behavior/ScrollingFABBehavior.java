@@ -1,4 +1,4 @@
-package crazysheep.io.nina.widget.fab;
+package crazysheep.io.nina.widget.behavior;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;

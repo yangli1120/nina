@@ -15,6 +15,10 @@
     <item name="avatar_iv" type="id" />
     <item name="user_name_tv" type="id" />
     <item name="user_screen_name_tv" type="id" />
+    <item name="user_introduction_tv" type="id" />
+    <item name="user_location_tv" type="id" />
+    <item name="follower_tv" type="id" />
+    <item name="following_tv" type="id" />
     <!-- timeline view holder -->
     <item name="view_holder_txt" type="id" />
     <item name="view_holder_image" type="id" />

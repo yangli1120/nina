@@ -4,7 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="screen_name">\@%s</string>
+    <string name="screen_name">\@ %s</string>
     <string name="time_just_now">just now</string>
     <string name="time_month">%smonth</string>
     <string name="time_month_s">%smonths</string>
@@ -22,4 +22,7 @@
     <string name="profile_tab_tweet">tweet</string>
     <string name="profile_tab_media">media</string>
     <string name="profile_tab_like">like</string>
+    <string name="profile_follower">%s follower</string>
+    <string name="profile_follower_s">%s followers</string>
+    <string name="profile_following">%s following</string>
 </resources>
