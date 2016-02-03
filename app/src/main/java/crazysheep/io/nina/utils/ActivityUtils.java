@@ -3,7 +3,9 @@ package crazysheep.io.nina.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 
 import crazysheep.io.nina.R;
 
@@ -47,6 +49,16 @@ public class ActivityUtils {
                                    @NonNull Intent intent) {
         activity.startActivityForResult(intent, requestCode);
         activity.overridePendingTransition(R.anim.slide_left_in, 0);
+    }
+
+    /**
+     * new a fragment instance
+     * */
+    @SuppressWarnings("unchecked")
+    public static <T extends Fragment> T newFragment(
+            @NonNull Context context, @NonNull Class<T> clazz,
+            Bundle bundle) {
+        return (T)Fragment.instantiate(context, clazz.getName(), bundle);
     }
 
 }

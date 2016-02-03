@@ -3,6 +3,7 @@ package crazysheep.io.nina;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -14,11 +15,13 @@ import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.HttpConstants;
 import crazysheep.io.nina.prefs.UserPrefs;
-import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Observable;
@@ -137,9 +140,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.avatar_iv: {
-                // TODO jump to my profile
-                DebugHelper.toast(this, "click avatar");
+                mDrawer.closeDrawer(GravityCompat.START);
+                RxWorker.delayOnUI(this, 300, new Runnable() {
+                    @Override
+                    public void run() {
+                        ActivityUtils.start(getActivity(),
+                                ActivityUtils.prepare(getActivity(), ProfileActivity.class)
+                                        .putExtra(BundleConstants.EXTRA_USER_SCREEN_NAME,
+                                                mUserPrefs.getUserScreenName()));
+                    }
+                });
             }break;
         }
     }
+
 }

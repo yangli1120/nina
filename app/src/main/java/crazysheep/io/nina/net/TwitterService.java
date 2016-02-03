@@ -25,8 +25,8 @@ public interface TwitterService {
     @GET("statuses/user_timeline.json")
     Call<List<TweetDto>> getUserTimeline(
             @Header(CacheConfig.PARAM_CACHE_CONTROL) int cacheType,
-            @Query("user_id") Long userId, @Query("screen_name") String screenName,
-            @Query("since_id") Long sinceId, @Query("count") Integer count,
+            @Query("screen_name") String screenName,
+            @Query("count") Integer count,
             @Query("max_id") Long maxId
     );
 

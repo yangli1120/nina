@@ -4,6 +4,12 @@
     <item name="appbar" type="id"/>
     <item name="toolbar" type="id" />
     <item name="data_rv" type="id" />
+    <item name="data_swipe_rv" type="id" />
+    <item name="collapsing_toolbar" type="id" />
+    <item name="parallax_header_iv" type="id" />
+    <item name="action_fab" type="id" />
+    <item name="tabs" type="id" />
+    <item name="content_vp" type="id" />
 
     <!-- profile -->
     <item name="avatar_iv" type="id" />
@@ -35,4 +41,5 @@
     <item name="_base_network_ft_loading_fl" type="id" />
     <item name="_base_network_ft_loading_msg_tv" type="id" />
     <item name="_base_network_ft_error_stub" type="id" />
+
 </resources>

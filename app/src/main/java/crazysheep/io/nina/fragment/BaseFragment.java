@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import crazysheep.io.nina.net.HttpClient;
-import retrofit.Retrofit;
+import crazysheep.io.nina.net.TwitterService;
 
 /**
  * base fragment
@@ -13,13 +13,27 @@ import retrofit.Retrofit;
  */
 public class BaseFragment extends Fragment {
 
+    ////////////////////////////// interface //////////////////////////////////////
+
+    /**
+     * if fragment need request twitter service, implement this fragment
+     * */
+    public interface INetworkFragment {}
+
+    //////////////////////////////////////////////////////////////////////////////
+
     public static String TAG = BaseFragment.class.getSimpleName();
+
+    protected TwitterService mTwitter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         TAG = getClass().getSimpleName();
+
+        if(this instanceof INetworkFragment)
+            mTwitter = HttpClient.getInstance().create(TwitterService.class);
     }
 
 }

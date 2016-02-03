@@ -14,7 +14,7 @@ import android.widget.ProgressBar;
  *
  * Created by crazysheep on 16/1/27.
  */
-public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
+public class LoadMoreRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<T> {
 
     private static final int ITEM_TYPE_LOAD_MORE = -9527;
@@ -62,8 +62,8 @@ public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         }
     };
 
-    public SwipeRecyclerViewAdapter(@NonNull Context context, @NonNull RecyclerView.Adapter son,
-                                    boolean enableLoadMore) {
+    public LoadMoreRecyclerViewAdapter(@NonNull Context context, @NonNull RecyclerView.Adapter son,
+                                       boolean enableLoadMore) {
         mContext = context;
         mAdapter = son; // yes, ur my son
         mAdapter.registerAdapterDataObserver(mObserver);
@@ -72,9 +72,10 @@ public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
     }
 
     public void setLoadMore(boolean enableLoadMore) {
-        if(isEnableLoadMore != enableLoadMore)
+        if(isEnableLoadMore != enableLoadMore) {
+            isEnableLoadMore = enableLoadMore;
             notifyDataSetChanged();
-        isEnableLoadMore = enableLoadMore;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -95,8 +96,11 @@ public class SwipeRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        return position == getItemCount() - 1
-                ? ITEM_TYPE_LOAD_MORE : mAdapter.getItemViewType(position);
+        if(isEnableLoadMore)
+            return position == getItemCount() - 1
+                    ? ITEM_TYPE_LOAD_MORE : mAdapter.getItemViewType(position);
+        else
+            return mAdapter.getItemViewType(position);
     }
 
     @Override

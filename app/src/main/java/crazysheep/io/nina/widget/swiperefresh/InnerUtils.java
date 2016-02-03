@@ -12,6 +12,10 @@ import android.util.TypedValue;
  */
 class InnerUtils {
 
+    public static boolean isNull(Object obj) {
+        return null == obj;
+    }
+
     /**
      * transform dp to px
      * */

@@ -14,8 +14,11 @@ import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.TimeUtils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -25,7 +28,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  *
  * Created by crazysheep on 16/1/23.
  */
-public abstract class BaseHolder extends RecyclerView.ViewHolder {
+public abstract class BaseHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
     @Bind(R.id.author_name_tv) TextView authorNameTv;
@@ -71,10 +74,13 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
         Glide.with(mContext)
                 .load(tweetDto.user.profile_image_url_https)
                 .into(avatarIv);
+        avatarIv.setOnClickListener(this);
 
         authorNameTv.setText(tweetDto.user.name);
+        authorNameTv.setOnClickListener(this);
         authorScreenNameTv.setText(mContext.getString(R.string.screen_name,
                 tweetDto.user.screen_name));
+        authorScreenNameTv.setOnClickListener(this);
         timeTv.setText(TimeUtils.formatTimestamp(mContext,
                 TimeUtils.getTimeFromDate(tweetDto.created_at.trim())));
 
@@ -105,4 +111,17 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder {
                 ? R.drawable.ic_favorite_black : R.drawable.ic_un_favorite_grey);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.author_avatar_iv:
+            case R.id.author_name_tv:
+            case R.id.author_screen_name_tv: {
+                ActivityUtils.start(mContext,
+                        ActivityUtils.prepare(mContext, ProfileActivity.class)
+                                .putExtra(BundleConstants.EXTRA_USER_SCREEN_NAME,
+                                        mTweetDto.user.screen_name));
+            }break;
+        }
+    }
 }

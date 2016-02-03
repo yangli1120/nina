@@ -13,7 +13,7 @@ import android.util.AttributeSet;
  */
 public class SwipeRecyclerView extends SwipeRefreshBase<RecyclerView> {
 
-    private SwipeRecyclerViewAdapter mSwipeRefreshAdapter;
+    private LoadMoreRecyclerViewAdapter mSwipeRefreshAdapter;
 
     public SwipeRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -41,7 +41,7 @@ public class SwipeRecyclerView extends SwipeRefreshBase<RecyclerView> {
     }
 
     public void setAdapter(@NonNull RecyclerView.Adapter adapter) {
-        mSwipeRefreshAdapter = new SwipeRecyclerViewAdapter(getContext(), adapter, enableLoadMore);
+        mSwipeRefreshAdapter = new LoadMoreRecyclerViewAdapter(getContext(), adapter, enableLoadMore);
         getRefreshableView().setAdapter(mSwipeRefreshAdapter);
     }
 

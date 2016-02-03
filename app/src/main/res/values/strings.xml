@@ -16,4 +16,10 @@
     <string name="time_min_s">%smins</string>
 
     <string name="err_load_failed">load failed</string>
+
+    <!-- profile -->
+    <string name="profile_title">profile</string>
+    <string name="profile_tab_tweet">tweet</string>
+    <string name="profile_tab_media">media</string>
+    <string name="profile_tab_like">like</string>
 </resources>

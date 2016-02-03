@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.TwitterService;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -16,9 +18,24 @@ import pub.devrel.easypermissions.EasyPermissions;
  */
 public class BaseActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
+    //////////////////////////// api ////////////////////////////////
+
+    /**
+     * if current activity need request network service, implement this interface,
+     * then BaseActivity will init TwitterService instance
+     * */
+    public interface ITwitterServiceActivity {}
+
+    /////////////////////////////////////////////////////////////////
+
+    protected TwitterService mTwitter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(this instanceof ITwitterServiceActivity)
+            mTwitter = HttpClient.getInstance().create(TwitterService.class);
     }
 
     protected final Activity getActivity() {
