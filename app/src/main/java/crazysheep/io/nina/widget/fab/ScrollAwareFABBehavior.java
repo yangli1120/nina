@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package crazysheep.io.nina.widget;
+package crazysheep.io.nina.widget.fab;
 
 import android.content.Context;
 import android.os.Build;
