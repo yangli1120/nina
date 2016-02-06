@@ -35,6 +35,7 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
     @Bind(R.id.author_screen_name_tv) TextView authorScreenNameTv;
     @Bind(R.id.time_tv) TextView timeTv;
     @Bind(R.id.tweet_content_fl) FrameLayout contentFl;
+    @Bind(R.id.tweet_content_tv) TextView mContentTv;
     @Bind(R.id.action_reply_ll) View replyLl;
     @Bind(R.id.action_reply_iv) ImageView replyIv;
     @Bind(R.id.action_retweet_ll) View retweetLl;
@@ -85,6 +86,7 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
                 TimeUtils.getTimeFromDate(tweetDto.created_at.trim())));
 
         /* content layout should be render by sub-holder */
+        mContentTv.setText(tweetDto.text);
 
         /* bottom action bar */
         replyLl.setOnClickListener(new View.OnClickListener() {
@@ -125,4 +127,5 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
             }break;
         }
     }
+
 }

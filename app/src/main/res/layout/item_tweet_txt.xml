@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-    android:id="@id/tweet_content_tv"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
-    android:paddingTop="8dp"
-    android:textSize="@dimen/text_14"
-    android:textColor="?color_text_primary"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+<View xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="0dp"/>

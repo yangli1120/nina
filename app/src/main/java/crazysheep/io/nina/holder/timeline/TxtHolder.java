@@ -16,8 +16,6 @@ import crazysheep.io.nina.bean.TweetDto;
  */
 public class TxtHolder extends BaseHolder {
 
-    @Bind(R.id.tweet_content_tv) TextView txtEtv;
-
     public TxtHolder(@NonNull ViewGroup parent) {
         super(parent);
         ButterKnife.bind(this, parent);
@@ -31,8 +29,6 @@ public class TxtHolder extends BaseHolder {
     @Override
     public void bindData(int position, @NonNull TweetDto tweetDto) {
         super.bindData(position, tweetDto);
-
-        txtEtv.setText(tweetDto.text);
     }
 
 }

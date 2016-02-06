@@ -50,6 +50,19 @@ public class TweetMediaDto implements BaseDto, Parcelable {
                             "resize": "fit"
                         }
                     }
+                    "video_info": {
+                        "aspect_ratio": [
+                            4,
+                            3
+                        ],
+                        "variants": [
+                            {
+                                "bitrate": 0,
+                                "content_type": "video/mp4",
+                                "url": "https://pbs.twimg.com/tweet_video/Cacz1wkXEAAQWr2.mp4"
+                            }
+                        ]
+                    }
                 }
     * */
 
@@ -67,6 +80,8 @@ public class TweetMediaDto implements BaseDto, Parcelable {
     public String expanded_url;
     @SerializedName("type")
     public String type;
+    @SerializedName("video_info")
+    public VideoInfoDto video_info;
 
     ////////////////////////// Parcelable /////////////////////////////
 

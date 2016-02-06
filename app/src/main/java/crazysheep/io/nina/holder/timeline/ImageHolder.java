@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -24,7 +23,6 @@ public class ImageHolder extends BaseHolder implements GridGalleryLayout.OnChild
         GridGalleryLayout.OnChildClickListener{
 
     @Bind(R.id.tweet_gallery_ggl) GridGalleryLayout imgsGgl;
-    @Bind(R.id.tweet_content_tv) TextView contentTv;
 
     public ImageHolder(@NonNull ViewGroup view) {
         super(view);
@@ -56,7 +54,6 @@ public class ImageHolder extends BaseHolder implements GridGalleryLayout.OnChild
         imgsGgl.setOnChildLifeListener(this);
         imgsGgl.setItemCount(tweetDto.extended_entities.media.size());
         imgsGgl.setOnChildClickListener(this);
-        contentTv.setText(tweetDto.text);
     }
 
     @Override

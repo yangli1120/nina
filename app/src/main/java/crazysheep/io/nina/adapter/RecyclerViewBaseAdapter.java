@@ -30,6 +30,12 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         boolean onItemLongClick(View view, int position);
     }
 
+    public interface OnViewHolderLifeCallback<VH extends RecyclerView.ViewHolder> {
+        void onViewRecycled(VH holder);
+        void onViewAttached(VH holder);
+        void onViewDetached(VH holder);
+    }
+
     //////////////////////////////////////////////////////
 
     protected Context mContext;
@@ -111,10 +117,26 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
     public abstract void onBindViewHolder(VH holder, int position);
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onViewRecycled(VH holder) {
-        super.onViewRecycled(holder);
-
         updateClickListener(holder);
+
+        if(holder instanceof OnViewHolderLifeCallback)
+            ((OnViewHolderLifeCallback)holder).onViewRecycled(holder);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onViewDetachedFromWindow(VH holder) {
+        if(holder instanceof OnViewHolderLifeCallback)
+            ((OnViewHolderLifeCallback)holder).onViewDetached(holder);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onViewAttachedToWindow(VH holder) {
+        if(holder instanceof OnViewHolderLifeCallback)
+            ((OnViewHolderLifeCallback)holder).onViewAttached(holder);
     }
 
     @Override

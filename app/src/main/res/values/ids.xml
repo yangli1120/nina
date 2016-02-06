@@ -31,6 +31,9 @@
     <item name="tweet_content_fl" type="id" />
     <item name="tweet_gallery_ggl" type="id" />
     <item name="tweet_content_tv" type="id" />
+    <item name="tweet_video_vv" type="id" />
+    <item name="tweet_video_fl" type="id" />
+    <item name="tweet_gif_label_tv" type="id" />
 
     <item name="action_reply_ll" type="id" />
     <item name="action_reply_iv" type="id" />

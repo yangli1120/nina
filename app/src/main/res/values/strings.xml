@@ -25,4 +25,7 @@
     <string name="profile_follower">%s follower</string>
     <string name="profile_follower_s">%s followers</string>
     <string name="profile_following">%s following</string>
+
+    <!-- timeline -->
+    <string name="tag_gif">Gif</string>
 </resources>

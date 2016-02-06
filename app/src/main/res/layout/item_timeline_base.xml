@@ -61,6 +61,14 @@
                 android:textColor="?color_text_secondary"/>
         </RelativeLayout>
         <!-- container of tweet's content -->
+        <TextView
+            android:id="@id/tweet_content_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textSize="@dimen/text_14"
+            android:textColor="?color_text_primary"/>
         <FrameLayout
             android:id="@id/tweet_content_fl"
             android:layout_width="match_parent"

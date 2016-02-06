@@ -108,6 +108,33 @@ public class LoadMoreRecyclerViewAdapter<T extends RecyclerView.ViewHolder>
         return isEnableLoadMore ? mAdapter.getItemCount() + 1 : mAdapter.getItemCount();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onViewRecycled(T holder) {
+        super.onViewRecycled(holder);
+
+        if(!(holder instanceof LoadMoreViewHolder))
+            mAdapter.onViewRecycled(holder);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onViewAttachedToWindow(T holder) {
+        super.onViewAttachedToWindow(holder);
+
+        if(!(holder instanceof LoadMoreViewHolder))
+            mAdapter.onViewAttachedToWindow(holder);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onViewDetachedFromWindow(T holder) {
+        super.onViewDetachedFromWindow(holder);
+
+        if(!(holder instanceof LoadMoreViewHolder))
+            mAdapter.onViewDetachedFromWindow(holder);
+    }
+
     private FrameLayout createLoadMoreItemView() {
         FrameLayout loadMoreRoot = new FrameLayout(mContext);
         RecyclerView.LayoutParams parentParams = new RecyclerView.LayoutParams(

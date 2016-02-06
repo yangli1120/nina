@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/tweet_video_fl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <VideoView
+        android:id="@id/tweet_video_vv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <TextView
+        android:id="@id/tweet_gif_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/label_bg"
+        android:layout_marginLeft="@dimen/space_4"
+        android:layout_marginBottom="@dimen/space_4"
+        android:textSize="@dimen/text_12"
+        android:text="@string/tag_gif"
+        android:textColor="?color_text_secondary"/>
+</FrameLayout>

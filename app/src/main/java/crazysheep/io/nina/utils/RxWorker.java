@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * rx worker
@@ -39,4 +40,5 @@ public class RxWorker extends Utils {
                     }
                 });
     }
+
 }
