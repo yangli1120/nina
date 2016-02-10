@@ -80,6 +80,8 @@ public class TweetMediaDto implements BaseDto, Parcelable {
     public String expanded_url;
     @SerializedName("type")
     public String type;
+    @SerializedName("sizes")
+    public MediaSizesDto sizes;
     @SerializedName("video_info")
     public VideoInfoDto video_info;
 

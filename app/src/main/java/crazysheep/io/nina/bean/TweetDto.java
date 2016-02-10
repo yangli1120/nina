@@ -2,9 +2,12 @@ package crazysheep.io.nina.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
+
+import crazysheep.io.nina.utils.Utils;
 
 /**
  * tweet data
@@ -13,6 +16,16 @@ import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
  */
 @ParcelablePlease
 public class TweetDto implements BaseDto, Parcelable {
+
+    ////////////////////////// api ////////////////////////
+
+    public boolean isPhoto() {
+        return !Utils.isNull(extended_entities) && !Utils.isNull(extended_entities.media)
+                && !Utils.isNull(extended_entities.media.get(0))
+                && "photo".equals(extended_entities.media.get(0).type);
+    }
+
+    ///////////////////////////////////////////////////////
 
     /*
     *  {

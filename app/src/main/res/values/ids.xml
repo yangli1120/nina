@@ -19,6 +19,7 @@
     <item name="user_location_tv" type="id" />
     <item name="follower_tv" type="id" />
     <item name="following_tv" type="id" />
+    <item name="tweet_img_iv" type="id" />
     <!-- timeline view holder -->
     <item name="view_holder_txt" type="id" />
     <item name="view_holder_image" type="id" />
