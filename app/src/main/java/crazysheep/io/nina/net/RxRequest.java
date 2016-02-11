@@ -28,11 +28,7 @@ public class RxRequest {
         void onFailed(Throwable t);
     }
 
-    /**
-     * request user info
-     * */
-    public static void showUser(@NonNull Context context, @NonNull final String screenName,
-                                @NonNull final RxRequestCallback<User> callback) {
+    private static Twitter getTwitter(@NonNull Context context) {
         final UserPrefs mUserPrefs = new UserPrefs(context);
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(false)
@@ -41,7 +37,15 @@ public class RxRequest {
                 .setOAuthAccessToken(mUserPrefs.getAuthToken())
                 .setOAuthAccessTokenSecret(mUserPrefs.getSecret());
         TwitterFactory tf = new TwitterFactory(cb.build());
-        final Twitter twitter = tf.getInstance();
+        return tf.getInstance();
+    }
+
+    /**
+     * request user info
+     * */
+    public static void showUser(@NonNull Context context, @NonNull final String screenName,
+                                @NonNull final RxRequestCallback<User> callback) {
+        final Twitter twitter = getTwitter(context);
 
         Observable.just(twitter)
                 .map(new Func1<Twitter, User>() {

@@ -40,6 +40,14 @@ public interface TwitterService {
             @Query("count") Integer count);
 
     /**
+     * get user favorite tweets timeline
+     * */
+    @GET("favorites/list")
+    Call<List<TweetDto>> getFavoritesTimeline(
+            @Query("screen_name") String screenName, @Query("max_id") Long maxId,
+            @Query("count") Integer count);
+
+    /**
      * get target user's profile info
      * */
     @GET("users/show")
