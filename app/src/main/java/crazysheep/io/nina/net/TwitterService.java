@@ -5,10 +5,10 @@ import java.util.List;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
-import retrofit.Call;
-import retrofit.http.GET;
-import retrofit.http.Header;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.Call;
+import retrofit2.http.Header;
+import retrofit2.http.Query;
 
 /**
  * twitter api

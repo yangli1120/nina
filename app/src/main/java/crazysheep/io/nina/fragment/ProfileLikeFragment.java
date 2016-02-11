@@ -22,9 +22,8 @@ import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * profile like fragment
@@ -91,7 +90,7 @@ public class ProfileLikeFragment extends BaseFragment
         mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if (response.body().size() > PAGE_SIZE_WANTED) {
                     mTimelineRv.setLoadMoreEnable(true);
                     response.body().remove(response.body().size() - 1);
@@ -103,7 +102,7 @@ public class ProfileLikeFragment extends BaseFragment
 
             @Override
             public void onFailed(Throwable t) {
-                L.d(t.toString());
+
             }
         });
     }
@@ -116,7 +115,7 @@ public class ProfileLikeFragment extends BaseFragment
         mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, maxId, PAGE_SIZE);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
                     mTimelineRv.setLoadMoreEnable(true);
                 } else {

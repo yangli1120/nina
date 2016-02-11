@@ -21,8 +21,8 @@ import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
-import retrofit.Response;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * fragment show twitter timeline
@@ -82,7 +82,8 @@ public class TimelineFragment extends BaseNetworkFragment {
         mHttp.getHomeTimeline(cacheType, null, PAGE_SIZE)
                 .enqueue(new NiceCallback<List<TweetDto>>() {
                     @Override
-                    public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+                    public void onRespond(Call<List<TweetDto>> call,
+                                          Response<List<TweetDto>> response) {
                         mAdapter.setData(response.body());
                         mTimelineRv.setEnableLoadMore(true);
                     }
@@ -109,7 +110,8 @@ public class TimelineFragment extends BaseNetworkFragment {
                         NEXT_PAGE_SIZE)
                 .enqueue(new NiceCallback<List<TweetDto>>() {
                     @Override
-                    public void onRespond(Response<List<TweetDto>> response, Retrofit retrofit) {
+                    public void onRespond(Call<List<TweetDto>> call,
+                                          Response<List<TweetDto>> response) {
                         response.body().remove(0); // remove repeat one
                         mAdapter.addData(response.body());
                     }

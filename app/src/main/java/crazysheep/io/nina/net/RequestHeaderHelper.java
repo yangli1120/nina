@@ -1,12 +1,9 @@
 package crazysheep.io.nina.net;
 
-import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
-
-import com.soupkodjou.twitterapp.appuser.Authorization;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -22,8 +19,6 @@ import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import crazysheep.io.nina.prefs.UserPrefs;
 
 /**
  * helper for build twitter api request
@@ -45,7 +40,7 @@ public class RequestHeaderHelper {
     * Authorization: OAuth oauth_consumer_key="OK4Jokq5amNT6NIASXA0rIUiI", oauth_nonce="5ca1ff6c549b765783795c5baf75d2f2", oauth_signature="NUQdUVamvXbc8sNU5K78sm32GGQ%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1453557047", oauth_token="3301250162-M6evawbslQqtCfUGN2BHBLsIwE07DeK4xekbSXu", oauth_version="1.0"
     * see{@link https://dev.twitter.com/oauth/overview/authorizing-requests}
     * */
-    public static String builderAuth(
+    /*public static String builderAuth(
             @NonNull Context context, @NonNull String method,
             @NonNull String url, Map<String, String> requestBodyForm) {
         UserPrefs userPrefs = new UserPrefs(context);
@@ -57,7 +52,7 @@ public class RequestHeaderHelper {
 
         // trim is very important, see{@link https://github.com/square/retrofit/issues/1153}
         return authorizationStr.trim();
-    }
+    }*/
 
     private static String randomAuthNonce() {
 

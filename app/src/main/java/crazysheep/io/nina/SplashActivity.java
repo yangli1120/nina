@@ -26,8 +26,6 @@ import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit.Response;
-import retrofit.Retrofit;
 import rx.Observable;
 import rx.functions.Action1;
 
@@ -93,14 +91,6 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void failure(TwitterException e) {
                 L.d(e.toString());
-            }
-
-            @Override
-            public void onResponse(Response<TwitterSession> response, Retrofit retrofit) {
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
             }
         });
     }

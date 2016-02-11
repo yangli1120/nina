@@ -3,14 +3,13 @@ package crazysheep.io.nina.net;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.CacheControl;
-
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.utils.Utils;
+import okhttp3.Cache;
+import okhttp3.CacheControl;
 
 /**
  * http cache
