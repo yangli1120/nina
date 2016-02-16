@@ -31,7 +31,7 @@ public class RxRequest {
     private static Twitter getTwitter(@NonNull Context context) {
         final UserPrefs mUserPrefs = new UserPrefs(context);
         ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(false)
+        cb.setDebugEnabled(true)
                 .setOAuthConsumerKey(HttpConstants.NINA_CONSUMER_KEY)
                 .setOAuthConsumerSecret(HttpConstants.NINA_CONSUMER_SECRET)
                 .setOAuthAccessToken(mUserPrefs.getAuthToken())

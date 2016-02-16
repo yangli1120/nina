@@ -15,25 +15,22 @@ import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
-import crazysheep.io.nina.net.HttpConstants;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.net.RxRequest;
+import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import retrofit2.Call;
+import retrofit2.Response;
 import twitter4j.User;
-import twitter4j.conf.ConfigurationBuilder;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -44,7 +41,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TextView mUserScreenNameTv;
 
     private UserPrefs mUserPrefs;
-    private Twitter mTwitter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +50,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mUserPrefs = new UserPrefs(this);
 
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(false)
-                .setOAuthConsumerKey(HttpConstants.NINA_CONSUMER_KEY)
-                .setOAuthConsumerSecret(HttpConstants.NINA_CONSUMER_SECRET)
-                .setOAuthAccessToken(mUserPrefs.getAuthToken())
-                .setOAuthAccessTokenSecret(mUserPrefs.getSecret());
-        TwitterFactory tf = new TwitterFactory(cb.build());
-        mTwitter = tf.getInstance();
-
         initUI();
     }
 
@@ -71,31 +58,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         super.onResume();
 
         // every back to this activity, refresh user information
-        Observable.just(mTwitter)
-                .map(new Func1<Twitter, User>() {
+        RxRequest.showUser(this, mUserPrefs.getUserScreenName(),
+                new RxRequest.RxRequestCallback<User>() {
                     @Override
-                    public User call(Twitter twitter) {
-                        try {
-                            return mTwitter.showUser(mUserPrefs.getId());
-                        } catch (TwitterException te) {
-                            L.d("fetch user exception: " + te);
-                        }
-
-                        return null;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
+                    public void onRespond(User user) {
                         if (!Utils.isNull(user)) {
-                            if(!user.getName().equals(mUserPrefs.getUsername())) {
+                            if (!user.getName().equals(mUserPrefs.getUsername())) {
                                 mUserPrefs.setUsername(user.getName());
                                 mUserNameTv.setText(user.getName());
                             }
                             String profileImageUrl = user.getOriginalProfileImageURLHttps();
-                            if(!TextUtils.isEmpty(profileImageUrl)
+                            if (!TextUtils.isEmpty(profileImageUrl)
                                     && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
                                 mUserPrefs.setUserAvatar(profileImageUrl);
                                 Glide.with(getActivity())
@@ -103,6 +76,39 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                                         .into(mAvatarCiv);
                             }
                         }
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                        L.d(t.toString());
+                    }
+                });
+
+        HttpClient.getInstance()
+                .create(TwitterService.class)
+                .getUserInfo(mUserPrefs.getUserScreenName())
+                .enqueue(new NiceCallback<UserDto>() {
+                    @Override
+                    public void onRespond(Call<UserDto> call, Response<UserDto> response) {
+                        UserDto user = response.body();
+                        if (!Utils.isNull(user)) {
+                            if (!user.name.equals(mUserPrefs.getUsername())) {
+                                mUserPrefs.setUsername(user.name);
+                                mUserNameTv.setText(user.name);
+                            }
+                            String profileImageUrl = user.profile_image_url_https;
+                            if (!TextUtils.isEmpty(profileImageUrl)
+                                    && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
+                                mUserPrefs.setUserAvatar(profileImageUrl);
+                                Glide.with(getActivity())
+                                        .load(profileImageUrl)
+                                        .into(mAvatarCiv);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
                     }
                 });
     }
