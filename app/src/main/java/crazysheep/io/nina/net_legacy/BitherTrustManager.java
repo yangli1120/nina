@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net;
+package crazysheep.io.nina.net_legacy;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;

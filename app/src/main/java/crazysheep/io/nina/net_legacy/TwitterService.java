@@ -1,10 +1,10 @@
-package crazysheep.io.nina.net;
+package crazysheep.io.nina.net_legacy;
 
 import java.util.List;
 
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UserDto;
-import crazysheep.io.nina.net.HttpCache.CacheConfig;
+import crazysheep.io.nina.net_legacy.HttpCache.CacheConfig;
 import retrofit2.http.GET;
 import retrofit2.Call;
 import retrofit2.http.Header;

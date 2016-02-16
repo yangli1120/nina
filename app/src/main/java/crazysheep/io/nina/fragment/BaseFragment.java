@@ -3,8 +3,8 @@ package crazysheep.io.nina.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import crazysheep.io.nina.net.HttpClient;
-import crazysheep.io.nina.net.TwitterService;
+import crazysheep.io.nina.net_legacy.HttpClient;
+import crazysheep.io.nina.net_legacy.TwitterService;
 
 /**
  * base fragment

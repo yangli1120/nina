@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
-import crazysheep.io.nina.net.HttpClient;
-import crazysheep.io.nina.net.TwitterService;
+import crazysheep.io.nina.net_legacy.HttpClient;
+import crazysheep.io.nina.net_legacy.TwitterService;
 import crazysheep.io.nina.utils.Utils;
 
 /**

@@ -27,7 +27,7 @@ import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.ProfileLikeFragment;
 import crazysheep.io.nina.fragment.ProfileMediaFragment;
 import crazysheep.io.nina.fragment.ProfileTimelineFragment;
-import crazysheep.io.nina.net.RxRequest;
+import crazysheep.io.nina.net_legacy.RxRequest;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.StringUtils;

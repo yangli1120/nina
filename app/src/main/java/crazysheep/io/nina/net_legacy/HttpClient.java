@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net;
+package crazysheep.io.nina.net_legacy;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -15,7 +15,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
 import crazysheep.io.nina.application.BaseApplication;
-import crazysheep.io.nina.net.HttpCache.CacheConfig;
+import crazysheep.io.nina.net_legacy.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.L;

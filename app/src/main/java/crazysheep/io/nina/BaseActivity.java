@@ -7,8 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
-import crazysheep.io.nina.net.HttpClient;
-import crazysheep.io.nina.net.TwitterService;
+import crazysheep.io.nina.net_legacy.HttpClient;
+import crazysheep.io.nina.net_legacy.TwitterService;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**

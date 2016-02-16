@@ -16,8 +16,8 @@ import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.net.HttpCache;
-import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.net_legacy.HttpCache;
+import crazysheep.io.nina.net_legacy.Retrofit2NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
@@ -80,7 +80,7 @@ public class TimelineFragment extends BaseNetworkFragment {
                 : HttpCache.CacheConfig.CACHE_IF_HIT;
 
         mHttp.getHomeTimeline(cacheType, null, PAGE_SIZE)
-                .enqueue(new NiceCallback<List<TweetDto>>() {
+                .enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
                     @Override
                     public void onRespond(Call<List<TweetDto>> call,
                                           Response<List<TweetDto>> response) {
@@ -108,7 +108,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
         mHttp.getHomeTimeline(HttpCache.CacheConfig.CACHE_NETWORK, oldestTweetDto.id,
                         NEXT_PAGE_SIZE)
-                .enqueue(new NiceCallback<List<TweetDto>>() {
+                .enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
                     @Override
                     public void onRespond(Call<List<TweetDto>> call,
                                           Response<List<TweetDto>> response) {

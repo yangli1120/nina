@@ -18,19 +18,13 @@ import butterknife.ButterKnife;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
-import crazysheep.io.nina.net.HttpClient;
-import crazysheep.io.nina.net.NiceCallback;
-import crazysheep.io.nina.net.RxRequest;
-import crazysheep.io.nina.net.TwitterService;
+import crazysheep.io.nina.net_new.NiceCallback;
+import crazysheep.io.nina.net_new.TwitterClient;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
-import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit2.Call;
-import retrofit2.Response;
-import twitter4j.User;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -57,17 +51,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
 
-        // every back to this activity, refresh user information
-        RxRequest.showUser(this, mUserPrefs.getUserScreenName(),
-                new RxRequest.RxRequestCallback<User>() {
+        TwitterClient.getInstance()
+                .getTwitterApiClient()
+                .getUsersService()
+                .getUserInfo(mUserPrefs.getUserScreenName(), new NiceCallback<UserDto>() {
                     @Override
-                    public void onRespond(User user) {
-                        if (!Utils.isNull(user)) {
-                            if (!user.getName().equals(mUserPrefs.getUsername())) {
-                                mUserPrefs.setUsername(user.getName());
-                                mUserNameTv.setText(user.getName());
+                    public void onRespond(UserDto userDto, retrofit.client.Response response) {
+                        if (!Utils.isNull(userDto)) {
+                            if (!userDto.name.equals(mUserPrefs.getUsername())) {
+                                mUserPrefs.setUsername(userDto.name);
+                                mUserNameTv.setText(userDto.name);
                             }
-                            String profileImageUrl = user.getOriginalProfileImageURLHttps();
+                            String profileImageUrl = userDto.profile_image_url_https;
                             if (!TextUtils.isEmpty(profileImageUrl)
                                     && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
                                 mUserPrefs.setUserAvatar(profileImageUrl);
@@ -80,35 +75,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
                     @Override
                     public void onFailed(Throwable t) {
-                        L.d(t.toString());
-                    }
-                });
 
-        HttpClient.getInstance()
-                .create(TwitterService.class)
-                .getUserInfo(mUserPrefs.getUserScreenName())
-                .enqueue(new NiceCallback<UserDto>() {
-                    @Override
-                    public void onRespond(Call<UserDto> call, Response<UserDto> response) {
-                        UserDto user = response.body();
-                        if (!Utils.isNull(user)) {
-                            if (!user.name.equals(mUserPrefs.getUsername())) {
-                                mUserPrefs.setUsername(user.name);
-                                mUserNameTv.setText(user.name);
-                            }
-                            String profileImageUrl = user.profile_image_url_https;
-                            if (!TextUtils.isEmpty(profileImageUrl)
-                                    && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
-                                mUserPrefs.setUserAvatar(profileImageUrl);
-                                Glide.with(getActivity())
-                                        .load(profileImageUrl)
-                                        .into(mAvatarCiv);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailed(Throwable t) {
                     }
                 });
     }

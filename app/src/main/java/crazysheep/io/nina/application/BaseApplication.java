@@ -5,10 +5,8 @@ import android.app.Application;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 
-import crazysheep.io.nina.net.HttpConstants;
+import crazysheep.io.nina.net_new.TwitterClient;
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -31,9 +29,7 @@ public class BaseApplication extends Application {
         // init logger
         Logger.init(TAG);
         // init twitter sdk
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(HttpConstants.NINA_CONSUMER_KEY,
-                HttpConstants.NINA_CONSUMER_SECRET);
-        Fabric.with(this, new Crashlytics(), new TwitterCore(authConfig));
+        Fabric.with(this, new Crashlytics(), TwitterClient.getInstance().getTwitterCore());
         // init stetho
         Stetho.initializeWithDefaults(this);
     }
