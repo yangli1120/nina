@@ -2,7 +2,6 @@ package crazysheep.io.nina.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
@@ -23,6 +22,13 @@ public class TweetDto implements BaseDto, Parcelable {
         return !Utils.isNull(extended_entities) && !Utils.isNull(extended_entities.media)
                 && !Utils.isNull(extended_entities.media.get(0))
                 && "photo".equals(extended_entities.media.get(0).type);
+    }
+
+    /**
+     * if this tweet is retweeted
+     * */
+    public boolean isRetweeted() {
+        return !Utils.isNull(retweeted_status);
     }
 
     ///////////////////////////////////////////////////////
@@ -141,6 +147,8 @@ public class TweetDto implements BaseDto, Parcelable {
     public boolean possibly_sensitive;
     @SerializedName("user")
     public UserDto user;
+    @SerializedName("retweeted_status")
+    public TweetDto retweeted_status;
 
     ////////////////////////////////// Parcelable //////////////////////////////////
 

@@ -31,11 +31,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public abstract class BaseHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
+    @Bind(R.id.retweet_author_tv) TextView retweetAuthorTv;
     @Bind(R.id.author_name_tv) TextView authorNameTv;
     @Bind(R.id.author_screen_name_tv) TextView authorScreenNameTv;
     @Bind(R.id.time_tv) TextView timeTv;
     @Bind(R.id.tweet_content_fl) FrameLayout contentFl;
-    @Bind(R.id.tweet_content_tv) TextView mContentTv;
+    @Bind(R.id.tweet_content_tv) TextView contentTv;
     @Bind(R.id.action_reply_ll) View replyLl;
     @Bind(R.id.action_reply_iv) ImageView replyIv;
     @Bind(R.id.action_retweet_ll) View retweetLl;
@@ -66,27 +67,34 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
      * base holder implement common ui, sub-holder implement itself ui
      * */
     public void bindData(int position, @NonNull TweetDto tweetDto) {
-        mTweetDto = tweetDto;
+        mTweetDto = tweetDto.isRetweeted() ? tweetDto.retweeted_status : tweetDto;
 
         /* top header */
         // cancel before image load request if need
         Glide.clear(avatarIv);
         // start current request
         Glide.with(mContext)
-                .load(tweetDto.user.profile_image_url_https)
+                .load(mTweetDto.user.profile_image_url_https)
                 .into(avatarIv);
         avatarIv.setOnClickListener(this);
 
-        authorNameTv.setText(tweetDto.user.name);
+        if(tweetDto.isRetweeted()) {
+            retweetAuthorTv.setVisibility(View.VISIBLE);
+            retweetAuthorTv.setText(
+                    mContext.getString(R.string.retweet_author, tweetDto.user.name));
+        } else {
+            retweetAuthorTv.setVisibility(View.GONE);
+        }
+        authorNameTv.setText(mTweetDto.user.name);
         authorNameTv.setOnClickListener(this);
         authorScreenNameTv.setText(mContext.getString(R.string.screen_name,
-                tweetDto.user.screen_name));
+                mTweetDto.user.screen_name));
         authorScreenNameTv.setOnClickListener(this);
         timeTv.setText(TimeUtils.formatTimestamp(mContext,
-                TimeUtils.getTimeFromDate(tweetDto.created_at.trim())));
+                TimeUtils.getTimeFromDate(mTweetDto.created_at.trim())));
 
         /* content layout should be render by sub-holder */
-        mContentTv.setText(tweetDto.text);
+        contentTv.setText(mTweetDto.text);
 
         /* bottom action bar */
         replyLl.setOnClickListener(new View.OnClickListener() {
@@ -108,8 +116,8 @@ public abstract class BaseHolder extends RecyclerView.ViewHolder implements View
                 DebugHelper.toast(mContext, "click like");
             }
         });
-        likeCountTv.setText(String.valueOf(tweetDto.user.favourites_count));
-        likeIv.setImageResource(tweetDto.favorited
+        likeCountTv.setText(String.valueOf(mTweetDto.user.favourites_count));
+        likeIv.setImageResource(mTweetDto.favorited
                 ? R.drawable.ic_favorite_black : R.drawable.ic_un_favorite_grey);
     }
 

@@ -78,7 +78,7 @@ dependencies {
     compile 'com.android.support:support-v13:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.android.support:percent:23.1.1'
-    // network layer: okhttp3.x + retrofit2.x
+    // network layer: okhttp3 + retrofit2
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
@@ -98,8 +98,6 @@ dependencies {
     // oauth support
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'se.akerfeldt:okhttp-signpost:1.1.0'
-    // twitter4j
-    compile 'org.twitter4j:twitter4j-core:4.0.2'
     // for pretty log
     compile 'com.github.orhanobut:logger:1.12'
     // permission request

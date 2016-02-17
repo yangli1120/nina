@@ -28,4 +28,5 @@
 
     <!-- timeline -->
     <string name="tag_gif">Gif</string>
+    <string name="retweet_author">%s Retweeted</string>
 </resources>

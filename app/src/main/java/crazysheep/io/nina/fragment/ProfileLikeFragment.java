@@ -87,7 +87,6 @@ public class ProfileLikeFragment extends BaseFragment
     private void requestFirstPage() {
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
-        // TODO use NinaTwitterApiClient
         mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
