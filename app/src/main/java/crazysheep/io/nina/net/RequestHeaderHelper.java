@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net_legacy;
+package crazysheep.io.nina.net;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;

@@ -18,10 +18,12 @@ import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
-import crazysheep.io.nina.net_new.NiceCallback;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * profile timeline fragment
@@ -39,8 +41,8 @@ public class ProfileTimelineFragment extends BaseFragment
     @Bind(R.id.data_rv) LoadMoreRecyclerView mTimelineRv;
     private TimelineAdapter mTimelineAdapter;
 
+    private Call<List<TweetDto>> mTimelineCall;
     private String mScreenName;
-    private boolean hasRequestFirstPage = false;
 
     @Override
     public String getTitle(@NonNull Context context) {
@@ -72,7 +74,7 @@ public class ProfileTimelineFragment extends BaseFragment
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if(!hasRequestFirstPage && isVisibleToUser)
+        if(Utils.isNull(mTimelineCall) && isVisibleToUser)
             requestFirstPage();
     }
 
@@ -83,37 +85,38 @@ public class ProfileTimelineFragment extends BaseFragment
 
     @SuppressWarnings("unchecked")
     public void requestFirstPage() {
-        hasRequestFirstPage = true;
+        if(!Utils.isNull(mTimelineCall))
+            mTimelineCall.cancel();
 
-        NiceCallback.cancel(TAG);
-        mTwitter.getUserTimeline(PAGE_SIZE, mScreenName, null,
-                new NiceCallback<List<TweetDto>>(TAG) {
-                    @Override
-                    public void onRespond(List<TweetDto> tweetDtos, Response response) {
-                        // if server return tweet count equal PAGE_SIZE,
-                        // that mean timeline have more tweets
-                        if (tweetDtos.size() > PAGE_SIZE_WANTED) {
-                            mTimelineRv.setLoadMoreEnable(true);
-                            //tweetDtos.remove(tweetDtos.size() - 1); // remove lasted tweet
-                        } else {
-                            mTimelineRv.setLoadMoreEnable(false);
-                        }
-                        mTimelineAdapter.setData(tweetDtos);
-                    }
+        /*mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+            @Override
+            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+                // if server return tweet count equal PAGE_SIZE,
+                // that mean timeline have more tweets
+                if (response.body().size() > PAGE_SIZE_WANTED) {
+                    mTimelineRv.setLoadMoreEnable(true);
+                    //tweetDtos.remove(tweetDtos.size() - 1); // remove lasted tweet
+                } else {
+                    mTimelineRv.setLoadMoreEnable(false);
+                }
+                mTimelineAdapter.setData(response.body());
+            }
 
-                    @Override
-                    public void onFailed(Throwable t) {
-                        L.d(t.toString());
-                    }
-                });
+            @Override
+            public void onFailed(Throwable t) {
+                L.d(t.toString());
+            }
+        });*/
     }
 
     @SuppressWarnings("unchecked")
     public void requestNextPage() {
-        NiceCallback.cancel(TAG);
+        if(!Utils.isNull(mTimelineCall))
+            mTimelineCall.cancel();
+
         long maxId = ((TweetDto)mTimelineAdapter.getItem(mTimelineAdapter.getItemCount() - 1)).id;
-        mTwitter.getUserTimeline(PAGE_SIZE, mScreenName, maxId,
-                new NiceCallback<List<TweetDto>>(TAG) {
+        /*mTwitter.getUserTimeline(PAGE_SIZE, mScreenName, maxId,
+                new Retrofit1NiceCallback<List<TweetDto>>(TAG) {
                     @Override
                     public void onRespond(List<TweetDto> tweetDtos, Response response) {
                         if (tweetDtos.size() > PAGE_SIZE_WANTED)
@@ -128,7 +131,7 @@ public class ProfileTimelineFragment extends BaseFragment
                     public void onFailed(Throwable t) {
                         L.d(t.toString());
                     }
-                });
+                });*/
     }
 
 }

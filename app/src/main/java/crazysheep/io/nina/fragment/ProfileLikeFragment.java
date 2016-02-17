@@ -87,7 +87,7 @@ public class ProfileLikeFragment extends BaseFragment
             mTimelineCall.cancel();
         // TODO use NinaTwitterApiClient
         /*mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
-        mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if (response.body().size() > PAGE_SIZE_WANTED) {
@@ -113,7 +113,7 @@ public class ProfileLikeFragment extends BaseFragment
         long maxId = ((TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1)).id;
         // TODO use NinaTwitterApiClient
         /*mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, maxId, PAGE_SIZE);
-        mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {

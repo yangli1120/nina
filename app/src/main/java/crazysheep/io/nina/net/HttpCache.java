@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net_legacy;
+package crazysheep.io.nina.net;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -16,7 +16,20 @@ import okhttp3.CacheControl;
  *
  * Created by crazysheep on 16/1/26.
  */
-class HttpCache {
+public class HttpCache {
+
+    /**
+     * response from network only, not cache
+     * */
+    public static final int CACHE_NETWORK = -1;
+    /**
+     * if hit cache, response from cache, otherwise from network
+     * */
+    public static final int CACHE_IF_HIT = 0;
+    /**
+     * response only from cache, not network
+     * */
+    public static final int CACHE_FORCE = 1;
 
     private static HttpCache mInstance;
     private Cache mCache; // cache for okhttp client
@@ -53,10 +66,6 @@ class HttpCache {
         public static final String PARAM_CACHE_CONTROL = "cache_control";
 
         public static final int DEFAULT_CACHE_FRESH_DURATION = 5 * 60; // cache fresh time is 5 minutes
-
-        public static final int CACHE_NETWORK = -1; // response from network only, not cache
-        public static final int CACHE_IF_HIT = 0; // if hit cache, response from cache, otherwise from network
-        public static final int CACHE_FORCE = 1; // response only from cache, not network
 
         /**
          * make cache control from cacheType

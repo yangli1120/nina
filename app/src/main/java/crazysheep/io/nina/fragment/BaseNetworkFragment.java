@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
-import crazysheep.io.nina.net_new.TwitterClient;
-import crazysheep.io.nina.net_new.TwitterService;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.utils.Utils;
 
 /**
@@ -39,7 +39,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTwitter = TwitterClient.getInstance().getTwitterApiClient().getTwitterService();
+        mTwitter = HttpClient.getInstance().getTwitterService();
     }
 
     @Nullable

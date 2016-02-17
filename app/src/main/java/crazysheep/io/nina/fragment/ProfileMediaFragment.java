@@ -91,7 +91,7 @@ public class ProfileMediaFragment extends BaseFragment
         // TODO use NinaTwitterApiClient
         /*mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
                 PAGE_SIZE, null);
-        mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
@@ -117,7 +117,7 @@ public class ProfileMediaFragment extends BaseFragment
         /*long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
                 PAGE_SIZE, maxId);
-        mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {

@@ -1,7 +1,9 @@
-package crazysheep.io.nina.net_new;
+package crazysheep.io.nina.net_legacy;
 
 import com.twitter.sdk.android.core.Session;
 import com.twitter.sdk.android.core.TwitterApiClient;
+
+import crazysheep.io.nina.net.TwitterService;
 
 /**
  * custom twitter api client for request REST api more than twitter-kit-android sdk
@@ -9,7 +11,7 @@ import com.twitter.sdk.android.core.TwitterApiClient;
  *
  * Created by crazysheep on 16/2/16.
  */
-public class NinaTwitterApiClient extends TwitterApiClient {
+class NinaTwitterApiClient extends TwitterApiClient {
 
     public NinaTwitterApiClient(Session session) {
         super(session);

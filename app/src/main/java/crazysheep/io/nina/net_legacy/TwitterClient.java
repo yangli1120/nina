@@ -1,8 +1,9 @@
-package crazysheep.io.nina.net_new;
+package crazysheep.io.nina.net_legacy;
 
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
+import crazysheep.io.nina.net.HttpConstants;
 import crazysheep.io.nina.utils.Utils;
 
 /**
@@ -10,7 +11,7 @@ import crazysheep.io.nina.utils.Utils;
  *
  * Created by crazysheep on 16/2/16.
  */
-public class TwitterClient {
+class TwitterClient {
 
     private static TwitterClient mTwitterClient;
 

@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net_legacy;
+package crazysheep.io.nina.net;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -15,7 +15,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
 import crazysheep.io.nina.application.BaseApplication;
-import crazysheep.io.nina.net_legacy.HttpCache.CacheConfig;
+import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.L;
@@ -36,16 +36,21 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
  *
  * Created by crazysheep on 16/1/22.
  */
-class HttpClient {
+public class HttpClient {
 
-    private static Retrofit mRetrofit;
+    private static HttpClient mHttpClient;
 
-    private HttpClient() {}
+    private Retrofit mRetrofit;
+    private TwitterService mTwitterService;
 
-    public static Retrofit getInstance() {
-        if(Utils.isNull(mRetrofit))
+    private HttpClient(@NonNull Retrofit retrofit) {
+        mRetrofit = retrofit;
+    }
+
+    public static HttpClient getInstance() {
+        if(Utils.isNull(mHttpClient))
             synchronized (HttpClient.class) {
-                if (Utils.isNull(mRetrofit)) {
+                if (Utils.isNull(mHttpClient)) {
                     UserPrefs userPrefs = new UserPrefs(BaseApplication.getAppContext());
                     OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(
                             HttpConstants.NINA_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_SECRET);
@@ -70,15 +75,27 @@ class HttpClient {
                             .addNetworkInterceptor(new StethoInterceptor())
                             .build();
 
-                    mRetrofit = new Retrofit.Builder()
+                    Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(HttpConstants.BASE_URL)
                             .addConverterFactory(GsonConverterFactory.create())
                             .client(okHttpClient)
                             .build();
+
+                    mHttpClient = new HttpClient(retrofit);
                 }
             }
 
-        return mRetrofit;
+        return mHttpClient;
+    }
+
+    public TwitterService getTwitterService() {
+        if(Utils.isNull(mTwitterService))
+            synchronized (HttpClient.class) {
+                if(Utils.isNull(mTwitterService))
+                    mTwitterService = mRetrofit.create(TwitterService.class);
+            }
+
+        return mTwitterService;
     }
 
     /*

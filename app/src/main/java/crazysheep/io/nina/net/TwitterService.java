@@ -1,10 +1,10 @@
-package crazysheep.io.nina.net_legacy;
+package crazysheep.io.nina.net;
 
 import java.util.List;
 
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UserDto;
-import crazysheep.io.nina.net_legacy.HttpCache.CacheConfig;
+import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import retrofit2.http.GET;
 import retrofit2.Call;
 import retrofit2.http.Header;
@@ -15,7 +15,7 @@ import retrofit2.http.Query;
  *
  * Created by crazysheep on 16/1/23.
  */
-interface TwitterService {
+public interface TwitterService {
 
     /**
      * get user timeline

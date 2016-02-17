@@ -3,9 +3,8 @@ package crazysheep.io.nina.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import crazysheep.io.nina.net_new.NinaTwitterApiClient;
-import crazysheep.io.nina.net_new.TwitterClient;
-import crazysheep.io.nina.net_new.TwitterService;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.TwitterService;
 
 /**
  * base fragment
@@ -34,7 +33,7 @@ public class BaseFragment extends Fragment {
         TAG = getClass().getSimpleName();
 
         if(this instanceof INetworkFragment)
-            mTwitter = TwitterClient.getInstance().getTwitterApiClient().getTwitterService();
+            mTwitter = HttpClient.getInstance().getTwitterService();
     }
 
 }

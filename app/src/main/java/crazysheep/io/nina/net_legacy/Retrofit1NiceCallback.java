@@ -1,4 +1,4 @@
-package crazysheep.io.nina.net_new;
+package crazysheep.io.nina.net_legacy;
 
 import android.support.annotation.NonNull;
 
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import crazysheep.io.nina.net.HttpConstants;
 import crazysheep.io.nina.utils.Utils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -16,20 +17,20 @@ import retrofit.client.Response;
  *
  * Created by crazysheep on 16/1/27.
  */
-public abstract class NiceCallback<T> implements Callback<T> {
+abstract class Retrofit1NiceCallback<T> implements Callback<T> {
 
     ////////////////////// callback manager ///////////////////////////
 
     public static class CallbackManager {
 
-        private static Map<String, NiceCallback> mCallbacks = new HashMap<>();
+        private static Map<String, Retrofit1NiceCallback> mCallbacks = new HashMap<>();
 
-        public void add(NiceCallback callback) {
+        public void add(Retrofit1NiceCallback callback) {
             mCallbacks.put(callback.getTag(), callback);
         }
 
         public void cancel(String tag) {
-            NiceCallback callback = mCallbacks.get(tag);
+            Retrofit1NiceCallback callback = mCallbacks.get(tag);
             if(!Utils.isNull(callback)) {
                 callback.cancel();
                 // remove this callback from map
@@ -38,7 +39,7 @@ public abstract class NiceCallback<T> implements Callback<T> {
         }
 
         public void cancelAll() {
-            for(NiceCallback callback : mCallbacks.values()) {
+            for(Retrofit1NiceCallback callback : mCallbacks.values()) {
                 if(!Utils.isNull(callback)) {
                     callback.cancel();
                     // remove from map
@@ -77,7 +78,7 @@ public abstract class NiceCallback<T> implements Callback<T> {
         isCanceled = true;
     }
 
-    public NiceCallback(String tag) {
+    public Retrofit1NiceCallback(String tag) {
         TAG = tag;
         getCallbackManager().add(this);
     }
