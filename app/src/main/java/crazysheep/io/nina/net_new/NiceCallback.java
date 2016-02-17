@@ -102,8 +102,31 @@ public abstract class NiceCallback<T> implements Callback<T> {
         if(isCanceled)
             return;
 
-        onFailed(new Throwable(Utils.isNull(error) ? "unknow error" : error.toString()));
+        onFailed(new Throwable(Utils.isNull(error) ? "unknow error"
+                : printResponse(error.getResponse())));
         onDone();
+    }
+
+    private static String printResponse(Response response) {
+        if(!Utils.isNull(response)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\"")
+                    .append(response.getUrl())
+                    .append("\"")
+                    .append(" response:");
+            // headers
+            if(!Utils.isNull(response.getHeaders()))
+                sb.append("\n---headers---\n")
+                        .append(response.getHeaders().toString());
+            // body
+            if(!Utils.isNull(response.getBody()))
+                sb.append("\n---body---\n")
+                        .append(response.getBody().toString());
+
+            return sb.toString();
+        }
+
+        return null;
     }
 
     public abstract void onRespond(T t, Response response);
