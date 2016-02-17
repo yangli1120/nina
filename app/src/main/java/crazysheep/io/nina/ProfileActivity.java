@@ -23,15 +23,19 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.ProfilePagerAdapter;
+import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.ProfileLikeFragment;
 import crazysheep.io.nina.fragment.ProfileMediaFragment;
 import crazysheep.io.nina.fragment.ProfileTimelineFragment;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
-import twitter4j.User;
+import retrofit2.Call;
+import retrofit2.Response;
 
 /**
  * user profile activity
@@ -39,7 +43,7 @@ import twitter4j.User;
  * Created by crazysheep on 16/2/2.
  */
 public class ProfileActivity extends BaseSwipeBackActivity
-        implements AppBarLayout.OnOffsetChangedListener {
+        implements BaseActivity.ITwitterServiceActivity, AppBarLayout.OnOffsetChangedListener {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.appbar) AppBarLayout mAppbar;
@@ -59,6 +63,8 @@ public class ProfileActivity extends BaseSwipeBackActivity
 
     private String mUserName;
     private String mScreenName;
+
+    private Call<UserDto> mUserCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,39 +129,53 @@ public class ProfileActivity extends BaseSwipeBackActivity
     }
 
     private void requestUser(String screenName) {
-        // TODO use NinaTwitterApiClient request "users/show"
+        if(!Utils.isNull(mUserCall))
+            mUserCall.cancel();
+
+        mUserCall = mTwitter.getUserInfo(screenName);
+        mUserCall.enqueue(new NiceCallback<UserDto>() {
+            @Override
+            public void onRespond(Response<UserDto> response) {
+                updateUserUI(response.body());
+            }
+
+            @Override
+            public void onFailed(Throwable t) {
+                L.d(t.toString());
+            }
+        });
     }
 
-    private void updateUserUI(User user) {
+    private void updateUserUI(UserDto user) {
         if(!Utils.isNull(user)) {
             Glide.clear(mUserAvatar);
             Glide.with(this)
-                    .load(user.getOriginalProfileImageURLHttps())
+                    .load(user.profile_image_url_https)
                     .into(mUserAvatar);
 
             Glide.clear(mHeaderIv);
             Glide.with(this)
-                    .load(user.getProfileBackgroundImageUrlHttps())
+                    .load(user.profile_background_image_url_https)
                     .error(R.color.colorPrimary)
                     .into(mHeaderIv);
 
-            mUserNameTv.setText(user.getName());
-            mUserScreenNameTv.setText(getString(R.string.screen_name, user.getScreenName()));
-            mUserIntroductionTv.setText(user.getDescription());
-            if(!TextUtils.isEmpty(user.getLocation())) {
-                mUserLocationTv.setText(user.getLocation());
+            mUserNameTv.setText(user.name);
+            mUserScreenNameTv.setText(getString(R.string.screen_name, user.screen_name));
+            mUserIntroductionTv.setText(user.description);
+            if(!TextUtils.isEmpty(user.location)) {
+                mUserLocationTv.setText(user.location);
                 TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(mUserLocationTv,
                         R.drawable.ic_location_grey, 0, 0, 0);
             } else {
                 mUserLocationTv.setVisibility(View.GONE);
             }
             mFollowerTv.setText(
-                    getString(user.getFollowersCount() <= 1
+                    getString(user.followers_count <= 1
                                     ? R.string.profile_follower : R.string.profile_follower_s,
-                            StringUtils.formatCount(user.getFollowersCount())));
+                            StringUtils.formatCount(user.followers_count)));
             mFollowingTv.setText(
                     getString(R.string.profile_following,
-                            StringUtils.formatCount(user.getFriendsCount())));
+                            StringUtils.formatCount(user.friends_count)));
         }
     }
 

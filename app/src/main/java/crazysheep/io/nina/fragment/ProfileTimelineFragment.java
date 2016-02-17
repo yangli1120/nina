@@ -18,6 +18,7 @@ import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
@@ -88,9 +89,11 @@ public class ProfileTimelineFragment extends BaseFragment
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
 
-        /*mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_IF_HIT, mScreenName,
+                PAGE_SIZE, null);
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+            public void onRespond(Response<List<TweetDto>> response) {
                 // if server return tweet count equal PAGE_SIZE,
                 // that mean timeline have more tweets
                 if (response.body().size() > PAGE_SIZE_WANTED) {
@@ -104,9 +107,9 @@ public class ProfileTimelineFragment extends BaseFragment
 
             @Override
             public void onFailed(Throwable t) {
-                L.d(t.toString());
+
             }
-        });*/
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -115,23 +118,24 @@ public class ProfileTimelineFragment extends BaseFragment
             mTimelineCall.cancel();
 
         long maxId = ((TweetDto)mTimelineAdapter.getItem(mTimelineAdapter.getItemCount() - 1)).id;
-        /*mTwitter.getUserTimeline(PAGE_SIZE, mScreenName, maxId,
-                new Retrofit1NiceCallback<List<TweetDto>>(TAG) {
-                    @Override
-                    public void onRespond(List<TweetDto> tweetDtos, Response response) {
-                        if (tweetDtos.size() > PAGE_SIZE_WANTED)
-                            mTimelineRv.setLoadMoreEnable(true);
-                        else
-                            mTimelineRv.setLoadMoreEnable(false);
-                        tweetDtos.remove(0); // remove maxId tweet
-                        mTimelineAdapter.addData(tweetDtos);
-                    }
+        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
+                maxId);
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+            @Override
+            public void onRespond(Response<List<TweetDto>> response) {
+                if (response.body().size() > PAGE_SIZE_WANTED)
+                    mTimelineRv.setLoadMoreEnable(true);
+                else
+                    mTimelineRv.setLoadMoreEnable(false);
+                response.body().remove(0); // remove maxId tweet
+                mTimelineAdapter.addData(response.body());
+            }
 
-                    @Override
-                    public void onFailed(Throwable t) {
-                        L.d(t.toString());
-                    }
-                });*/
+            @Override
+            public void onFailed(Throwable t) {
+                L.d(t.toString());
+            }
+        });
     }
 
 }

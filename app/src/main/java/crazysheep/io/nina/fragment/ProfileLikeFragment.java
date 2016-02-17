@@ -18,6 +18,8 @@ import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
 import retrofit2.Call;
@@ -33,7 +35,7 @@ public class ProfileLikeFragment extends BaseFragment
                    LoadMoreRecyclerView.OnLoadMoreListener{
 
     private static final int PAGE_SIZE = 21;
-    private static final int PAGE_SIZE_WANTED = 20;
+    private static final int PAGE_SIZE_WANTED = PAGE_SIZE - 1;
 
     @Bind(R.id.data_rv) LoadMoreRecyclerView mTimelineRv;
     private TimelineAdapter mAdapter;
@@ -86,10 +88,10 @@ public class ProfileLikeFragment extends BaseFragment
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
         // TODO use NinaTwitterApiClient
-        /*mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
+        mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+            public void onRespond(Response<List<TweetDto>> response) {
                 if (response.body().size() > PAGE_SIZE_WANTED) {
                     mTimelineRv.setLoadMoreEnable(true);
                     response.body().remove(response.body().size() - 1);
@@ -101,9 +103,9 @@ public class ProfileLikeFragment extends BaseFragment
 
             @Override
             public void onFailed(Throwable t) {
-
+                L.d(t.toString());
             }
-        });*/
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -111,11 +113,10 @@ public class ProfileLikeFragment extends BaseFragment
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
         long maxId = ((TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1)).id;
-        // TODO use NinaTwitterApiClient
-        /*mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, maxId, PAGE_SIZE);
+        mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, maxId, PAGE_SIZE);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+            public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
                     mTimelineRv.setLoadMoreEnable(true);
                 } else {
@@ -129,7 +130,7 @@ public class ProfileLikeFragment extends BaseFragment
             public void onFailed(Throwable t) {
                 L.d(t.toString());
             }
-        });*/
+        });
     }
 
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
-import retrofit2.http.GET;
 import retrofit2.Call;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
 
@@ -16,6 +16,8 @@ import retrofit2.http.Query;
  * Created by crazysheep on 16/1/23.
  */
 public interface TwitterService {
+
+    /////////////////////// statuses //////////////////////////
 
     /**
      * get user timeline
@@ -39,24 +41,30 @@ public interface TwitterService {
             @Query("max_id") Long maxId,
             @Query("count") Integer count);
 
+    //////////////////// favorites ///////////////////////
+
     /**
      * get user favorite tweets timeline
      * */
-    @GET("favorites/list")
+    @GET("favorites/list.json")
     Call<List<TweetDto>> getFavoritesTimeline(
             @Query("screen_name") String screenName, @Query("max_id") Long maxId,
             @Query("count") Integer count);
 
+    ////////////////////////// users /////////////////////
+
     /**
      * get target user's profile info
      * */
-    @GET("users/show")
+    @GET("users/show.json")
     Call<UserDto> getUserInfo(@Query("screen_name") String screenName);
+
+    ///////////////////////// account /////////////////////
 
     /**
      * verify if account is credential
      * */
-    @GET("account/verify_credentials")
+    @GET("account/verify_credentials.json")
     void getUserVerify(@Query("include_email") String email);
 
 }

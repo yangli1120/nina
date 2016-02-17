@@ -19,6 +19,8 @@ import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.ProfileMediaTimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.net.HttpCache;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
@@ -88,12 +90,12 @@ public class ProfileMediaFragment extends BaseFragment
     private void requestFirstPage() {
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
-        // TODO use NinaTwitterApiClient
-        /*mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
-                PAGE_SIZE, null);
+
+        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
+                null);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+            public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
                     mMediaRv.setLoadMoreEnable(true);
                     response.body().remove(response.body().size() - 1);
@@ -107,19 +109,19 @@ public class ProfileMediaFragment extends BaseFragment
             public void onFailed(Throwable t) {
                 L.d(t.toString());
             }
-        });*/
+        });
     }
 
     private void requestNextPage() {
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
-        // TODO use NinaTwitterApiClient
-        /*long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
-        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
-                PAGE_SIZE, maxId);
+
+        long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
+        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
+                maxId);
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
-            public void onRespond(Call<List<TweetDto>> call, Response<List<TweetDto>> response) {
+            public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
                     mMediaRv.setLoadMoreEnable(true);
                 } else {
@@ -133,7 +135,7 @@ public class ProfileMediaFragment extends BaseFragment
             public void onFailed(Throwable t) {
                 L.d(t.toString());
             }
-        });*/
+        });
     }
 
     private List<TweetDto> filterMediaTweets(List<TweetDto> tweets) {

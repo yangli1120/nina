@@ -65,7 +65,7 @@ public class HttpCache {
 
         public static final String PARAM_CACHE_CONTROL = "cache_control";
 
-        public static final int DEFAULT_CACHE_FRESH_DURATION = 5 * 60; // cache fresh time is 5 minutes
+        public static final int DEFAULT_CACHE_FRESH_DURATION = 2 * 60; // cache fresh time is 2 minutes
 
         /**
          * make cache control from cacheType
