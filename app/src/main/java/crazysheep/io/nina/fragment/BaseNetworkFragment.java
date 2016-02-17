@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
-import crazysheep.io.nina.net_legacy.HttpClient;
-import crazysheep.io.nina.net_legacy.TwitterService;
+import crazysheep.io.nina.net_new.TwitterClient;
+import crazysheep.io.nina.net_new.TwitterService;
 import crazysheep.io.nina.utils.Utils;
 
 /**
@@ -33,13 +33,13 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
     private FrameLayout mErrorFl;
     private TextView mErrorMsgTv;
 
-    protected TwitterService mHttp;
+    protected TwitterService mTwitter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mHttp = HttpClient.getInstance().create(TwitterService.class);
+        mTwitter = TwitterClient.getInstance().getTwitterApiClient().getTwitterService();
     }
 
     @Nullable

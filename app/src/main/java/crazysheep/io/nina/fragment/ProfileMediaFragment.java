@@ -19,8 +19,6 @@ import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.ProfileMediaTimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
-import crazysheep.io.nina.net_legacy.HttpCache;
-import crazysheep.io.nina.net_legacy.Retrofit2NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
@@ -90,7 +88,8 @@ public class ProfileMediaFragment extends BaseFragment
     private void requestFirstPage() {
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
-        mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
+        // TODO use NinaTwitterApiClient
+        /*mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
                 PAGE_SIZE, null);
         mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
             @Override
@@ -108,13 +107,14 @@ public class ProfileMediaFragment extends BaseFragment
             public void onFailed(Throwable t) {
                 L.d(t.toString());
             }
-        });
+        });*/
     }
 
     private void requestNextPage() {
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
-        long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
+        // TODO use NinaTwitterApiClient
+        /*long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CacheConfig.CACHE_NETWORK, mScreenName,
                 PAGE_SIZE, maxId);
         mTimelineCall.enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
@@ -133,7 +133,7 @@ public class ProfileMediaFragment extends BaseFragment
             public void onFailed(Throwable t) {
                 L.d(t.toString());
             }
-        });
+        });*/
     }
 
     private List<TweetDto> filterMediaTweets(List<TweetDto> tweets) {

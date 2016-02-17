@@ -105,8 +105,8 @@ public class GifHolder extends BaseHolder
     }
 
     private float getWHAspectRatio() {
-        return mTweetDto.extended_entities.media.get(0).video_info.aspect_ratio.get(0) * 1f
-                / mTweetDto.extended_entities.media.get(0).video_info.aspect_ratio.get(1);
+        return mTweetDto.extended_entities.media.get(0).video_info.aspect_ratio[0] * 1f
+                / mTweetDto.extended_entities.media.get(0).video_info.aspect_ratio[1];
     }
 
     private void animateLabel() {

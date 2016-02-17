@@ -16,7 +16,7 @@ import okhttp3.CacheControl;
  *
  * Created by crazysheep on 16/1/26.
  */
-public class HttpCache {
+class HttpCache {
 
     private static HttpCache mInstance;
     private Cache mCache; // cache for okhttp client

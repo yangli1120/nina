@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
  *
  * Created by crazysheep on 16/1/25.
  */
-public class RequestHeaderHelper {
+class RequestHeaderHelper {
 
     private static Comparator<Map.Entry<String, String>> mComparator = new Comparator<Map.Entry<String, String>>() {
 

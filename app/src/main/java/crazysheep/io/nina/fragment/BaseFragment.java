@@ -3,8 +3,8 @@ package crazysheep.io.nina.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-import crazysheep.io.nina.net_legacy.HttpClient;
-import crazysheep.io.nina.net_legacy.TwitterService;
+import crazysheep.io.nina.net_new.NinaTwitterApiClient;
+import crazysheep.io.nina.net_new.TwitterClient;
 
 /**
  * base fragment
@@ -24,7 +24,7 @@ public class BaseFragment extends Fragment {
 
     public static String TAG = BaseFragment.class.getSimpleName();
 
-    protected TwitterService mTwitter;
+    protected NinaTwitterApiClient mTwitter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class BaseFragment extends Fragment {
         TAG = getClass().getSimpleName();
 
         if(this instanceof INetworkFragment)
-            mTwitter = HttpClient.getInstance().create(TwitterService.class);
+            mTwitter = TwitterClient.getInstance().getTwitterApiClient();
     }
 
 }

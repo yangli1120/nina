@@ -9,7 +9,7 @@ import retrofit2.Response;
  *
  * Created by crazysheep on 16/1/27.
  */
-public abstract class Retrofit2NiceCallback<T> implements retrofit2.Callback<T> {
+abstract class Retrofit2NiceCallback<T> implements retrofit2.Callback<T> {
 
     @Override
     public void onResponse(Call<T> call, Response<T> response) {

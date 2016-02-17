@@ -16,10 +16,10 @@ public class NinaTwitterApiClient extends TwitterApiClient {
     }
 
     /**
-     * request users api, such like "TWITTER_BASE_URL/users/show"
+     * twitter REST api service
      * */
-    public UsersService getUsersService() {
-        return getService(UsersService.class);
+    public TwitterService getTwitterService() {
+        return getService(TwitterService.class);
     }
 
 }

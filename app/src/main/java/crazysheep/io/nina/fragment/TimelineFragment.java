@@ -16,13 +16,11 @@ import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.net_legacy.HttpCache;
-import crazysheep.io.nina.net_legacy.Retrofit2NiceCallback;
+import crazysheep.io.nina.net_new.NiceCallback;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
-import retrofit2.Call;
-import retrofit2.Response;
+import retrofit.client.Response;
 
 /**
  * fragment show twitter timeline
@@ -47,7 +45,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         ButterKnife.bind(this, contentView);
 
         initUI();
-        requestTimeline(false);
+        requestTimeline();
 
         return contentView;
     }
@@ -63,7 +61,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestTimeline(true);
+                requestTimeline();
             }
         });
         mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
@@ -75,30 +73,26 @@ public class TimelineFragment extends BaseNetworkFragment {
     }
 
     @SuppressWarnings("unchecked")
-    private void requestTimeline(boolean force) {
-        int cacheType = force ? HttpCache.CacheConfig.CACHE_NETWORK
-                : HttpCache.CacheConfig.CACHE_IF_HIT;
+    private void requestTimeline() {
+        NiceCallback.cancel(TAG);
+        mTwitter.getHomeTimeline(PAGE_SIZE, null, new NiceCallback<List<TweetDto>>(TAG) {
+            @Override
+            public void onRespond(List<TweetDto> tweetDtos, retrofit.client.Response response) {
+                mAdapter.setData(tweetDtos);
+                mTimelineRv.setEnableLoadMore(true);
+            }
 
-        mHttp.getHomeTimeline(cacheType, null, PAGE_SIZE)
-                .enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
-                    @Override
-                    public void onRespond(Call<List<TweetDto>> call,
-                                          Response<List<TweetDto>> response) {
-                        mAdapter.setData(response.body());
-                        mTimelineRv.setEnableLoadMore(true);
-                    }
+            @Override
+            public void onFailed(Throwable t) {
+                showError();
+                L.d(t.toString());
+            }
 
-                    @Override
-                    public void onFailed(Throwable t) {
-                        showError();
-                        L.d(t.toString());
-                    }
-
-                    @Override
-                    public void onDone() {
-                        mTimelineRv.setRefreshing(false);
-                    }
-                });
+            @Override
+            public void onDone() {
+                mTimelineRv.setRefreshing(false);
+            }
+        });
     }
 
     // load more
@@ -106,14 +100,13 @@ public class TimelineFragment extends BaseNetworkFragment {
     private void requestTimelineNextPage() {
         TweetDto oldestTweetDto = (TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1);
 
-        mHttp.getHomeTimeline(HttpCache.CacheConfig.CACHE_NETWORK, oldestTweetDto.id,
-                        NEXT_PAGE_SIZE)
-                .enqueue(new Retrofit2NiceCallback<List<TweetDto>>() {
+        NiceCallback.cancel(TAG);
+        mTwitter.getHomeTimeline(NEXT_PAGE_SIZE, oldestTweetDto.id,
+                new NiceCallback<List<TweetDto>>(TAG) {
                     @Override
-                    public void onRespond(Call<List<TweetDto>> call,
-                                          Response<List<TweetDto>> response) {
-                        response.body().remove(0); // remove repeat one
-                        mAdapter.addData(response.body());
+                    public void onRespond(List<TweetDto> tweetDtos, Response response) {
+                        tweetDtos.remove(0); // remove repeat one
+                        mAdapter.addData(tweetDtos);
                     }
 
                     @Override
@@ -126,7 +119,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     @Override
     protected void onErrorClick() {
-        requestTimeline(false);
+        requestTimeline();
     }
 
 }

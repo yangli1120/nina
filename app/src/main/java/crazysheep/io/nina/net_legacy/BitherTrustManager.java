@@ -18,7 +18,7 @@ import javax.net.ssl.X509TrustManager;
  *
  * Created by crazysheep on 16/2/16.
  */
-public class BitherTrustManager implements X509TrustManager {
+class BitherTrustManager implements X509TrustManager {
 
     static class LocalStoreX509TrustManager implements X509TrustManager {
 

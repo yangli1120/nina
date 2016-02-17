@@ -15,7 +15,7 @@ import retrofit2.http.Query;
  *
  * Created by crazysheep on 16/1/23.
  */
-public interface TwitterService {
+interface TwitterService {
 
     /**
      * get user timeline

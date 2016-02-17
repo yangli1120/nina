@@ -3,7 +3,6 @@ package crazysheep.io.nina.net_new;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
-import crazysheep.io.nina.net_legacy.HttpConstants;
 import crazysheep.io.nina.utils.Utils;
 
 /**

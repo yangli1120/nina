@@ -21,7 +21,7 @@ import twitter4j.conf.ConfigurationBuilder;
  *
  * Created by crazysheep on 16/2/3.
  */
-public class RxRequest {
+class RxRequest {
 
     public interface RxRequestCallback<T> {
         void onRespond(T t);

@@ -36,7 +36,7 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
  *
  * Created by crazysheep on 16/1/22.
  */
-public class HttpClient {
+class HttpClient {
 
     private static Retrofit mRetrofit;
 

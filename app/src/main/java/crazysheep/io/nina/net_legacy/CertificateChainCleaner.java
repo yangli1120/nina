@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * <p>
  * Created by crazysheep on 16/2/16.
  */
-final class CertificateChainCleaner {
+class CertificateChainCleaner {
     private CertificateChainCleaner() {
     }
 

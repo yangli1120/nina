@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public class VideoInfoDto implements BaseDto, Parcelable {
                 }
     * */
     @SerializedName("aspect_ratio")
-    public ArrayList<Integer> aspect_ratio;
+    public int[] aspect_ratio;
     @SerializedName("variants")
     public List<VariantDto> variants;
 

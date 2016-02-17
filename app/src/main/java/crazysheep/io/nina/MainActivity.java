@@ -19,14 +19,14 @@ import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net_new.NiceCallback;
-import crazysheep.io.nina.net_new.TwitterClient;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity
+        implements BaseActivity.ITwitterServiceActivity, View.OnClickListener {
 
     @Bind(R.id.drawer) DrawerLayout mDrawer;
     @Bind(R.id.nav_layout) NavigationView mNav;
@@ -51,33 +51,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onResume() {
         super.onResume();
 
-        TwitterClient.getInstance()
-                .getTwitterApiClient()
-                .getUsersService()
-                .getUserInfo(mUserPrefs.getUserScreenName(), new NiceCallback<UserDto>() {
-                    @Override
-                    public void onRespond(UserDto userDto, retrofit.client.Response response) {
-                        if (!Utils.isNull(userDto)) {
-                            if (!userDto.name.equals(mUserPrefs.getUsername())) {
-                                mUserPrefs.setUsername(userDto.name);
-                                mUserNameTv.setText(userDto.name);
-                            }
-                            String profileImageUrl = userDto.profile_image_url_https;
-                            if (!TextUtils.isEmpty(profileImageUrl)
-                                    && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
-                                mUserPrefs.setUserAvatar(profileImageUrl);
-                                Glide.with(getActivity())
-                                        .load(profileImageUrl)
-                                        .into(mAvatarCiv);
-                            }
-                        }
+        mTwitter.getUserInfo(mUserPrefs.getUserScreenName(), new NiceCallback<UserDto>(TAG) {
+            @Override
+            public void onRespond(UserDto userDto, retrofit.client.Response response) {
+                if (!Utils.isNull(userDto)) {
+                    if (!userDto.name.equals(mUserPrefs.getUsername())) {
+                        mUserPrefs.setUsername(userDto.name);
+                        mUserNameTv.setText(userDto.name);
                     }
-
-                    @Override
-                    public void onFailed(Throwable t) {
-
+                    String profileImageUrl = userDto.profile_image_url_https;
+                    if (!TextUtils.isEmpty(profileImageUrl)
+                            && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
+                        mUserPrefs.setUserAvatar(profileImageUrl);
+                        Glide.with(getActivity())
+                                .load(profileImageUrl)
+                                .into(mAvatarCiv);
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onFailed(Throwable t) {
+
+            }
+        });
     }
 
     private void initUI() {

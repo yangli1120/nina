@@ -27,9 +27,7 @@ import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.ProfileLikeFragment;
 import crazysheep.io.nina.fragment.ProfileMediaFragment;
 import crazysheep.io.nina.fragment.ProfileTimelineFragment;
-import crazysheep.io.nina.net_legacy.RxRequest;
 import crazysheep.io.nina.utils.ActivityUtils;
-import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -125,17 +123,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
     }
 
     private void requestUser(String screenName) {
-        RxRequest.showUser(this, screenName, new RxRequest.RxRequestCallback<User>() {
-            @Override
-            public void onRespond(User user) {
-                updateUserUI(user);
-            }
-
-            @Override
-            public void onFailed(Throwable t) {
-                L.d(t.toString());
-            }
-        });
+        // TODO use NinaTwitterApiClient request "users/show"
     }
 
     private void updateUserUI(User user) {

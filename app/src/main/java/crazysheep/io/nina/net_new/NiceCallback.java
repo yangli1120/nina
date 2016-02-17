@@ -1,10 +1,11 @@
 package crazysheep.io.nina.net_new;
 
-/**
- * Created by crazysheep on 16/2/16.
- */
+import android.support.annotation.NonNull;
 
-import crazysheep.io.nina.net_legacy.HttpConstants;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import crazysheep.io.nina.utils.Utils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -17,8 +18,75 @@ import retrofit.client.Response;
  */
 public abstract class NiceCallback<T> implements Callback<T> {
 
+    ////////////////////// callback manager ///////////////////////////
+
+    public static class CallbackManager {
+
+        private static Map<String, NiceCallback> mCallbacks = new HashMap<>();
+
+        public void add(NiceCallback callback) {
+            mCallbacks.put(callback.getTag(), callback);
+        }
+
+        public void cancel(String tag) {
+            NiceCallback callback = mCallbacks.get(tag);
+            if(!Utils.isNull(callback)) {
+                callback.cancel();
+                // remove this callback from map
+                mCallbacks.remove(callback);
+            }
+        }
+
+        public void cancelAll() {
+            for(NiceCallback callback : mCallbacks.values()) {
+                if(!Utils.isNull(callback)) {
+                    callback.cancel();
+                    // remove from map
+                    mCallbacks.remove(callback);
+                }
+            }
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+
+    private String TAG = UUID.randomUUID().toString();
+
+    private static CallbackManager mCallbackMgr;
+    private boolean isCanceled = false;
+
+    public String getTag() {
+        return TAG;
+    }
+
+    /**
+     * return CallbackManager
+     * */
+    private static CallbackManager getCallbackManager() {
+        if(Utils.isNull(mCallbackMgr))
+            mCallbackMgr = new CallbackManager();
+
+        return mCallbackMgr;
+    }
+
+    public static void cancel(@NonNull String tag) {
+        getCallbackManager().cancel(tag);
+    }
+
+    public void cancel() {
+        isCanceled = true;
+    }
+
+    public NiceCallback(String tag) {
+        TAG = tag;
+        getCallbackManager().add(this);
+    }
+
     @Override
     public void success(T t, Response response) {
+        if(isCanceled)
+            return;
+
         if(response.getStatus() == HttpConstants.CODE_200)
             onRespond(t, response);
         else
@@ -31,12 +99,14 @@ public abstract class NiceCallback<T> implements Callback<T> {
 
     @Override
     public void failure(RetrofitError error) {
+        if(isCanceled)
+            return;
+
         onFailed(new Throwable(Utils.isNull(error) ? "unknow error" : error.toString()));
         onDone();
     }
 
     public abstract void onRespond(T t, Response response);
-
     public abstract void onFailed(Throwable t);
 
     public void onDone() {}
