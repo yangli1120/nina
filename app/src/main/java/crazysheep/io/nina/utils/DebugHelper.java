@@ -2,7 +2,6 @@ package crazysheep.io.nina.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import crazysheep.io.nina.BuildConfig;
 
@@ -20,7 +19,7 @@ public class DebugHelper {
      * */
     public static void toast(@NonNull Context context, @NonNull String msg) {
         if(BuildConfig.DEBUG)
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            ToastUtils.t(context, msg);
     }
 
     /**

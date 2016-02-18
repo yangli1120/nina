@@ -12,12 +12,15 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import crazysheep.io.nina.PostTweetActivity;
 import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
@@ -121,7 +124,6 @@ public class TimelineFragment extends BaseNetworkFragment {
 
             @Override
             public void onFailed(Throwable t) {
-                showError();
                 L.d(t.toString());
             }
         });
@@ -130,6 +132,11 @@ public class TimelineFragment extends BaseNetworkFragment {
     @Override
     protected void onErrorClick() {
         requestTimeline();
+    }
+
+    @OnClick(R.id.action_fab)
+    protected void clickFab() {
+        ActivityUtils.start(getActivity(), PostTweetActivity.class);
     }
 
 }

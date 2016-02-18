@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#3b94d9">
+
+    <item>
+        <selector>
+            <!-- send button disable state -->
+            <item android:state_enabled="false">
+                <color android:color="#99cdf5" />
+            </item>
+            <!-- send button enable state -->
+            <item>
+                <color android:color="#55acee" />
+            </item>
+        </selector>
+    </item>
+    <item android:id="@android:id/mask">
+        <selector>
+            <!-- send button disable state -->
+            <item android:state_enabled="false">
+                <color android:color="#99cdf5" />
+            </item>
+            <!-- send button enable state -->
+            <item>
+                <color android:color="#55acee" />
+            </item>
+        </selector>
+    </item>
+</ripple>

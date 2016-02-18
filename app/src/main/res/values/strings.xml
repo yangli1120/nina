@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">nina</string>
 
+    <!-- fab behavior -->
+    <string name="fab_behavior_scale_1">crazysheep.io.nina.widget.behavior.ScrollingFABBehavior</string>
+    <string name="fab_behavior_scale_2">crazysheep.io.nina.widget.behavior.ScrollAwareFABBehavior</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -29,4 +33,8 @@
     <!-- timeline -->
     <string name="tag_gif">Gif</string>
     <string name="retweet_author">%s Retweeted</string>
+
+    <!-- create tweet -->
+    <string name="hint_edit_tweet">What\'s happening...</string>
+    <string name="tweet">Tweet</string>
 </resources>

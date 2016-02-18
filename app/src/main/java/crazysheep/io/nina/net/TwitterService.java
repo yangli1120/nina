@@ -8,6 +8,7 @@ import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -18,6 +19,17 @@ import retrofit2.http.Query;
 public interface TwitterService {
 
     /////////////////////// statuses //////////////////////////
+
+    /**
+     * create a new tweet
+     * */
+    @POST("statuses/update.json")
+    Call<TweetDto> postTweet(
+            @Query("status") String status,
+            @Query("in_reply_to_status_id") Long replyStatusId,
+            @Query("place_id") Long placeId,
+            @Query("display_coordinates") boolean displayCoordinates,
+            @Query("media_ids") String mediaIds);
 
     /**
      * get user timeline

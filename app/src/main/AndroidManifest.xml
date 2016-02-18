@@ -18,6 +18,10 @@
         <meta-data
             android:name="crazysheep.io.nina.utils.NinaGlideModel"
             android:value="GlideModule" />
+        <!-- twitter fabric sdk-->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="4f271d2cd1768bac3e7d396f967addc30efafb6c" />
 
         <activity android:name=".SplashActivity"
             android:label="@string/app_name"
@@ -34,9 +38,10 @@
         <activity android:name=".ProfileActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Day"/>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="4f271d2cd1768bac3e7d396f967addc30efafb6c" />
+        <activity android:name=".PostTweetActivity"
+            android:windowSoftInputMode="adjustResize|stateUnspecified"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.Day"/>
     </application>
 
 </manifest>
