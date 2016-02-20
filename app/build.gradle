@@ -116,4 +116,6 @@ dependencies {
     compile 'me.imid.swipebacklayout.lib:library:1.0.0'
     // recyclerview divider
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.8'
+    // event bus
+    compile 'org.greenrobot:eventbus:3.0.0'
 }

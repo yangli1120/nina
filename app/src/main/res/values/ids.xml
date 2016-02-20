@@ -24,6 +24,7 @@
     <item name="view_holder_txt" type="id" />
     <item name="view_holder_image" type="id" />
     <item name="view_holder_gif" type="id" />
+    <item name="view_holder_draft" type="id" />
     <!-- timeline item -->
     <item name="retweet_author_tv" type="id" />
     <item name="author_avatar_iv" type="id" />

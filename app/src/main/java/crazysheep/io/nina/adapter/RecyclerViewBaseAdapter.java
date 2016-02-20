@@ -68,6 +68,11 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         }
     }
 
+    public void addDataToFirst(DT dt) {
+        mItems.add(0, dt);
+        notifyItemInserted(0);
+    }
+
     public List<DT> getData() {
         return mItems;
     }

@@ -52,6 +52,14 @@ public class ActivityUtils {
     }
 
     /**
+     * start for result from fragment
+     * */
+    public static void startResult(@NonNull Fragment fragment, int requestCode,
+                                   @NonNull Intent intent) {
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
+    /**
      * new a fragment instance
      * */
     @SuppressWarnings("unchecked")

@@ -12,4 +12,5 @@ public class BundleConstants {
     public static final String EXTRA_USER_NAME = "extra_user_name";
     public static final String EXTRA_PROFILE_TITLE = "extra_profile_title";
     public static final String EXTRA_REPLY_STATUS_ID = "extra_replay_status_id";
+    public static final String EXTRA_POST_TWEET = "extra_post_tweet";
 }

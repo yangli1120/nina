@@ -2,12 +2,13 @@ package crazysheep.io.nina.net;
 
 import android.support.annotation.NonNull;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.NetworkUtils;
 import crazysheep.io.nina.utils.Utils;
 import retrofit2.Response;
@@ -28,26 +29,43 @@ public class RxTweeting {
 
     //////////////////////// api ////////////////////////////////
 
-    public static class ErrorSubscription implements Subscription {
+    public static class EventPostTweetSuccess {
+        private PostTweetBean postTweetBean;
+        private TweetDto tweetDto;
 
-        private String subscriptionError;
+        public EventPostTweetSuccess(@NonNull PostTweetBean postTweetBean,
+                                     @NonNull TweetDto tweetDto) {
+            this.postTweetBean = postTweetBean;
+            this.tweetDto = tweetDto;
+        }
 
-        public ErrorSubscription(@NonNull String error) {
-            this.subscriptionError = error;
+        public PostTweetBean getPostTweetBean() {
+            return this.postTweetBean;
+        }
+
+        public TweetDto getTweet() {
+            return tweetDto;
+        }
+    }
+
+    public static class EventPostTweetFailed {
+        private PostTweetBean postTweetBean;
+        private String error;
+
+        public EventPostTweetFailed(@NonNull PostTweetBean postTweetBean, String err) {
+            this.postTweetBean = postTweetBean;
+            this.error = err;
+        }
+
+        public PostTweetBean getPostTweetBean() {
+            return postTweetBean;
         }
 
         public String getError() {
-            return subscriptionError;
+            return error;
         }
-
-        @Override
-        public boolean isUnsubscribed() {
-            return false;
-        }
-
-        @Override
-        public void unsubscribe() {}
     }
+
     /////////////////////////////////////////////////////////////
 
     /**
@@ -55,13 +73,16 @@ public class RxTweeting {
      *
      * @param postTweet The tweet to post
      */
-    public static Subscription postTweet(@NonNull PostTweetBean postTweet) {
+    public static Subscription postTweet(@NonNull final PostTweetBean postTweet) {
         // first step, check network state if is connected
-        if(!NetworkUtils.isConnected(BaseApplication.getAppContext()))
-            return new ErrorSubscription("network is not connected");
+        if(!NetworkUtils.isConnected(BaseApplication.getAppContext())) {
+            EventBus.getDefault().post(
+                    new EventPostTweetFailed(postTweet, "network is not connected"));
+            return null;
+        }
 
         return Observable.just(postTweet)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 // second step, save post tweet as draft(may be save to database or sharedperferences)
                 .map(new Func1<PostTweetBean, PostTweetBean>() {
                     @Override
@@ -70,6 +91,7 @@ public class RxTweeting {
                         return postTweetBean;
                     }
                 })
+                .subscribeOn(Schedulers.io())
                 // third step, check if post tweet have media file to upload to twitter sever
                 .map(new Func1<PostTweetBean, PostTweetBean>() {
                     @Override
@@ -93,11 +115,12 @@ public class RxTweeting {
                             if (response.code() == HttpConstants.CODE_200
                                     && !Utils.isNull(response.body()))
                                 return response.body();
+                            else {
                                 // TODO post tweet error handle
-                            else
                                 throw Exceptions.propagate(new Throwable(
                                         "request \"" + response.raw().request().url() + "\" error: "
                                                 + response.message()));
+                            }
                         } catch (IOException ioe) {
                             ioe.printStackTrace();
 
@@ -113,16 +136,14 @@ public class RxTweeting {
 
                     @Override
                     public void onError(Throwable e) {
-                        // TODO post tweet failed, handle it
-                        DebugHelper.toast(BaseApplication.getAppContext(),
-                                "post tweet exception: " + e.toString());
+                        EventBus.getDefault().post(
+                                new EventPostTweetFailed(postTweet, Utils.isNull(e)
+                                        ? "post tweet failed" : e.toString()));
                     }
 
                     @Override
                     public void onNext(TweetDto tweetDto) {
-                        // TODO post tweet successful, broadcast it
-                        DebugHelper.toast(BaseApplication.getAppContext(),
-                                "post tweet\"" + tweetDto.text + "\"" + " successful!");
+                        EventBus.getDefault().post(new EventPostTweetSuccess(postTweet, tweetDto));
                     }
                 });
     }

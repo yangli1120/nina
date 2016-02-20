@@ -19,7 +19,7 @@ import crazysheep.io.nina.widget.imagegroup.GridGalleryLayout;
  *
  * Created by crazysheep on 16/1/29.
  */
-public class ImageHolder extends BaseHolder implements GridGalleryLayout.OnChildLifeListener,
+public class ImageHolder extends BaseNormalHolder implements GridGalleryLayout.OnChildLifeListener,
         GridGalleryLayout.OnChildClickListener{
 
     @Bind(R.id.tweet_gallery_ggl) GridGalleryLayout imgsGgl;

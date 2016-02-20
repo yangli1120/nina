@@ -1,5 +1,10 @@
 package crazysheep.io.nina.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
+
 import java.util.List;
 
 /**
@@ -7,38 +12,41 @@ import java.util.List;
  *
  * Created by crazysheep on 16/2/18.
  */
-public class PostTweetBean {
+@ParcelablePlease
+public class PostTweetBean implements Parcelable, ITweet {
 
     /**
      * tweet status
      * */
-    private String status;
+    protected String status;
     /**
      * status id if is a reply tweet
      * */
-    private Long replyStatusId;
+    protected Long replyStatusId;
     /**
      * media ids
      * */
-    private String mediaIds;
+    protected String mediaIds;
     /**
      * place id
      * */
-    private Long placeId;
+    protected Long placeId;
     /**
      * posted tweet should display coordinates
      * */
-    private boolean displayCoordinates;
+    protected boolean displayCoordinates;
     /**
      * photos' file path on storage, twitter allow at most 4 photo every tweet
      * */
-    private List<String> photoFiles;
+    protected String[] photoFiles;
     /**
      * video's file path on storage, twitter allow at most 1 video every tweet
      * */
-    private String videoFiles;
+    protected String videoFiles;
 
-    private PostTweetBean(boolean displayCoordinates, String mediaIds, List<String> photoFiles,
+    private PostTweetBean() {}
+
+    private PostTweetBean(boolean displayCoordinates, String mediaIds, String[] photoFiles,
                          Long placeId, Long replyStatusId, String status, String videoFiles) {
         this.displayCoordinates = displayCoordinates;
         this.mediaIds = mediaIds;
@@ -58,7 +66,7 @@ public class PostTweetBean {
     public String getMediaIds() {
         return mediaIds;
     }
-    public List<String> getPhotoFiles() {
+    public String[] getPhotoFiles() {
         return photoFiles;
     }
     public Long getPlaceId() {
@@ -78,7 +86,7 @@ public class PostTweetBean {
         private String mediaIds;
         private Long placeId;
         private boolean displayCoordinates;
-        private List<String> photoFiles;
+        private String[] photoFiles;
         private String videoFiles;
 
         public Builder() {
@@ -92,7 +100,7 @@ public class PostTweetBean {
             this.mediaIds = mediaIds;
             return this;
         }
-        public Builder setPhotoFiles(List<String> photoFiles) {
+        public Builder setPhotoFiles(String[] photoFiles) {
             this.photoFiles = photoFiles;
             return this;
         }
@@ -119,4 +127,27 @@ public class PostTweetBean {
         }
     }
 
+    ///////////////////////////// Parcelable /////////////////////////////
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        PostTweetBeanParcelablePlease.writeToParcel(this, dest, flags);
+    }
+
+    public static final Creator<PostTweetBean> CREATOR = new Creator<PostTweetBean>() {
+        public PostTweetBean createFromParcel(Parcel source) {
+            PostTweetBean target = new PostTweetBean();
+            PostTweetBeanParcelablePlease.readFromParcel(target, source);
+            return target;
+        }
+
+        public PostTweetBean[] newArray(int size) {
+            return new PostTweetBean[size];
+        }
+    };
 }

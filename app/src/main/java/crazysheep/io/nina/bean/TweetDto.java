@@ -14,7 +14,7 @@ import crazysheep.io.nina.utils.Utils;
  * Created by crazysheep on 16/1/23.
  */
 @ParcelablePlease
-public class TweetDto implements BaseDto, Parcelable {
+public class TweetDto implements BaseDto, Parcelable, ITweet {
 
     ////////////////////////// api ////////////////////////
 

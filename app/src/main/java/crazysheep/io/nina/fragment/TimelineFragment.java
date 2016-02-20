@@ -1,5 +1,7 @@
 package crazysheep.io.nina.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,16 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import crazysheep.io.nina.PostTweetActivity;
 import crazysheep.io.nina.MainActivity;
+import crazysheep.io.nina.PostTweetActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.TimelineAdapter;
+import crazysheep.io.nina.bean.ITweet;
+import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.ActivityUtils;
@@ -34,6 +40,8 @@ import retrofit2.Response;
  * Created by crazysheep on 16/1/22.
  */
 public class TimelineFragment extends BaseNetworkFragment {
+
+    private static final int REQUEST_POST_TWEET = 111;
 
     private static final int PAGE_SIZE = 20; // tweet count every request
     private static final int NEXT_PAGE_SIZE = PAGE_SIZE + 1; // because twitter api will also return
@@ -89,7 +97,12 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
-                mAdapter.setData(response.body());
+                // TODO filter draft from adapter, add to front
+                List<ITweet> items = new ArrayList<>();
+                items.addAll(mAdapter.getDraftItems());
+                for(TweetDto tweetDto : response.body())
+                    items.add(tweetDto);
+                mAdapter.setData(items);
                 mTimelineRv.setEnableLoadMore(true);
             }
 
@@ -134,9 +147,30 @@ public class TimelineFragment extends BaseNetworkFragment {
         requestTimeline();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_POST_TWEET: {
+                    // TODO update timeline ui, show draft item
+                    PostTweetBean postTweetBean = data.getParcelableExtra(
+                            BundleConstants.EXTRA_POST_TWEET);
+                    if(!Utils.isNull(postTweetBean)) {
+                        mAdapter.addDataToFirst(postTweetBean);
+                        mTimelineRv.getRefreshableView().smoothScrollToPosition(0);
+                    }
+                }break;
+            }
+        }
+    }
+
     @OnClick(R.id.action_fab)
     protected void clickFab() {
-        ActivityUtils.start(getActivity(), PostTweetActivity.class);
+        ActivityUtils.startResult(this, REQUEST_POST_TWEET,
+                ActivityUtils.prepare(getActivity(), PostTweetActivity.class));
     }
 
 }

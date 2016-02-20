@@ -1,6 +1,12 @@
 package crazysheep.io.nina;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -14,12 +20,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
-import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.utils.ImeUtils;
-import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
-import rx.Subscription;
+import service.BatmanService;
 
 /**
  * create a tweet
@@ -34,6 +38,22 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     // if post a reply tweet
     private long replayStatusId;
+
+    private boolean isServiceBinded = false;
+    private BatmanService mBatmanService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            isServiceBinded = true;
+            mBatmanService = ((BatmanService.BatmanBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isServiceBinded = false;
+            mBatmanService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +88,17 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
             @Override
             public void onScrollOverThreshold() {}
         });
+
+        // bind service
+        bindService(new Intent(this, BatmanService.class), mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(isServiceBinded)
+            unbindService(mConnection);
     }
 
     @Override
@@ -91,6 +122,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @Override
     public void afterTextChanged(Editable s) {
         mSendBtn.setEnabled(!TextUtils.isEmpty(s.toString()));
+
+        // TODO check if words length is too long that twitter forbid a tweet status length more than 140
     }
 
     @OnClick(R.id.send_tweet_btn)
@@ -99,11 +132,13 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         PostTweetBean postTweet = new PostTweetBean.Builder()
                 .setStatus(mTweetEt.getEditableText().toString())
                 .build();
-        Subscription subscription = RxTweeting.postTweet(postTweet);
-        if(subscription instanceof RxTweeting.ErrorSubscription)
-            ToastUtils.t(this, ((RxTweeting.ErrorSubscription) subscription).getError());
-        else
-            finish();
+        mBatmanService.postTweet(postTweet);
+
+        // set result to TimelineFragment to show draft item UI in timeline
+        Intent data = new Intent();
+        data.putExtra(BundleConstants.EXTRA_POST_TWEET, postTweet);
+        setResult(Activity.RESULT_OK, data);
+        finish();
     }
 
 }

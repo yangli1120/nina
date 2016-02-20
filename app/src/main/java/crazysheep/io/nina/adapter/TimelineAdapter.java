@@ -4,10 +4,11 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import crazysheep.io.nina.R;
-import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.ITweet;
+import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.holder.timeline.BaseHolder;
 import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
 
@@ -16,19 +17,19 @@ import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
  *
  * Created by crazysheep on 16/1/23.
  */
-public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapter<T, TweetDto> {
+public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapter<T, ITweet> {
 
-    public TimelineAdapter(@NonNull Context context, List<TweetDto> data) {
+    public TimelineAdapter(@NonNull Context context, List<ITweet> data) {
         super(context, data);
     }
 
     @Override
     protected T onCreateHolder(ViewGroup parent, int viewType) {
-        ViewGroup itemRoot = (ViewGroup)mInflater.inflate(R.layout.item_timeline_base, parent, false);
-        return TimelineHolderFactory.createHolder(itemRoot, viewType);
+        return TimelineHolderFactory.createHolder(mInflater, parent, viewType);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(T holder, int position) {
         holder.bindData(position, getItem(position));
     }
@@ -36,6 +37,15 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
     @Override
     public int getItemViewType(int position) {
         return TimelineHolderFactory.getViewType(getItem(position));
+    }
+
+    public List<ITweet> getDraftItems() {
+        List<ITweet> drafts = new ArrayList<>();
+        for(ITweet iTweet : getData())
+            if(iTweet instanceof PostTweetBean)
+                drafts.add(iTweet);
+
+        return drafts;
     }
 
 }
