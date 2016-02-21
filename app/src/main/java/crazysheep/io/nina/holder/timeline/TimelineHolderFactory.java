@@ -89,6 +89,7 @@ public class TimelineHolderFactory {
      * parse view holder type from tweet data
      * */
     public static int getViewType(@NonNull ITweet iTweet) {
+        // TODO more draft type may be, for good UX
         if(iTweet instanceof PostTweetBean) {
             return TYPE_DRAFT;
         } else if(iTweet instanceof TweetDto) {
