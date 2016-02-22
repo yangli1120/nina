@@ -31,6 +31,7 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
     public static final String COLUMN_VIDEO_FILE = "video_file";
     public static final String COLUMN_POST_STATE = "post_state";
     public static final String COLUMN_RANDOM_ID = "random_id";
+    public static final String COLUMN_CREATED_AT = "created_at";
 
     public static final String STATE_READY = "state_ready";
     public static final String STATE_POSTING = "state_posting";
@@ -86,11 +87,17 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
     @Column(name = COLUMN_RANDOM_ID)
     public String randomId;
 
-    private PostTweetBean() {}
+    /**
+     * post tweet draft created at
+     * */
+    @Column(name = COLUMN_CREATED_AT)
+    public long created_at;
+
+    public PostTweetBean() {}
 
     private PostTweetBean(boolean displayCoordinates, String mediaIds, String photoFiles,
                           Long placeId, Long replyStatusId, String status, String videoFile,
-                          String randomId) {
+                          String randomId, long created_at) {
         this.displayCoordinates = displayCoordinates;
         this.mediaIds = mediaIds;
         this.photoFiles = photoFiles;
@@ -99,6 +106,7 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         this.status = status;
         this.videoFile = videoFile;
         this.randomId = randomId;
+        this.created_at = created_at;
     }
 
     public String getVideoFile() {
@@ -189,7 +197,7 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
 
         public PostTweetBean build() {
             return new PostTweetBean(displayCoordinates, mediaIds, photoFiles, placeId,
-                    replyStatusId, status, videoFile, Utils.randomId());
+                    replyStatusId, status, videoFile, Utils.randomId(), System.currentTimeMillis());
         }
     }
 

@@ -27,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
 import se.akerfeldt.okhttp.signpost.SigningInterceptor;
@@ -42,6 +43,7 @@ public class HttpClient {
 
     private Retrofit mRetrofit;
     private TwitterService mTwitterService;
+    private RxTwitterService mRxTwitterService;
 
     private HttpClient(@NonNull Retrofit retrofit) {
         mRetrofit = retrofit;
@@ -78,6 +80,8 @@ public class HttpClient {
                     Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(HttpConstants.BASE_URL)
                             .addConverterFactory(GsonConverterFactory.create())
+                            // use rxjava
+                            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                             .client(okHttpClient)
                             .build();
 
@@ -96,6 +100,16 @@ public class HttpClient {
             }
 
         return mTwitterService;
+    }
+
+    public RxTwitterService getRxTwitterService() {
+        if(Utils.isNull(mRxTwitterService))
+            synchronized (HttpClient.class) {
+                if(Utils.isNull(mRxTwitterService))
+                    mRxTwitterService = mRetrofit.create(RxTwitterService.class);
+            }
+
+        return mRxTwitterService;
     }
 
     /*

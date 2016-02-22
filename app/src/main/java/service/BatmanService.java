@@ -56,6 +56,7 @@ public class BatmanService extends Service {
                         if(!Utils.isNull(postTweetBean)) {
                             reference.get().hasTweetPosting = true;
                             // do request
+                            postTweetBean.setPosting();
                             RxTweeting.postTweet(postTweetBean);
                         } else if(reference.get().mPostQueue.size() > 0) {
                             // if post tweet is null, but queue is more than 0, toggle next post
@@ -116,6 +117,7 @@ public class BatmanService extends Service {
         // and background task had upload photos successful but post tweet failed, then table column
         // "media_ids" and "photo_files" will be update, so that we do not need upload files
         // again to save our life
+        event.getPostTweetBean().setFailed();
         event.getPostTweetBean().save();
 
         // notify queue to post next tweet

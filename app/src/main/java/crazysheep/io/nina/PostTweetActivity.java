@@ -39,18 +39,18 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     // if post a reply tweet
     private long replayStatusId;
 
-    private boolean isServiceBinded = false;
+    private boolean isServiceBinding = false;
     private BatmanService mBatmanService;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            isServiceBinded = true;
+            isServiceBinding = true;
             mBatmanService = ((BatmanService.BatmanBinder)service).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            isServiceBinded = false;
+            isServiceBinding = false;
             mBatmanService = null;
         }
     };
@@ -97,7 +97,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     protected void onDestroy() {
         super.onDestroy();
 
-        if(isServiceBinded)
+        if(isServiceBinding)
             unbindService(mConnection);
     }
 

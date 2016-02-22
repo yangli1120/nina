@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.activeandroid.query.Select;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -31,15 +33,18 @@ import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.net.HttpCache;
-import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
-import retrofit2.Call;
-import retrofit2.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * fragment show twitter timeline
@@ -59,7 +64,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     private TimelineAdapter mAdapter;
 
-    private Call<List<TweetDto>> mTimelineCall;
+    private Observable<List<ITweet>> mTimelineObser;
 
     @Nullable
     @Override
@@ -68,7 +73,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         ButterKnife.bind(this, contentView);
 
         initUI();
-        requestTimeline();
+        requestFirstPage();
 
         return contentView;
     }
@@ -98,74 +103,107 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestTimeline();
+                requestFirstPage();
             }
         });
         mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                requestTimelineNextPage();
+                requestNextPage();
             }
         });
     }
 
     @SuppressWarnings("unchecked")
-    private void requestTimeline() {
-        if(!Utils.isNull(mTimelineCall))
-            mTimelineCall.cancel();
+    private void requestFirstPage() {
+        if(!Utils.isNull(mTimelineObser))
+            mTimelineObser.unsubscribeOn(AndroidSchedulers.mainThread());
 
-        mTimelineCall = mTwitter.getHomeTimeline(HttpCache.CACHE_IF_HIT, null, PAGE_SIZE);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
-            @Override
-            public void onRespond(Response<List<TweetDto>> response) {
-                // filter draft from adapter, add to front
-                List<ITweet> items = new ArrayList<>();
-                items.addAll(mAdapter.getDraftItems());
-                for (TweetDto tweetDto : response.body())
-                    items.add(tweetDto);
-                mAdapter.setData(items);
-                mTimelineRv.setEnableLoadMore(true);
-            }
+        mTimelineObser = mRxTwitter
+                .getHomeTimeline(HttpCache.CACHE_IF_HIT, null, PAGE_SIZE)
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<List<TweetDto>, List<ITweet>>() {
+                    @Override
+                    public List<ITweet> call(List<TweetDto> tweetDtos) {
+                        return new ArrayList<ITweet>(tweetDtos);
+                    }
+                });
+        final List<ITweet> draftsAndTweets = new ArrayList<>();
+        Observable.merge(queryDrafts(), mTimelineObser)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<ITweet>>() {
+                    @Override
+                    public void onCompleted() {
+                        mTimelineRv.setRefreshing(false);
 
-            @Override
-            public void onFailed(Throwable t) {
-                showError();
-                L.d(t.toString());
-            }
+                        mAdapter.setData(draftsAndTweets);
+                        mTimelineRv.setEnableLoadMore(true);
+                    }
 
-            @Override
-            public void onDone() {
-                mTimelineRv.setRefreshing(false);
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        showError();
+                        L.d(e.toString());
+                    }
+
+                    @Override
+                    public void onNext(List<ITweet> iTweets) {
+                        draftsAndTweets.addAll(iTweets);
+                    }
+                });
     }
 
     // load more
     @SuppressWarnings("unchecked")
-    private void requestTimelineNextPage() {
-        if(!Utils.isNull(mTimelineCall))
-            mTimelineCall.cancel();
+    private void requestNextPage() {
+        if(!Utils.isNull(mTimelineObser))
+            mTimelineObser.unsubscribeOn(AndroidSchedulers.mainThread());
 
         TweetDto oldestTweetDto = (TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1);
-        mTimelineCall = mTwitter.getHomeTimeline(HttpCache.CACHE_NETWORK,
-                oldestTweetDto.id, NEXT_PAGE_SIZE);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineObser = mRxTwitter
+                .getHomeTimeline(HttpCache.CACHE_NETWORK, oldestTweetDto.id, NEXT_PAGE_SIZE)
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<List<TweetDto>, List<ITweet>>() {
+                    @Override
+                    public List<ITweet> call(List<TweetDto> tweetDtos) {
+                        return new ArrayList<ITweet>(tweetDtos);
+                    }
+                });
+        mTimelineObser.subscribe(new Action1<List<ITweet>>() {
             @Override
-            public void onRespond(Response<List<TweetDto>> response) {
-                response.body().remove(0); // remove repeat one
-                mAdapter.addData(response.body());
-            }
-
-            @Override
-            public void onFailed(Throwable t) {
-                L.d(t.toString());
+            public void call(List<ITweet> iTweets) {
+                if (iTweets.size() > 0) {
+                    iTweets.remove(0); // remove repeat one
+                    mAdapter.addData(iTweets);
+                }
             }
         });
     }
 
+    // query drafts from database
+    private Observable<List<ITweet>> queryDrafts() {
+        return Observable
+                .create(new Observable.OnSubscribe<List<ITweet>>() {
+                    @Override
+                    public void call(Subscriber<? super List<ITweet>> subscriber) {
+                        try {
+                            List<PostTweetBean> drafts = new Select().from(PostTweetBean.class)
+                                    .orderBy(PostTweetBean.COLUMN_CREATED_AT + " DESC")
+                                    .execute();
+                            subscriber.onNext(new ArrayList<ITweet>(drafts));
+                        } catch (Exception e) {
+                            subscriber.onError(e);
+                        }
+
+                        subscriber.onCompleted();
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
     @Override
     protected void onErrorClick() {
-        requestTimeline();
+        requestFirstPage();
     }
 
     @Override
