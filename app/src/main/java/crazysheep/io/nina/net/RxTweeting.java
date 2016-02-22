@@ -82,17 +82,8 @@ public class RxTweeting {
         }
 
         return Observable.just(postTweet)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                // second step, save post tweet as draft(may be save to database or sharedperferences)
-                .map(new Func1<PostTweetBean, PostTweetBean>() {
-                    @Override
-                    public PostTweetBean call(PostTweetBean postTweetBean) {
-                        // TODO save post tweet as draft
-                        return postTweetBean;
-                    }
-                })
                 .subscribeOn(Schedulers.io())
-                // third step, check if post tweet have media file to upload to twitter sever
+                // second step, check if post tweet have media file to upload to twitter sever
                 .map(new Func1<PostTweetBean, PostTweetBean>() {
                     @Override
                     public PostTweetBean call(PostTweetBean postTweetBean) {
@@ -100,7 +91,7 @@ public class RxTweeting {
                         return postTweetBean;
                     }
                 })
-                // final step, post tweet
+                // final step, every thing is ready, post tweet
                 .map(new Func1<PostTweetBean, TweetDto>() {
                     @Override
                     public TweetDto call(PostTweetBean post) {

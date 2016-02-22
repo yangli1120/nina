@@ -1,5 +1,7 @@
 package crazysheep.io.nina.utils;
 
+import java.util.UUID;
+
 /**
  * common utils
  *
@@ -9,5 +11,9 @@ public class Utils {
 
     public static boolean isNull(Object obj) {
         return null == obj;
+    }
+
+    public static String randomId() {
+        return UUID.randomUUID().toString();
     }
 }

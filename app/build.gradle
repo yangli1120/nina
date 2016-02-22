@@ -12,6 +12,7 @@ buildscript {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
@@ -30,6 +31,7 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
@@ -118,4 +120,6 @@ dependencies {
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.8'
     // event bus
     compile 'org.greenrobot:eventbus:3.0.0'
+    // orm: active android
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
 }

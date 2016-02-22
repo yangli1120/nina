@@ -54,8 +54,8 @@ public class BatmanService extends Service {
                     if(!Utils.isNull(reference.get()) && reference.get().mPostQueue.size() > 0) {
                         PostTweetBean postTweetBean = reference.get().mPostQueue.poll();
                         if(!Utils.isNull(postTweetBean)) {
-                            // if post tweet bean is not null, start request
                             reference.get().hasTweetPosting = true;
+                            // do request
                             RxTweeting.postTweet(postTweetBean);
                         } else if(reference.get().mPostQueue.size() > 0) {
                             // if post tweet is null, but queue is more than 0, toggle next post
@@ -89,6 +89,8 @@ public class BatmanService extends Service {
 
     public void postTweet(@NonNull PostTweetBean postTweetBean) {
         mPostQueue.addLast(postTweetBean);
+        // save post tweet bean to database
+        postTweetBean.save();
 
         if(!hasTweetPosting)
             mHandler.sendEmptyMessage(MSG_POST_TWEET);
@@ -97,7 +99,8 @@ public class BatmanService extends Service {
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetSuccess event) {
-        // TODO post tweet success, delete draft from database
+        // post tweet success, delete draft from database
+        event.getPostTweetBean().delete();
 
         // notify queue to post next tweet
         hasTweetPosting = false;
@@ -107,8 +110,13 @@ public class BatmanService extends Service {
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetFailed event) {
-        // TODO post tweet failed, re-add post tweet bean to queue's last for next change, and update draft state in database
+        // post tweet failed, re-add post tweet bean to queue's last for next change
         mPostQueue.addLast(event.getPostTweetBean());
+        // update draft in database, why? because maybe this post tweet have more photo files,
+        // and background task had upload photos successful but post tweet failed, then table column
+        // "media_ids" and "photo_files" will be update, so that we do not need upload files
+        // again to save our life
+        event.getPostTweetBean().save();
 
         // notify queue to post next tweet
         hasTweetPosting = false;

@@ -50,4 +50,5 @@ public class DraftHolder extends BaseHolder<PostTweetBean> {
 
         contentTv.setText(postTweetBean.getStatus());
     }
+
 }

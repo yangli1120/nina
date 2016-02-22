@@ -2,6 +2,8 @@ package crazysheep.io.nina.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +29,10 @@ import crazysheep.io.nina.bean.ITweet;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
@@ -66,6 +73,20 @@ public class TimelineFragment extends BaseNetworkFragment {
         return contentView;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        EventBus.getDefault().unregister(this);
+    }
+
     private void initUI() {
         if(getActivity() instanceof MainActivity)
             ((MainActivity)getActivity()).setToolbar(mToolbar);
@@ -97,10 +118,10 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
-                // TODO filter draft from adapter, add to front
+                // filter draft from adapter, add to front
                 List<ITweet> items = new ArrayList<>();
                 items.addAll(mAdapter.getDraftItems());
-                for(TweetDto tweetDto : response.body())
+                for (TweetDto tweetDto : response.body())
                     items.add(tweetDto);
                 mAdapter.setData(items);
                 mTimelineRv.setEnableLoadMore(true);
@@ -171,6 +192,28 @@ public class TimelineFragment extends BaseNetworkFragment {
     protected void clickFab() {
         ActivityUtils.startResult(this, REQUEST_POST_TWEET,
                 ActivityUtils.prepare(getActivity(), PostTweetActivity.class));
+    }
+
+    @SuppressWarnings("unchecked, unused")
+    @Subscribe(priority = EventBusConstants.PRIORITY_LOW)
+    public void onEvent(@NonNull RxTweeting.EventPostTweetSuccess event) {
+        // post tweet successful, replace draft UI to tweet UI
+        for(PostTweetBean postTweetBean : (List<PostTweetBean>)mAdapter.getDraftItems())
+            if(postTweetBean.randomId.equals(event.getPostTweetBean().randomId)) {
+                mAdapter.removeItem(postTweetBean);
+                mAdapter.insertData(mAdapter.getDraftItems().size(), event.getTweet());
+            }
+    }
+
+    @SuppressWarnings("unchecked, unused")
+    @Subscribe(priority = EventBusConstants.PRIORITY_LOW)
+    public void onEvent(@NonNull RxTweeting.EventPostTweetFailed event) {
+        // post tweet failed, update draft UI to failed state
+        for(PostTweetBean postTweetBean : (List<PostTweetBean>) mAdapter.getDraftItems())
+            if(postTweetBean.randomId.equals(event.getPostTweetBean().randomId)) {
+                postTweetBean.setFailed();
+                mAdapter.notifyItemChanged(mAdapter.findItemPosition(postTweetBean));
+            }
     }
 
 }

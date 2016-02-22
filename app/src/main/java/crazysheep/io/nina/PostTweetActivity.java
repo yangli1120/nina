@@ -128,7 +128,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     @OnClick(R.id.send_tweet_btn)
     protected void postTweet() {
-        // TODO post a tweet
+        // TODO post a tweet, txt, photo, or video
         PostTweetBean postTweet = new PostTweetBean.Builder()
                 .setStatus(mTweetEt.getEditableText().toString())
                 .build();

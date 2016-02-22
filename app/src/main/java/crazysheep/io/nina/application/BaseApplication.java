@@ -16,7 +16,7 @@ import io.fabric.sdk.android.Fabric;
  *
  * Created by crazysheep on 16/1/20.
  */
-public class BaseApplication extends Application {
+public class BaseApplication extends com.activeandroid.app.Application {
 
     private static BaseApplication mContext;
 

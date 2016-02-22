@@ -68,11 +68,6 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         }
     }
 
-    public void addDataToFirst(DT dt) {
-        mItems.add(0, dt);
-        notifyItemInserted(0);
-    }
-
     public List<DT> getData() {
         return mItems;
     }
@@ -89,14 +84,24 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         return getItemCount() - 1 == position;
     }
 
-    protected final void removeItem(int position) {
+    public final void addDataToFirst(DT dt) {
+        mItems.add(0, dt);
+        notifyItemInserted(0);
+    }
+
+    public final void insertData(int position, DT dt) {
+        mItems.add(position, dt);
+        notifyItemInserted(position);
+    }
+
+    public final void removeItem(int position) {
         if(position >= 0 && position < getItemCount()) {
             mItems.remove(position);
             notifyItemRemoved(position);
         }
     }
 
-    protected final void removeItem(@NonNull DT item) {
+    public final void removeItem(@NonNull DT item) {
         int index = mItems.indexOf(item);
         if(index >= 0 && index < getItemCount()) {
             mItems.remove(index);
@@ -104,7 +109,7 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         }
     }
 
-    protected final int findItemPosition(@NonNull DT item) {
+    public final int findItemPosition(@NonNull DT item) {
         return mItems.indexOf(item);
     }
 

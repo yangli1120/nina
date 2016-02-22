@@ -39,11 +39,11 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
         return TimelineHolderFactory.getViewType(getItem(position));
     }
 
-    public List<ITweet> getDraftItems() {
-        List<ITweet> drafts = new ArrayList<>();
+    public List<PostTweetBean> getDraftItems() {
+        List<PostTweetBean> drafts = new ArrayList<>();
         for(ITweet iTweet : getData())
             if(iTweet instanceof PostTweetBean)
-                drafts.add(iTweet);
+                drafts.add((PostTweetBean)iTweet);
 
         return drafts;
     }
