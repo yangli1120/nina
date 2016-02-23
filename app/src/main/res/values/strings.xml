@@ -37,4 +37,8 @@
     <!-- create tweet -->
     <string name="hint_edit_tweet">What\'s happening...</string>
     <string name="tweet">Tweet</string>
+
+    <!-- dialog -->
+    <string name="ok_btn">OK</string>
+    <string name="cancel_btn">Cancel</string>
 </resources>

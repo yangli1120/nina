@@ -122,4 +122,8 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     // orm: active android
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    // material dialog
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.4@aar') {
+        transitive = true
+    }
 }

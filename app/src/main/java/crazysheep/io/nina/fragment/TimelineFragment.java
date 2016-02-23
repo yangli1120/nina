@@ -32,6 +32,7 @@ import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.constants.EventBusConstants;
+import crazysheep.io.nina.holder.timeline.DraftHolder;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.utils.ActivityUtils;
@@ -251,6 +252,15 @@ public class TimelineFragment extends BaseNetworkFragment {
             if(postTweetBean.randomId.equals(event.getPostTweetBean().randomId)) {
                 postTweetBean.setFailed();
                 mAdapter.notifyItemChanged(mAdapter.findItemPosition(postTweetBean));
+            }
+    }
+
+    @SuppressWarnings("unused, unchecked")
+    @Subscribe
+    public void onEvent(@NonNull DraftHolder.EventRemoveDraft event) {
+        for(PostTweetBean postTweetBean : (List<PostTweetBean>)mAdapter.getDraftItems())
+            if(event.getPostTweetBean().randomId.equals(postTweetBean.randomId)) {
+                mAdapter.removeItem(postTweetBean);
             }
     }
 
