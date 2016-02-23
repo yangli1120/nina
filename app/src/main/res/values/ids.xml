@@ -27,6 +27,7 @@
     <item name="view_holder_draft" type="id" />
     <!-- timeline item -->
     <item name="draft_remove_iv" type="id" />
+    <item name="draft_posting_pb" type="id" />
     <item name="retweet_author_tv" type="id" />
     <item name="author_avatar_iv" type="id" />
     <item name="author_name_tv" type="id" />

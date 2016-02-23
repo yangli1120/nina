@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -52,6 +53,7 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
     @Bind(R.id.author_screen_name_tv) TextView authorScreenNameTv;
     @Bind(R.id.tweet_content_tv) TextView contentTv;
     @Bind(R.id.draft_remove_iv) ImageView removeIv;
+    @Bind(R.id.draft_posting_pb) ProgressBar postingPb;
 
     private PostTweetBean mPostTweetBean;
 
@@ -65,7 +67,7 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
     @Override
     public void bindData(int position, PostTweetBean postTweetBean) {
         mPostTweetBean = postTweetBean;
-        // TODO bind draft UI with data
+
         Glide.clear(avatarIv);
         Glide.with(mContext)
                 .load(mUserPrefs.getUserAvatar())
@@ -79,6 +81,7 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
 
         removeIv.setVisibility(postTweetBean.isFailed() ? View.VISIBLE : View.GONE);
         removeIv.setOnClickListener(this);
+        postingPb.setVisibility(postTweetBean.isFailed() ? View.GONE : View.VISIBLE);
     }
 
     @Override
