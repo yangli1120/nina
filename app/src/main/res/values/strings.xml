@@ -41,4 +41,7 @@
     <!-- dialog -->
     <string name="ok_btn">OK</string>
     <string name="cancel_btn">Cancel</string>
+
+    <!-- gallery -->
+    <string name="gallery">Gallery</string>
 </resources>

@@ -45,6 +45,9 @@
             android:windowSoftInputMode="adjustResize|stateUnspecified"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Day"/>
+        <activity android:name=".GalleryActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.Day" />
 
         <service android:name=".service.BatmanService" android:exported="false" />
     </application>

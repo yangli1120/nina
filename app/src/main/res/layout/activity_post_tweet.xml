@@ -49,7 +49,7 @@
                 android:layout_toRightOf="@id/add_location_iv"
                 android:clickable="true"
                 android:background="@drawable/button_bg"
-                android:src="@drawable/ic_photo_grey"
+                android:src="@drawable/ic_photo_grey_24dp"
                 android:adjustViewBounds="true"
                 android:scaleType="center"/>
 

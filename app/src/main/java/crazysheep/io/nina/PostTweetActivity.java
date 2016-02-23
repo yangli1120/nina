@@ -20,10 +20,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.service.BatmanService;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.ImeUtils;
 import crazysheep.io.nina.utils.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
-import crazysheep.io.nina.service.BatmanService;
 
 /**
  * create a tweet
@@ -31,6 +32,8 @@ import crazysheep.io.nina.service.BatmanService;
  * Created by crazysheep on 16/2/17.
  */
 public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatcher {
+
+    public static final int REQUEST_CHOOSE_IMAGE = 100;
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.edit_tweet_et) EditText mTweetEt;
@@ -124,6 +127,12 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         mSendBtn.setEnabled(!TextUtils.isEmpty(s.toString()));
 
         // TODO check if words length is too long that twitter forbid a tweet status length more than 140
+    }
+
+    @OnClick(R.id.add_image_iv)
+    protected void addImage() {
+        ActivityUtils.startResult(this, REQUEST_CHOOSE_IMAGE,
+                ActivityUtils.prepare(this, GalleryActivity.class));
     }
 
     @OnClick(R.id.send_tweet_btn)

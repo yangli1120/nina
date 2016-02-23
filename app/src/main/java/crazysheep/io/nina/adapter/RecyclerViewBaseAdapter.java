@@ -80,6 +80,10 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerView.ViewHolder
         mOnItemLongClickListener = listener;
     }
 
+    protected boolean isHeader(int position) {
+        return 0 == position;
+    }
+
     protected boolean isFooter(int position) {
         return getItemCount() - 1 == position;
     }
