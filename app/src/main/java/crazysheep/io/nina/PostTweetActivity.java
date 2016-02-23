@@ -23,7 +23,7 @@ import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.utils.ImeUtils;
 import crazysheep.io.nina.utils.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
-import service.BatmanService;
+import crazysheep.io.nina.service.BatmanService;
 
 /**
  * create a tweet
