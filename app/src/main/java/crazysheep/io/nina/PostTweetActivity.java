@@ -105,6 +105,19 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_CHOOSE_IMAGE: {
+                    // TODO return selected images, show preview
+                }break;
+            }
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: {

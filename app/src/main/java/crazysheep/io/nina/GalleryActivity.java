@@ -1,5 +1,7 @@
 package crazysheep.io.nina;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -8,8 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -17,9 +22,10 @@ import butterknife.ButterKnife;
 import crazysheep.io.nina.adapter.GalleryAdapter;
 import crazysheep.io.nina.adapter.RecyclerViewBaseAdapter;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
+import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.db.RxDB;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.SystemUIHelper;
+import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
 
 /**
@@ -62,7 +68,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
         // see{@link http://stackoverflow.com/questions/24914191/recyclerview-cliptopadding-false}
         mGalleryRv.setPadding(
                 mGalleryRv.getPaddingLeft(),
-                mGalleryRv.getPaddingTop() + caulateSystemUIHeight(),
+                mGalleryRv.getPaddingTop() + calculateSystemUIHeight(),
                 mGalleryRv.getPaddingRight(), mGalleryRv.getPaddingBottom());
 
         RxDB.getAllImages(getContentResolver(), new RxDB.Callback<List<MediaStoreImageBean>>() {
@@ -78,11 +84,46 @@ public class GalleryActivity extends BaseSwipeBackActivity
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        DebugHelper.toast(this, "click image: " + mAdapter.getItem(position).title);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_gallery, menu);
+        MenuItem doneItem = menu.findItem(R.id.select_done);
+        doneItem.setTitle(getString(R.string.select_done, mAdapter.getSelectedPositions().size()));
+        return true;
     }
 
-    private int caulateSystemUIHeight() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.select_done: {
+                if(mAdapter.getSelectedPositions().size() == 0) {
+                    ToastUtils.t(this, getString(R.string.toast_select_no_image));
+                } else {
+                    // return select images
+                    Intent data = new Intent();
+                    data.putParcelableArrayListExtra(BundleConstants.EXTRA_SELECTED_IMAGES,
+                            (ArrayList<MediaStoreImageBean>)mAdapter.getSelectedItems());
+                    setResult(Activity.RESULT_OK, data);
+                    finish();
+                }
+
+                return true;
+            }
+
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        mAdapter.toggleSelection(position);
+        invalidateOptionsMenu();
+    }
+
+    private int calculateSystemUIHeight() {
         return Math.round(SystemUIHelper.getStatusBarSize(this)
                 + SystemUIHelper.getToolbarSize(this));
     }

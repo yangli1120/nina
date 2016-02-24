@@ -44,4 +44,6 @@
 
     <!-- gallery -->
     <string name="gallery">Gallery</string>
+    <string name="select_done">done(%s)</string>
+    <string name="toast_select_no_image">no image selected</string>
 </resources>

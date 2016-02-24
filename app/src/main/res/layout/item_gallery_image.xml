@@ -24,4 +24,11 @@
         android:background="#55000000"
         android:textColor="@android:color/white"
         android:textSize="@dimen/text_12"/>
+
+    <View
+        android:id="@+id/selected_state_v"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#6655acee"
+        android:visibility="gone"/>
 </FrameLayout>
