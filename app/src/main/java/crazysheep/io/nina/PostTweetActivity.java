@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -15,9 +17,13 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import crazysheep.io.nina.adapter.PreviewGalleryAdapter;
+import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.service.BatmanService;
@@ -38,9 +44,13 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.edit_tweet_et) EditText mTweetEt;
     @Bind(R.id.send_tweet_btn) Button mSendBtn;
+    @Bind(R.id.image_preview_rv) RecyclerView mPreviewRv;
+    private PreviewGalleryAdapter mPreviewAdapter;
 
     // if post a reply tweet
     private long replayStatusId;
+
+    private ArrayList<MediaStoreImageBean> mSelectedImages;
 
     private boolean isServiceBinding = false;
     private BatmanService mBatmanService;
@@ -77,6 +87,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
         mSendBtn.setEnabled(false);
         mTweetEt.addTextChangedListener(this);
+        mPreviewAdapter = new PreviewGalleryAdapter(this, null);
+        mPreviewRv.setLayoutManager(new GridLayoutManager(this, 4));
+        mPreviewRv.setAdapter(mPreviewAdapter);
 
         getSwipeBackLayout().addSwipeListener(new SwipeBackLayout.SwipeListener() {
             @Override
@@ -112,6 +125,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
             switch (requestCode) {
                 case REQUEST_CHOOSE_IMAGE: {
                     // TODO return selected images, show preview
+                    mSelectedImages = data.getParcelableArrayListExtra(
+                            BundleConstants.EXTRA_SELECTED_IMAGES);
+                    mPreviewAdapter.setData(mSelectedImages);
                 }break;
             }
         }
@@ -145,7 +161,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @OnClick(R.id.add_image_iv)
     protected void addImage() {
         ActivityUtils.startResult(this, REQUEST_CHOOSE_IMAGE,
-                ActivityUtils.prepare(this, GalleryActivity.class));
+                ActivityUtils.prepare(this, GalleryActivity.class)
+                        .putParcelableArrayListExtra(BundleConstants.EXTRA_SELECTED_IMAGES,
+                                mSelectedImages));
     }
 
     @OnClick(R.id.send_tweet_btn)

@@ -39,12 +39,15 @@
     <item name="tweet_video_vv" type="id" />
     <item name="tweet_video_fl" type="id" />
     <item name="tweet_gif_label_tv" type="id" />
-    <!-- create tweet -->
+    <!-- post tweet -->
     <item name="edit_tweet_et" type="id" />
     <item name="add_location_iv" type="id" />
     <item name="add_image_iv" type="id" />
     <item name="tweet_words_count_tv" type="id" />
     <item name="send_tweet_btn" type="id" />
+    <item name="image_preview_rv" type="id" />
+    <item name="image_preview_iv" type="id" />
+    <item name="remove_image_iv" type="id" />
 
     <item name="action_reply_ll" type="id" />
     <item name="action_reply_iv" type="id" />

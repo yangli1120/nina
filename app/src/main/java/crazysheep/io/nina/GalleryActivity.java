@@ -19,7 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import crazysheep.io.nina.adapter.GalleryAdapter;
+import crazysheep.io.nina.adapter.SelectableGalleryAdapter;
 import crazysheep.io.nina.adapter.RecyclerViewBaseAdapter;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.constants.BundleConstants;
@@ -38,13 +38,18 @@ public class GalleryActivity extends BaseSwipeBackActivity
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) RecyclerView mGalleryRv;
-    private GalleryAdapter mAdapter;
+    private SelectableGalleryAdapter mAdapter;
+
+    private ArrayList<MediaStoreImageBean> mSelectedImages;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
         ButterKnife.bind(this);
+
+        mSelectedImages = getIntent().getParcelableArrayListExtra(
+                BundleConstants.EXTRA_SELECTED_IMAGES);
 
         setSupportActionBar(mToolbar);
         if(!Utils.isNull(getSupportActionBar())) {
@@ -61,7 +66,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
         }
         GridLayoutManager layoutMgr = new GridLayoutManager(this, 4);
         mGalleryRv.setLayoutManager(layoutMgr);
-        mAdapter = new GalleryAdapter(this, null);
+        mAdapter = new SelectableGalleryAdapter(this, null);
         mAdapter.setOnItemClickListener(this);
         mGalleryRv.setAdapter(mAdapter);
         // how to set recyclerview's padding,
@@ -75,6 +80,12 @@ public class GalleryActivity extends BaseSwipeBackActivity
             @Override
             public void onResult(List<MediaStoreImageBean> mediaStoreImageBeans) {
                 mAdapter.setData(mediaStoreImageBeans);
+
+                if(!Utils.isNull(mSelectedImages)) {
+                    for (MediaStoreImageBean imageBean : mSelectedImages)
+                        mAdapter.toggleSelection(imageBean);
+                    invalidateOptionsMenu();
+                }
             }
 
             @Override

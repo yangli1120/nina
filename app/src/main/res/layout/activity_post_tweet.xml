@@ -15,23 +15,41 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:fitsSystemWindows="true"/>
-        <EditText
-            android:id="@id/edit_tweet_et"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="@dimen/space_8"
-            android:textSize="@dimen/text_17"
-            android:textColor="?color_text_primary"
-            android:hint="@string/hint_edit_tweet"
-            android:gravity="left"
-            android:textColorHint="?color_text_secondary"/>
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@id/edit_tweet_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="100dp"
+                android:padding="@dimen/space_8"
+                android:textSize="@dimen/text_17"
+                android:textColor="?color_text_primary"
+                android:hint="@string/hint_edit_tweet"
+                android:background="@null"
+                android:gravity="left"
+                android:textColorHint="?color_text_secondary"/>
+            <!-- images preview -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@id/image_preview_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/edit_bottom_bar"
             android:paddingLeft="@dimen/space_8"
             android:paddingRight="@dimen/space_8"
             android:orientation="horizontal">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/half_1_dp"
+                android:background="@color/divide_line"/>
 
             <ImageView
                 android:id="@id/add_location_iv"

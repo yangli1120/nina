@@ -26,13 +26,13 @@ import crazysheep.io.nina.bean.MediaStoreImageBean;
  *
  * Created by crazysheep on 16/2/23.
  */
-public class GalleryAdapter extends RecyclerViewBaseAdapter<GalleryAdapter.ImageHolder,
+public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<SelectableGalleryAdapter.ImageHolder,
         MediaStoreImageBean> {
 
     private SparseBooleanArray mSelectMap = new SparseBooleanArray();
     private static int MAX_SELECTION = 4;
 
-    public GalleryAdapter(@NonNull Context context, List<MediaStoreImageBean> items) {
+    public SelectableGalleryAdapter(@NonNull Context context, List<MediaStoreImageBean> items) {
         super(context, items);
     }
 
@@ -72,6 +72,14 @@ public class GalleryAdapter extends RecyclerViewBaseAdapter<GalleryAdapter.Image
             }
 
             notifyItemChanged(position);
+        }
+    }
+
+    public void toggleSelection(@NonNull MediaStoreImageBean imageBean) {
+        for(MediaStoreImageBean item : mItems) {
+            if(item.id == imageBean.id) {
+                toggleSelection(findItemPosition(item));
+            }
         }
     }
 
