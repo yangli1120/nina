@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -88,6 +89,12 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         mSendBtn.setEnabled(false);
         mTweetEt.addTextChangedListener(this);
         mPreviewAdapter = new PreviewGalleryAdapter(this, null);
+        mPreviewAdapter.setOnItemRemoveListener(new PreviewGalleryAdapter.OnItemRemoveListener() {
+            @Override
+            public void onRemoved(int position) {
+                updateSendButton();
+            }
+        });
         mPreviewRv.setLayoutManager(new GridLayoutManager(this, 4));
         mPreviewRv.setAdapter(mPreviewAdapter);
 
@@ -128,6 +135,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                     mSelectedImages = data.getParcelableArrayListExtra(
                             BundleConstants.EXTRA_SELECTED_IMAGES);
                     mPreviewAdapter.setData(mSelectedImages);
+
+                    updateSendButton();
                 }break;
             }
         }
@@ -169,9 +178,16 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @OnClick(R.id.send_tweet_btn)
     protected void postTweet() {
         // TODO post a tweet, txt, photo, or video
-        PostTweetBean postTweet = new PostTweetBean.Builder()
-                .setStatus(mTweetEt.getEditableText().toString())
-                .build();
+        PostTweetBean.Builder builder = new PostTweetBean.Builder();
+        if(!Utils.isNull(mSelectedImages)) {
+            List<String> photoFiles = new ArrayList<>(mSelectedImages.size());
+            for(MediaStoreImageBean item : mSelectedImages)
+                photoFiles.add(item.filepath);
+            builder.setPhotoFiles(photoFiles);
+        }
+        if(!TextUtils.isEmpty(mTweetEt.getEditableText().toString()))
+            builder.setStatus(mTweetEt.getEditableText().toString());
+        PostTweetBean postTweet = builder.build();
         mBatmanService.postTweet(postTweet);
 
         // set result to TimelineFragment to show draft item UI in timeline
@@ -179,6 +195,11 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         data.putExtra(BundleConstants.EXTRA_POST_TWEET, postTweet);
         setResult(Activity.RESULT_OK, data);
         finish();
+    }
+
+    private void updateSendButton() {
+        mSendBtn.setEnabled(!TextUtils.isEmpty(mTweetEt.getEditableText().toString())
+                || (!Utils.isNull(mSelectedImages) && mSelectedImages.size() > 0));
     }
 
 }

@@ -10,6 +10,12 @@ public class HttpConstants {
     public static final String BASE_URL = "https://api.twitter.com/1.1/";
     public static final String HOST_NAME = "api.twitter.com";
 
+    // twitter upload media url
+    // see{@link http://stackoverflow.com/questions/28642239/odd-twitter-api-v1-1-returning-error46-the-twitter-rest-api-v1-is-no-longer}
+    public static final String UPLOAD_MEDIA_URL = "https://upload.twitter.com/1.1/media/upload.json";
+    // twitter allow image small than 3M can attach to a tweet
+    public static final int MAX_UPLOAD_PHOTO_SIZE = 3 * 1024 * 1024; // 3M
+
     ////////////////////// http status code ///////////////////////////////
 
     public static final int CODE_200 = 200; // every thing is OK

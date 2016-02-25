@@ -3,14 +3,18 @@ package crazysheep.io.nina.net;
 import java.util.List;
 
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.UploadMediaDto;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
-import rx.Observable;
+import retrofit2.http.Url;
 
 /**
  * twitter api
@@ -79,5 +83,12 @@ public interface TwitterService {
      * */
     @GET("account/verify_credentials.json")
     void getUserVerify(@Query("include_email") String email);
+
+    //////////////////////// upload ///////////////////////
+
+    @Multipart
+    @POST
+    Call<UploadMediaDto> uploadPhoto(@Url String uploadUrl,
+                                     @Part("media\"; filename=\"image.jpg\" ")RequestBody body);
 
 }

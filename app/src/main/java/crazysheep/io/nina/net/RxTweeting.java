@@ -1,16 +1,23 @@
 package crazysheep.io.nina.net;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.UploadMediaDto;
+import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.NetworkUtils;
 import crazysheep.io.nina.utils.Utils;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
@@ -88,13 +95,56 @@ public class RxTweeting {
                     @Override
                     public PostTweetBean call(PostTweetBean postTweetBean) {
                         // TODO upload media file and set media ids to post tweet bean if need
-                        return postTweetBean;
+                        String[] uploadParams = uploadFile(postTweetBean);
+                        if(Utils.isNull(uploadParams))
+                            return postTweetBean;
+
+                        DebugHelper.log("============== start upload =======================");
+                        DebugHelper.log("upload file: " + uploadParams[0]);
+
+                        // check if image file is small than 3M,
+                        // because twitter avoid a image file large than 3M when it attach to a tweet
+                        // see{@link https://twittercommunity.com/t/getting-media-parameter-is-invalid-after-successfully-uploading-media/58354/5}
+                        File imageFile = new File(uploadParams[0]);
+                        if(!imageFile.exists())
+                            throw Exceptions.propagate(new Throwable("file\""
+                                    + imageFile.getAbsolutePath() + "\" not exist"));
+                        else if(imageFile.length() > HttpConstants.MAX_UPLOAD_PHOTO_SIZE)
+                            throw Exceptions.propagate(new Throwable("file\""
+                                    + imageFile.getAbsolutePath()
+                                    + "\" is large than 3M, twitter not allowed attach to a tweet"));
+
+                        try {
+                            Response<UploadMediaDto> response = HttpClient.getInstance()
+                                    .getTwitterService()
+                                    .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
+                                            RequestBody.create(MediaType.parse(uploadParams[1]),
+                                                    new File(uploadParams[0])))
+                                    .execute();
+
+                            if(response.code() == HttpConstants.CODE_200
+                                    && !Utils.isNull(response.body())) {
+                                // update post tweet bean media ids
+                                return handleUploadResult(postTweetBean, response);
+                            } else {
+                                String err = "upload file \"" + uploadParams[0]
+                                        + "\" failed, response: " + printResponse(response);
+                                DebugHelper.log(err);
+                                throw Exceptions.propagate(new Throwable(err));
+                            }
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+                            DebugHelper.log("upload file failed 1, error: " + ioe.toString());
+
+                            throw  Exceptions.propagate(ioe);
+                        }
                     }
                 })
                 // final step, every thing is ready, post tweet
                 .map(new Func1<PostTweetBean, TweetDto>() {
                     @Override
                     public TweetDto call(PostTweetBean post) {
+                        DebugHelper.log("start post tweet: " + post.toString());
                         try {
                             Response<TweetDto> response = HttpClient.getInstance()
                                     .getTwitterService()
@@ -108,12 +158,14 @@ public class RxTweeting {
                                 return response.body();
                             else {
                                 // TODO post tweet error handle
-                                throw Exceptions.propagate(new Throwable(
-                                        "request \"" + response.raw().request().url() + "\" error: "
-                                                + response.message()));
+                                String err = "request \"" + response.raw().request().url()
+                                        + "\" response: " + printResponse(response);
+                                DebugHelper.log("post tweet failed 1, error: " + err);
+                                throw Exceptions.propagate(new Throwable(err));
                             }
                         } catch (IOException ioe) {
                             ioe.printStackTrace();
+                            DebugHelper.log("post tweet failed 2, error: " + ioe.toString());
 
                             throw Exceptions.propagate(ioe);
                         }
@@ -127,6 +179,8 @@ public class RxTweeting {
 
                     @Override
                     public void onError(Throwable e) {
+                        // update post tweet bean post state
+                        DebugHelper.log("post tweet failed, error: " + e.toString());
                         EventBus.getDefault().post(
                                 new EventPostTweetFailed(postTweet, Utils.isNull(e)
                                         ? "post tweet failed" : e.toString()));
@@ -138,4 +192,66 @@ public class RxTweeting {
                     }
                 });
     }
+
+    private static boolean havePhotos(@NonNull PostTweetBean postTweetBean) {
+        return !Utils.isNull(postTweetBean.getPhotoFiles())
+                && postTweetBean.getPhotoFiles().size() > 0;
+    }
+
+    private static boolean haveVideo(@NonNull PostTweetBean postTweetBean) {
+        return !TextUtils.isEmpty(postTweetBean.getVideoFile());
+    }
+
+    private static String[] uploadFile(@NonNull PostTweetBean postTweetBean) {
+        if(havePhotos(postTweetBean)) {
+            return new String[] {postTweetBean.getPhotoFiles().get(0), "application/octet-stream"};
+        } else if(haveVideo(postTweetBean)) {
+            // TODO upload video
+        }
+
+        return null;
+    }
+
+    private static PostTweetBean handleUploadResult(
+            @NonNull PostTweetBean postTweetBean, @NonNull Response<UploadMediaDto> response) {
+        String uploadedFile = null;
+        DebugHelper.log("handleUploadResult 11111");
+        if(havePhotos(postTweetBean)) {
+            List<String> photoFiles = postTweetBean.getPhotoFiles();
+            uploadedFile = photoFiles.remove(0);
+            postTweetBean.setPhotoFiles(photoFiles);
+            DebugHelper.log("handleUploadResult 222222");
+        } else if(haveVideo(postTweetBean)) {
+            uploadedFile = postTweetBean.getVideoFile();
+            postTweetBean.setVideoFile(null);
+            DebugHelper.log("handleUploadResult 333333");
+        }
+        DebugHelper.log("handleUploadResult(), uploadedFile: " + uploadedFile);
+        // upload file successful, remove uploaded file and update media ids
+        postTweetBean.setMediaIds(response.body().media_id_string);
+        postTweetBean.save();
+
+        DebugHelper.log("upload successful, remove file: " + uploadedFile
+                + ", media ids: " + response.body().media_id_string);
+
+        return postTweetBean;
+    }
+
+    private static String printResponse(@NonNull Response response) throws IOException {
+        return new StringBuffer("[\n")
+                .append("url:")
+                .append(response.raw().request().url().toString())
+                .append(", code:")
+                .append(response.code())
+                .append(", \nheader:")
+                .append(Utils.isNull(response.headers()) ? null : response.headers().toString())
+                .append(", \nbody:")
+                .append(Utils.isNull(response.body()) ? null : response.body().toString())
+                .append(", \nerrorBody:")
+                .append(Utils.isNull(response.errorBody())
+                        ? null : new String(response.errorBody().bytes(), "utf-8"))
+                .append("]")
+                .toString();
+    }
+
 }

@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,6 +110,20 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         this.created_at = created_at;
     }
 
+    @Override
+    public String toString() {
+        return "[post tweet: id, " + getId()
+                + "; replyStatusId, " + replyStatusId
+                + "; placeId, " + placeId
+                + "; displayCoordinates, " + displayCoordinates
+                + "; photoFiles, " + photoFiles
+                + "; videoFile, " + videoFile
+                + "; mediaIds, " + mediaIds
+                + "; randomId, " + randomId
+                + "; created_at, " + created_at
+                + "]";
+    }
+
     public String getVideoFile() {
         return videoFile;
     }
@@ -119,7 +134,10 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         return mediaIds;
     }
     public List<String> getPhotoFiles() {
-        return Utils.isNull(photoFiles) ? null : Arrays.asList(photoFiles.split(";"));
+        // Arrays.asList() returned list unsupport remove()
+        // see{@link http://stackoverflow.com/questions/7885573/remove-on-list-created-by-arrays-aslist-throws-unsupportedexception}
+        return Utils.isNull(photoFiles)
+                ? null : new ArrayList<>(Arrays.asList(photoFiles.split(";")));
     }
     public Long getPlaceId() {
         return placeId;
@@ -145,6 +163,26 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
 
     public boolean isFailed() {
         return STATE_FAILED.equals(postState);
+    }
+
+    public void setMediaIds(String mediaIds) {
+        this.mediaIds = mediaIds;
+    }
+
+    public void setVideoFile(String videoFile) {
+        this.videoFile = videoFile;
+    }
+
+    public void setPhotoFiles(List<String> photoFiles) {
+        if(!Utils.isNull(photoFiles) && photoFiles.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for(String s : photoFiles)
+                sb.append(s).append(";");
+            sb.deleteCharAt(sb.length() - 1);
+            this.photoFiles = sb.toString();
+        } else {
+            this.photoFiles = null;
+        }
     }
 
     public static class Builder {
@@ -196,8 +234,13 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         }
 
         public PostTweetBean build() {
-            return new PostTweetBean(displayCoordinates, mediaIds, photoFiles, placeId,
-                    replyStatusId, status, videoFile, Utils.randomId(), System.currentTimeMillis());
+            PostTweetBean postTweetBean = new PostTweetBean(
+                    displayCoordinates, mediaIds, photoFiles, placeId, replyStatusId, status,
+                    videoFile, Utils.randomId(), System.currentTimeMillis());
+            // save to database, init Model.id
+            postTweetBean.save();
+
+            return postTweetBean;
         }
     }
 

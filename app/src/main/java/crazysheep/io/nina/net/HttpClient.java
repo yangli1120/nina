@@ -17,7 +17,6 @@ import javax.net.ssl.TrustManager;
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
 import io.fabric.sdk.android.services.network.PinningInfoProvider;
@@ -141,11 +140,11 @@ public class HttpClient {
 
             /* handle original response data */
             Request originReq = chain.request();
-            DebugHelper.log("begin request " + originReq.url().toString());
+            //DebugHelper.log("begin request " + originReq.url().toString());
             long startTime = System.currentTimeMillis();
             Response.Builder respBuilder = chain.proceed(originReq).newBuilder();
-            DebugHelper.log("end request " + originReq.url().toString()
-                    + ", use time: " + (System.currentTimeMillis() - startTime) + "ms");
+            //DebugHelper.log("end request " + originReq.url().toString()
+            //        + ", use time: " + (System.currentTimeMillis() - startTime) + "ms");
             // for enable url cache, response header is very important
             // see{@link http://stackoverflow.com/questions/31321963/how-retrofit-with-okhttp-use-cache-data-when-offline}
             // see{@link https://github.com/square/retrofit/issues/693}
