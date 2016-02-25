@@ -1,10 +1,12 @@
 package crazysheep.io.nina.net;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -13,6 +15,7 @@ import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UploadMediaDto;
+import crazysheep.io.nina.utils.BitmapUtils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.NetworkUtils;
 import crazysheep.io.nina.utils.Utils;
@@ -95,31 +98,18 @@ public class RxTweeting {
                     @Override
                     public PostTweetBean call(PostTweetBean postTweetBean) {
                         // TODO upload media file and set media ids to post tweet bean if need
-                        String[] uploadParams = uploadFile(postTweetBean);
+                        String[] uploadParams = uploadParams(postTweetBean);
                         if(Utils.isNull(uploadParams))
                             return postTweetBean;
 
                         DebugHelper.log("============== start upload =======================");
                         DebugHelper.log("upload file: " + uploadParams[0]);
 
-                        // check if image file is small than 3M,
-                        // because twitter avoid a image file large than 3M when it attach to a tweet
-                        // see{@link https://twittercommunity.com/t/getting-media-parameter-is-invalid-after-successfully-uploading-media/58354/5}
-                        File imageFile = new File(uploadParams[0]);
-                        if(!imageFile.exists())
-                            throw Exceptions.propagate(new Throwable("file\""
-                                    + imageFile.getAbsolutePath() + "\" not exist"));
-                        else if(imageFile.length() > HttpConstants.MAX_UPLOAD_PHOTO_SIZE)
-                            throw Exceptions.propagate(new Throwable("file\""
-                                    + imageFile.getAbsolutePath()
-                                    + "\" is large than 3M, twitter not allowed attach to a tweet"));
-
                         try {
                             Response<UploadMediaDto> response = HttpClient.getInstance()
                                     .getTwitterService()
                                     .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
-                                            RequestBody.create(MediaType.parse(uploadParams[1]),
-                                                    new File(uploadParams[0])))
+                                            uploadBody(postTweetBean))
                                     .execute();
 
                             if(response.code() == HttpConstants.CODE_200
@@ -182,8 +172,7 @@ public class RxTweeting {
                         // update post tweet bean post state
                         DebugHelper.log("post tweet failed, error: " + e.toString());
                         EventBus.getDefault().post(
-                                new EventPostTweetFailed(postTweet, Utils.isNull(e)
-                                        ? "post tweet failed" : e.toString()));
+                                new EventPostTweetFailed(postTweet, e.toString()));
                     }
 
                     @Override
@@ -202,31 +191,61 @@ public class RxTweeting {
         return !TextUtils.isEmpty(postTweetBean.getVideoFile());
     }
 
-    private static String[] uploadFile(@NonNull PostTweetBean postTweetBean) {
+    private static String[] uploadParams(@NonNull PostTweetBean postTweetBean) {
         if(havePhotos(postTweetBean)) {
             return new String[] {postTweetBean.getPhotoFiles().get(0), "application/octet-stream"};
         } else if(haveVideo(postTweetBean)) {
             // TODO upload video
+            return null;
+        } else {
+            throw new RuntimeException("RxTweeting.uploadParams(), find not file to upload!");
         }
-
-        return null;
     }
 
+    /**
+     * create request body from post tweet bean if it contains upload file
+     * */
+    private static RequestBody uploadBody(@NonNull PostTweetBean postTweetBean) throws IOException {
+        String[] uploadParams = uploadParams(postTweetBean);
+        if(havePhotos(postTweetBean)) {
+            // check if image file is large than 3M,
+            // because twitter avoid a image file large than 3M when it attach to a tweet
+            // see{@link https://twittercommunity.com/t/getting-media-parameter-is-invalid-after-successfully-uploading-media/58354/5}
+            File imageFile = new File(uploadParams[0]);
+            if(!imageFile.exists()) {
+                throw Exceptions.propagate(new Throwable("file\""
+                        + imageFile.getAbsolutePath() + "\" not exist"));
+            } else if(imageFile.length() > HttpConstants.MAX_UPLOAD_PHOTO_SIZE) {
+                // image file is too large, compress it let small than 3M
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                BitmapUtils.decodeFile2048(uploadParams[0])
+                        .compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                return RequestBody.create(MediaType.parse(uploadParams[1]), bos.toByteArray());
+            } else {
+                return RequestBody.create(MediaType.parse(uploadParams[1]), imageFile);
+            }
+        } else if(haveVideo(postTweetBean)) {
+            // TODO create video request body
+            return null;
+        } else {
+            throw new RuntimeException("RxTweeting.uploadBody(), create request body failed");
+        }
+    }
+
+    /**
+     * handle result return by the upload media api
+     * */
     private static PostTweetBean handleUploadResult(
             @NonNull PostTweetBean postTweetBean, @NonNull Response<UploadMediaDto> response) {
         String uploadedFile = null;
-        DebugHelper.log("handleUploadResult 11111");
         if(havePhotos(postTweetBean)) {
             List<String> photoFiles = postTweetBean.getPhotoFiles();
             uploadedFile = photoFiles.remove(0);
             postTweetBean.setPhotoFiles(photoFiles);
-            DebugHelper.log("handleUploadResult 222222");
         } else if(haveVideo(postTweetBean)) {
             uploadedFile = postTweetBean.getVideoFile();
             postTweetBean.setVideoFile(null);
-            DebugHelper.log("handleUploadResult 333333");
         }
-        DebugHelper.log("handleUploadResult(), uploadedFile: " + uploadedFile);
         // upload file successful, remove uploaded file and update media ids
         postTweetBean.setMediaIds(response.body().media_id_string);
         postTweetBean.save();
