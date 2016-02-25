@@ -12,7 +12,7 @@ import crazysheep.io.nina.bean.TweetDto;
  *
  * Created by crazysheep on 16/1/23.
  */
-public class TxtHolder extends BaseNormalHolder {
+public class TxtHolder extends NormalBaseHolder {
 
     public TxtHolder(@NonNull ViewGroup parent) {
         super(parent);

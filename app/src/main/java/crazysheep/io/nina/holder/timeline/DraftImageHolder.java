@@ -4,27 +4,29 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+
+import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
-import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.widget.imagegroup.GridGalleryLayout;
 
 /**
- * image type tweet view holder
+ * image type draft holder
  *
- * Created by crazysheep on 16/1/29.
+ * Created by crazysheep on 16/2/25.
  */
-public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.OnChildLifeListener,
-        GridGalleryLayout.OnChildClickListener{
+public class DraftImageHolder extends DraftBaseHolder implements
+        GridGalleryLayout.OnChildLifeListener {
 
-    @Bind(R.id.tweet_gallery_ggl) GridGalleryLayout imgsGgl;
+    @Bind(R.id.tweet_gallery_ggl)
+    GridGalleryLayout imgsGgl;
 
-    public ImageHolder(@NonNull ViewGroup view) {
+    public DraftImageHolder(@NonNull ViewGroup view) {
         super(view);
         ButterKnife.bind(this, view);
 
@@ -43,41 +45,31 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
     }
 
     @Override
-    public int getContentViewRes() {
+    public void bindData(int position, PostTweetBean postTweetBean) {
+        super.bindData(position, postTweetBean);
+
+        imgsGgl.setOnChildLifeListener(this);
+        imgsGgl.setItemCount(postTweetBean.getPhotoFiles().size());
+    }
+
+    @Override
+    protected int getContentViewRes() {
         return R.layout.item_tweet_image;
     }
 
     @Override
-    public void bindData(int position, @NonNull TweetDto tweetDto) {
-        super.bindData(position, tweetDto);
-
-        imgsGgl.setOnChildLifeListener(this);
-        imgsGgl.setItemCount(tweetDto.extended_entities.media.size());
-        imgsGgl.setOnChildClickListener(this);
-    }
-
-    @Override
     public void onAttach(int position, ImageView view) {
-        // cancel before task and clear before images
         Glide.clear(view);
         view.setImageResource(0);
-        // load new one
         Glide.with(mContext)
-                .load(mTweetDto.extended_entities.media.get(position).media_url_https)
+                .load(new File(mPostTweetBean.getPhotoFiles().get(position)))
+                .placeholder(R.color.place_holder_bg)
                 .into(view);
     }
 
     @Override
     public void onDetach(int position, ImageView view) {
-        // cancel
         Glide.clear(view);
         view.setImageResource(0);
     }
-
-    @Override
-    public void onClick(int position, ImageView view) {
-        // TODO view big image
-        Toast.makeText(mContext, "click position: " + position, Toast.LENGTH_SHORT).show();
-    }
-
 }

@@ -1,6 +1,7 @@
 package crazysheep.io.nina.holder.timeline;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -20,7 +21,9 @@ public class TimelineHolderFactory {
     private static final String MEDIA_TYPE_PHOTO = "photo";
     private static final String MEDIA_TYPE_ANIMATED_GIF = "animated_gif";
 
-    public static final int TYPE_DRAFT = R.id.view_holder_draft;
+    public static final int TYPE_DRAFT_TXT = R.id.view_holder_draft_txt;
+    public static final int TYPE_DRAFT_IMAGE = R.id.view_holder_draft_image;
+    public static final int TYPE_DRAFT_VIDEO = R.id.view_holder_draft_video;
     public static final int TYPE_TXT = R.id.view_holder_txt;
     public static final int TYPE_IMAGE = R.id.view_holder_image;
     public static final int TYPE_GIF = R.id.view_holder_gif;
@@ -56,10 +59,15 @@ public class TimelineHolderFactory {
 
             ///////////////// draft item ///////////////////
 
-            case TYPE_DRAFT: {
-                return (T) new DraftHolder(itemRoot);
+            case TYPE_DRAFT_TXT: {
+                return (T) new DraftTxtHolder(itemRoot);
             }
 
+            case TYPE_DRAFT_IMAGE: {
+                return (T) new DraftImageHolder(itemRoot);
+            }
+
+            ////////////////// default /////////////////////
             default:
                 return (T) new TxtHolder(itemRoot);
         }
@@ -67,7 +75,9 @@ public class TimelineHolderFactory {
 
     private static boolean isDraftHolder(int viewType) {
         switch (viewType) {
-            case TYPE_DRAFT:
+            case TYPE_DRAFT_TXT:
+            case TYPE_DRAFT_IMAGE:
+            case TYPE_DRAFT_VIDEO:
                 return true;
         }
 
@@ -91,7 +101,13 @@ public class TimelineHolderFactory {
     public static int getViewType(@NonNull ITweet iTweet) {
         // TODO more draft type may be, for good UX
         if(iTweet instanceof PostTweetBean) {
-            return TYPE_DRAFT;
+            PostTweetBean tweetBean = (PostTweetBean) iTweet;
+            if(!Utils.isNull(tweetBean.getPhotoFiles()) && tweetBean.getPhotoFiles().size() > 0)
+                return TYPE_DRAFT_IMAGE;
+            else if(!TextUtils.isEmpty(tweetBean.getVideoFile()))
+                return TYPE_DRAFT_VIDEO;
+
+            return TYPE_DRAFT_TXT;
         } else if(iTweet instanceof TweetDto) {
             TweetDto tweetDto = (TweetDto) iTweet;
             if(!Utils.isNull(tweetDto.extended_entities)

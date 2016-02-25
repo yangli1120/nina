@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,11 +27,11 @@ import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * draft holder
+ * base draft holder
  *
  * Created by crazysheep on 16/2/19.
  */
-public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnClickListener {
+public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implements View.OnClickListener {
 
     /////////////////// event bus //////////////////////////
 
@@ -47,7 +49,7 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
 
     ////////////////////////////////////////////////////////
 
-    private Context mContext;
+    protected Context mContext;
     private UserPrefs mUserPrefs;
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
@@ -57,14 +59,22 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
     @Bind(R.id.draft_remove_iv) ImageView removeIv;
     @Bind(R.id.draft_posting_pb) ProgressBar postingPb;
 
-    private PostTweetBean mPostTweetBean;
+    protected PostTweetBean mPostTweetBean;
 
-    public DraftHolder(@NonNull ViewGroup view) {
+    public DraftBaseHolder(@NonNull ViewGroup view) {
         super(view);
         mContext = view.getContext();
         mUserPrefs = new UserPrefs(mContext);
-        ButterKnife.bind(this, view);
+
+        // add content layout
+        View contentView = LayoutInflater.from(mContext).inflate(getContentViewRes(), view, false);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        FrameLayout contentFl = ButterKnife.findById(view, R.id.tweet_content_fl);
+        contentFl.addView(contentView, params);
     }
+
+    protected abstract int getContentViewRes();
 
     @Override
     public void bindData(int position, PostTweetBean postTweetBean) {
@@ -84,6 +94,8 @@ public class DraftHolder extends BaseHolder<PostTweetBean> implements View.OnCli
         removeIv.setVisibility(postTweetBean.isFailed() ? View.VISIBLE : View.GONE);
         removeIv.setOnClickListener(this);
         postingPb.setVisibility(postTweetBean.isFailed() ? View.GONE : View.VISIBLE);
+
+        // content render by sub-holder
     }
 
     @Override

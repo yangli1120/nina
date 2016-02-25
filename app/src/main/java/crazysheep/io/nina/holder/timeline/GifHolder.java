@@ -26,7 +26,7 @@ import crazysheep.io.nina.widget.GlideSimpleViewTarget;
  *
  * Created by crazysheep on 16/2/5.
  */
-public class GifHolder extends BaseNormalHolder
+public class GifHolder extends NormalBaseHolder
         implements RecyclerViewBaseAdapter.OnViewHolderLifeCallback<GifHolder> {
 
     @Bind(R.id.tweet_video_fl) FrameLayout mVideoFl;

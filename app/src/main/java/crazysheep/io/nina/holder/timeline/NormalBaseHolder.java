@@ -28,7 +28,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  *
  * Created by crazysheep on 16/1/23.
  */
-public abstract class BaseNormalHolder extends BaseHolder<TweetDto>
+public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         implements View.OnClickListener {
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
@@ -50,7 +50,7 @@ public abstract class BaseNormalHolder extends BaseHolder<TweetDto>
     protected Context mContext;
     protected TweetDto mTweetDto;
 
-    public BaseNormalHolder(@NonNull ViewGroup parent) {
+    public NormalBaseHolder(@NonNull ViewGroup parent) {
         super(parent);
         View contentView = LayoutInflater.from(parent.getContext())
                 .inflate(getContentViewRes(), parent, false);

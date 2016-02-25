@@ -24,7 +24,9 @@
     <item name="view_holder_txt" type="id" />
     <item name="view_holder_image" type="id" />
     <item name="view_holder_gif" type="id" />
-    <item name="view_holder_draft" type="id" />
+    <item name="view_holder_draft_txt" type="id" />
+    <item name="view_holder_draft_image" type="id" />
+    <item name="view_holder_draft_video" type="id" />
     <!-- timeline item -->
     <item name="draft_remove_iv" type="id" />
     <item name="draft_posting_pb" type="id" />
