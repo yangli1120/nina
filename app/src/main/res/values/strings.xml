@@ -33,6 +33,8 @@
     <!-- timeline -->
     <string name="tag_gif">Gif</string>
     <string name="retweet_author">%s Retweeted</string>
+    <string name="tap_to_re_send">tap to re-send tweet</string>
+    <string name="remove_draft">remove this draft?</string>
 
     <!-- create tweet -->
     <string name="hint_edit_tweet">What\'s happening...</string>

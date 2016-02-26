@@ -1,8 +1,12 @@
 package crazysheep.io.nina.fragment;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -36,6 +40,7 @@ import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.holder.timeline.DraftBaseHolder;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.RxTweeting;
+import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
@@ -68,6 +73,19 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     private Observable<List<ITweet>> mTimelineObser;
 
+    private BatmanService mService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = ((BatmanService.BatmanBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
+    };
+
     @Nullable
     @Override
     protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
@@ -75,7 +93,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         ButterKnife.bind(this, contentView);
 
         initUI();
-        requestFirstPage();
+        setPostTweetFailedFirstTime();
 
         return contentView;
     }
@@ -85,6 +103,8 @@ public class TimelineFragment extends BaseNetworkFragment {
         super.onCreate(savedInstanceState);
 
         EventBus.getDefault().register(this);
+        getActivity().bindService(new Intent(getActivity(), BatmanService.class), mConnection,
+                Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -92,6 +112,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         super.onDestroy();
 
         EventBus.getDefault().unregister(this);
+        getActivity().unbindService(mConnection);
     }
 
     private void initUI() {
@@ -114,6 +135,34 @@ public class TimelineFragment extends BaseNetworkFragment {
                 requestNextPage();
             }
         });
+    }
+
+    // when we back to app, make drafts post state is 'post_failed'
+    private void setPostTweetFailedFirstTime() {
+        Observable.just(true)
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean aBoolean) {
+                        List<PostTweetBean> drafts = new Select()
+                                .all()
+                                .from(PostTweetBean.class)
+                                .execute();
+                        if(Utils.size(drafts) > 0)
+                            for (PostTweetBean postTweet : drafts) {
+                                postTweet.setFailed();
+                                postTweet.save();
+                            }
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        requestFirstPage();
+                    }
+                });
     }
 
     @SuppressWarnings("unchecked")
@@ -265,6 +314,17 @@ public class TimelineFragment extends BaseNetworkFragment {
         for(PostTweetBean postTweetBean : (List<PostTweetBean>)mAdapter.getDraftItems())
             if(event.getPostTweetBean().randomId.equals(postTweetBean.randomId)) {
                 mAdapter.removeItem(postTweetBean);
+            }
+    }
+
+    @SuppressWarnings("unused, unchecked")
+    @Subscribe
+    public void onEvent(@NonNull DraftBaseHolder.EventReSendDraft event) {
+        for(PostTweetBean postTweetBean : (List<PostTweetBean>)mAdapter.getDraftItems())
+            if(event.getPostTweetBean().randomId.equals(postTweetBean.randomId)) {
+                postTweetBean.setPosting();
+                mAdapter.notifyItemChanged(mAdapter.findItemPosition(postTweetBean));
+                mService.postTweet(postTweetBean);
             }
     }
 

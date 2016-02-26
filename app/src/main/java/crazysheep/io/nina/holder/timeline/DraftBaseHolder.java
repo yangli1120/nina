@@ -45,6 +45,18 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
         }
     }
 
+    public static class EventReSendDraft {
+        private PostTweetBean postTweetBean;
+
+        public PostTweetBean getPostTweetBean() {
+            return this.postTweetBean;
+        }
+
+        public EventReSendDraft(@NonNull PostTweetBean postTweetBean) {
+            this.postTweetBean = postTweetBean;
+        }
+    }
+
     ////////////////////////////////////////////////////////
 
     protected Context mContext;
@@ -56,6 +68,7 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
     @Bind(R.id.tweet_content_tv) TextView contentTv;
     @Bind(R.id.draft_remove_iv) ImageView removeIv;
     @Bind(R.id.draft_posting_pb) ProgressBar postingPb;
+    @Bind(R.id.draft_tap_to_re_send_tv) TextView tabToReSendTv;
 
     protected PostTweetBean mPostTweetBean;
 
@@ -92,6 +105,8 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
         removeIv.setVisibility(postTweetBean.isFailed() ? View.VISIBLE : View.GONE);
         removeIv.setOnClickListener(this);
         postingPb.setVisibility(postTweetBean.isFailed() ? View.GONE : View.VISIBLE);
+        tabToReSendTv.setVisibility(postTweetBean.isFailed() ? View.VISIBLE : View.GONE);
+        tabToReSendTv.setOnClickListener(this);
 
         // content render by sub-holder
     }
@@ -102,12 +117,17 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
             case R.id.draft_remove_iv: {
                 showRemoveDraftDialog();
             }break;
+
+            case R.id.draft_tap_to_re_send_tv: {
+                // re-send this tweet draft
+                EventBus.getDefault().post(new EventReSendDraft(mPostTweetBean));
+            }break;
         }
     }
 
     private void showRemoveDraftDialog() {
         DialogUtils.showConfirmDialog(
-                (Activity) mContext, null, "remove this draft?",
+                (Activity) mContext, null, mContext.getString(R.string.remove_draft),
                 new DialogUtils.SimpleButtonAction() {
                     @Override
                     public String getTitle() {

@@ -116,10 +116,6 @@ public class BatmanService extends Service {
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetFailed event) {
-        // TODO think if need re-add to queue
-        // post tweet failed, re-add post tweet bean to queue's last for next change
-        // mPostQueue.addLast(event.getPostTweetBean());
-
         // update draft in database, why? because maybe this post tweet have more photo files,
         // and background task had upload photos successful but post tweet failed, then table column
         // "media_ids" and "photo_files" will be update, so that we do not need upload files
