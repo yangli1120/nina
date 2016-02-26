@@ -49,7 +49,7 @@ public class DraftImageHolder extends DraftBaseHolder implements
         super.bindData(position, postTweetBean);
 
         imgsGgl.setOnChildLifeListener(this);
-        imgsGgl.setItemCount(postTweetBean.getPhotoFiles().size());
+        imgsGgl.setItemCount(postTweetBean.getPhotoPreviewFiles().size());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class DraftImageHolder extends DraftBaseHolder implements
         Glide.clear(view);
         view.setImageResource(0);
         Glide.with(mContext)
-                .load(new File(mPostTweetBean.getPhotoFiles().get(position)))
+                .load(new File(mPostTweetBean.getPhotoPreviewFiles().get(position)))
                 .placeholder(R.color.place_holder_bg)
                 .into(view);
     }

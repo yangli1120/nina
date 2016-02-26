@@ -87,7 +87,7 @@ public class RxTweeting {
         // first step, check network state if is connected
         if(!NetworkUtils.isConnected(BaseApplication.getAppContext())) {
             EventBus.getDefault().post(
-                    new EventPostTweetFailed(postTweet, "network is not connected"));
+                    new EventPostTweetFailed(postTweet, "network is not avialable"));
             return null;
         }
 
@@ -98,36 +98,41 @@ public class RxTweeting {
                     @Override
                     public PostTweetBean call(PostTweetBean postTweetBean) {
                         // TODO upload media file and set media ids to post tweet bean if need
-                        String[] uploadParams = uploadParams(postTweetBean);
-                        if(Utils.isNull(uploadParams))
-                            return postTweetBean;
+                        String[] uploadParams;
+                        int uploadedFileCount = -1;
+                        while (!Utils.isNull(uploadParams = uploadParams(postTweetBean))) {
+                            uploadedFileCount++;
+                            DebugHelper.log(String.format(
+                                    "============== %d start upload file %s ==================",
+                                    uploadedFileCount, uploadParams[0]));
 
-                        DebugHelper.log("============== start upload =======================");
-                        DebugHelper.log("upload file: " + uploadParams[0]);
+                            try {
+                                Response<UploadMediaDto> response = HttpClient.getInstance()
+                                        .getTwitterService()
+                                        .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
+                                                uploadBody(postTweetBean))
+                                        .execute();
 
-                        try {
-                            Response<UploadMediaDto> response = HttpClient.getInstance()
-                                    .getTwitterService()
-                                    .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
-                                            uploadBody(postTweetBean))
-                                    .execute();
+                                if(response.code() == HttpConstants.CODE_200
+                                        && !Utils.isNull(response.body())) {
+                                    // update post tweet bean media ids and remove uploaded file
+                                    // from post tweet bean
+                                    handleUploadResult(postTweetBean, response);
+                                } else {
+                                    String err = "upload file \"" + uploadParams[0]
+                                            + "\" failed, response: " + printResponse(response);
+                                    DebugHelper.log(err);
+                                    throw Exceptions.propagate(new Throwable(err));
+                                }
+                            } catch (IOException ioe) {
+                                ioe.printStackTrace();
+                                DebugHelper.log("upload file failed, error: " + ioe.toString());
 
-                            if(response.code() == HttpConstants.CODE_200
-                                    && !Utils.isNull(response.body())) {
-                                // update post tweet bean media ids
-                                return handleUploadResult(postTweetBean, response);
-                            } else {
-                                String err = "upload file \"" + uploadParams[0]
-                                        + "\" failed, response: " + printResponse(response);
-                                DebugHelper.log(err);
-                                throw Exceptions.propagate(new Throwable(err));
+                                throw  Exceptions.propagate(ioe);
                             }
-                        } catch (IOException ioe) {
-                            ioe.printStackTrace();
-                            DebugHelper.log("upload file failed 1, error: " + ioe.toString());
-
-                            throw  Exceptions.propagate(ioe);
                         }
+
+                        return postTweetBean;
                     }
                 })
                 // final step, every thing is ready, post tweet
@@ -150,12 +155,12 @@ public class RxTweeting {
                                 // TODO post tweet error handle
                                 String err = "request \"" + response.raw().request().url()
                                         + "\" response: " + printResponse(response);
-                                DebugHelper.log("post tweet failed 1, error: " + err);
+                                DebugHelper.log("final post tweet failed 1, error: " + err);
                                 throw Exceptions.propagate(new Throwable(err));
                             }
                         } catch (IOException ioe) {
                             ioe.printStackTrace();
-                            DebugHelper.log("post tweet failed 2, error: " + ioe.toString());
+                            DebugHelper.log("final post tweet failed 2, error: " + ioe.toString());
 
                             throw Exceptions.propagate(ioe);
                         }
@@ -198,7 +203,7 @@ public class RxTweeting {
             // TODO upload video
             return null;
         } else {
-            throw new RuntimeException("RxTweeting.uploadParams(), find not file to upload!");
+            return null; // no file to upload
         }
     }
 
@@ -247,11 +252,11 @@ public class RxTweeting {
             postTweetBean.setVideoFile(null);
         }
         // upload file successful, remove uploaded file and update media ids
-        postTweetBean.setMediaIds(response.body().media_id_string);
+        postTweetBean.appendMediaId(response.body().media_id_string);
         postTweetBean.save();
 
         DebugHelper.log("upload successful, remove file: " + uploadedFile
-                + ", media ids: " + response.body().media_id_string);
+                + ", media ids: " + postTweetBean.getMediaIds());
 
         return postTweetBean;
     }

@@ -2,6 +2,7 @@ package crazysheep.io.nina.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -29,7 +30,9 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
     public static final String COLUMN_PLACE_ID = "place_id";
     public static final String COLUMN_DISPLAY_COORDINATES = "display_coordinates";
     public static final String COLUMN_PHOTO_FILES = "photo_files";
+    public static final String COLUMN_PHOTO_PREVIEW_FILES ="photo_preview_files";
     public static final String COLUMN_VIDEO_FILE = "video_file";
+    public static final String COLUMN_VIDEO_PREVIEW_FILE = "video_preview_file";
     public static final String COLUMN_POST_STATE = "post_state";
     public static final String COLUMN_RANDOM_ID = "random_id";
     public static final String COLUMN_CREATED_AT = "created_at";
@@ -70,10 +73,22 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
     @Column(name = COLUMN_PHOTO_FILES)
     protected String photoFiles;
     /**
+     * just for draft UI show photos' preview, because photoFiles will be update after upload
+     * a photo file successful, but draft UI need show photos' preview in home timeline
+     * */
+    @Column(name = COLUMN_PHOTO_PREVIEW_FILES)
+    protected String photoPreviewFiles;
+    /**
      * video's file path on storage, twitter allow at most 1 video every tweet
      * */
     @Column(name = COLUMN_VIDEO_FILE)
     protected String videoFile;
+    /**
+     * videoFile will be remove after upload video file successful, and draft UI need
+     * know original file path to show preview in home timeline
+     * */
+    @Column(name = COLUMN_VIDEO_PREVIEW_FILE)
+    protected String videoPreviewFile;
 
     /**
      * for location database use, record current tweet post state, such like
@@ -102,10 +117,12 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         this.displayCoordinates = displayCoordinates;
         this.mediaIds = mediaIds;
         this.photoFiles = photoFiles;
+        this.photoPreviewFiles = photoFiles;
         this.placeId = placeId;
         this.replyStatusId = replyStatusId;
         this.status = status;
         this.videoFile = videoFile;
+        this.videoPreviewFile = videoFile;
         this.randomId = randomId;
         this.created_at = created_at;
     }
@@ -117,7 +134,9 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
                 + "; placeId, " + placeId
                 + "; displayCoordinates, " + displayCoordinates
                 + "; photoFiles, " + photoFiles
+                + "; photoPreviewFiles, " + photoPreviewFiles
                 + "; videoFile, " + videoFile
+                + "; videoPreviewFile, " + videoPreviewFile
                 + "; mediaIds, " + mediaIds
                 + "; randomId, " + randomId
                 + "; created_at, " + created_at
@@ -126,6 +145,9 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
 
     public String getVideoFile() {
         return videoFile;
+    }
+    public String getVideoPreviewFile() {
+        return videoPreviewFile;
     }
     public boolean isDisplayCoordinates() {
         return displayCoordinates;
@@ -138,6 +160,10 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
         // see{@link http://stackoverflow.com/questions/7885573/remove-on-list-created-by-arrays-aslist-throws-unsupportedexception}
         return Utils.isNull(photoFiles)
                 ? null : new ArrayList<>(Arrays.asList(photoFiles.split(";")));
+    }
+    public List<String> getPhotoPreviewFiles() {
+        return Utils.isNull(photoPreviewFiles)
+                ? null : new ArrayList<>(Arrays.asList(photoPreviewFiles.split(";")));
     }
     public Long getPlaceId() {
         return placeId;
@@ -167,6 +193,19 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
 
     public void setMediaIds(String mediaIds) {
         this.mediaIds = mediaIds;
+    }
+
+    public void appendMediaId(String mediaId) {
+        if(TextUtils.isEmpty(mediaId))
+            return;
+
+        if(TextUtils.isEmpty(mediaIds))
+            mediaIds = mediaId;
+        else
+            mediaIds = new StringBuilder(mediaIds)
+                    .append(",")
+                    .append(mediaId)
+                    .toString();
     }
 
     public void setVideoFile(String videoFile) {
