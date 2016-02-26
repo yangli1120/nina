@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -28,5 +29,12 @@ public class Utils {
     public static float dp2px(@NonNull Resources res, float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 res.getDisplayMetrics());
+    }
+
+    /**
+     * return the size of a {@link Collection}
+     * */
+    public static int size(Collection collection) {
+        return isNull(collection) ? 0 : collection.size();
     }
 }

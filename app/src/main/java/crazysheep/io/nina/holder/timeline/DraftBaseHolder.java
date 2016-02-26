@@ -21,9 +21,7 @@ import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.prefs.UserPrefs;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.DialogUtils;
-import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -121,11 +119,7 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
                         super.onClick(dialog);
 
                         // delete draft from database and update UI
-                        // TODO check why post tweet bean id is null int database
-                        DebugHelper.log("remove draft, id: " + mPostTweetBean.getId());
-                        if(!Utils.isNull(mPostTweetBean.getId())) {
-                            mPostTweetBean.delete();
-                        }
+                        mPostTweetBean.delete();
                         EventBus.getDefault().post(new EventRemoveDraft(mPostTweetBean));
                     }
                 },

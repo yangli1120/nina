@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.net.RxTweeting;
+import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.Utils;
 
 /**
@@ -102,27 +103,50 @@ public class BatmanService extends Service {
     public void onEvent(@NonNull RxTweeting.EventPostTweetSuccess event) {
         // post tweet success, delete draft from database
         event.getPostTweetBean().delete();
+        DebugHelper.log(String.format("post tweet \"%s\" successful, delete model %s",
+                event.getPostTweetBean().getStatus(), event.getPostTweetBean().getId()));
 
         // notify queue to post next tweet
-        hasTweetPosting = false;
-        mHandler.sendEmptyMessage(MSG_POST_TWEET);
+        if(!ensureIfNeedStopSelf()) {
+            hasTweetPosting = false;
+            mHandler.sendEmptyMessage(MSG_POST_TWEET);
+        }
     }
 
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetFailed event) {
+        // TODO think if need re-add to queue
         // post tweet failed, re-add post tweet bean to queue's last for next change
-        mPostQueue.addLast(event.getPostTweetBean());
+        // mPostQueue.addLast(event.getPostTweetBean());
+
         // update draft in database, why? because maybe this post tweet have more photo files,
         // and background task had upload photos successful but post tweet failed, then table column
         // "media_ids" and "photo_files" will be update, so that we do not need upload files
         // again to save our life
         event.getPostTweetBean().setFailed();
         event.getPostTweetBean().save();
+        DebugHelper.log(String.format("post tweet \"%s\" failed, update model %s",
+                event.getPostTweetBean().getStatus(), event.getPostTweetBean().getId()));
 
         // notify queue to post next tweet
-        hasTweetPosting = false;
-        mHandler.sendEmptyMessage(MSG_POST_TWEET);
+        if(!ensureIfNeedStopSelf()) {
+            hasTweetPosting = false;
+            mHandler.sendEmptyMessage(MSG_POST_TWEET);
+        }
+    }
+
+    public boolean isPosting() {
+        return mPostQueue.size() > 0;
+    }
+
+    private boolean ensureIfNeedStopSelf() {
+        if(mPostQueue.size() <= 0) {
+            stopSelf();
+            return true;
+        }
+
+        return false;
     }
 
 }

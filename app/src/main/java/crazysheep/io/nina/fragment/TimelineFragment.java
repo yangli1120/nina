@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.activeandroid.Model;
 import com.activeandroid.query.Select;
 
 import org.greenrobot.eventbus.EventBus;
@@ -215,10 +216,13 @@ public class TimelineFragment extends BaseNetworkFragment {
         if(resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_POST_TWEET: {
-                    // TODO update timeline ui, show draft item
+                    // update timeline ui, show draft item
                     PostTweetBean postTweetBean = data.getParcelableExtra(
                             BundleConstants.EXTRA_POST_TWEET);
                     if(!Utils.isNull(postTweetBean)) {
+                        // re-query from database, synchronized post state
+                        postTweetBean = Model.load(PostTweetBean.class, postTweetBean.getId());
+
                         mAdapter.addDataToFirst(postTweetBean);
                         mTimelineRv.getRefreshableView().smoothScrollToPosition(0);
                     }

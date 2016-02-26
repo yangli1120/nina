@@ -102,9 +102,10 @@ public class TimelineHolderFactory {
         // TODO more draft type may be, for good UX
         if(iTweet instanceof PostTweetBean) {
             PostTweetBean tweetBean = (PostTweetBean) iTweet;
-            if(!Utils.isNull(tweetBean.getPhotoFiles()) && tweetBean.getPhotoFiles().size() > 0)
+            if(!Utils.isNull(tweetBean.getPhotoPreviewFiles())
+                    && tweetBean.getPhotoPreviewFiles().size() > 0)
                 return TYPE_DRAFT_IMAGE;
-            else if(!TextUtils.isEmpty(tweetBean.getVideoFile()))
+            else if(!TextUtils.isEmpty(tweetBean.getVideoPreviewFile()))
                 return TYPE_DRAFT_VIDEO;
 
             return TYPE_DRAFT_TXT;

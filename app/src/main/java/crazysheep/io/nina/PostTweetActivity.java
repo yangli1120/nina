@@ -29,6 +29,7 @@ import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.ImeUtils;
 import crazysheep.io.nina.utils.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
@@ -191,6 +192,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         mBatmanService.postTweet(postTweet);
 
         // set result to TimelineFragment to show draft item UI in timeline
+        DebugHelper.log(String.format("return post tweet, model id %s", postTweet.getId()));
         Intent data = new Intent();
         data.putExtra(BundleConstants.EXTRA_POST_TWEET, postTweet);
         setResult(Activity.RESULT_OK, data);
@@ -199,7 +201,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     private void updateSendButton() {
         mSendBtn.setEnabled(!TextUtils.isEmpty(mTweetEt.getEditableText().toString())
-                || (!Utils.isNull(mSelectedImages) && mSelectedImages.size() > 0));
+                || Utils.size(mSelectedImages) > 0);
     }
 
 }

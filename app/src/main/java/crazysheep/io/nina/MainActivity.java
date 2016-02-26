@@ -1,6 +1,11 @@
 package crazysheep.io.nina;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +25,7 @@ import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
+import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
@@ -37,6 +43,18 @@ public class MainActivity extends BaseActivity
     private TextView mUserNameTv;
     private TextView mUserScreenNameTv;
 
+    private BatmanService mService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = ((BatmanService.BatmanBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
     private UserPrefs mUserPrefs;
 
     private Call<UserDto> mUserCall;
@@ -50,6 +68,9 @@ public class MainActivity extends BaseActivity
         mUserPrefs = new UserPrefs(this);
 
         initUI();
+
+        startService(new Intent(this, BatmanService.class));
+        bindService(new Intent(this, BatmanService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -84,6 +105,17 @@ public class MainActivity extends BaseActivity
                 L.d(t.toString());
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // if BatmanService is still posting tweet, do not stop it, it will stop itself
+        // after post done
+        if(!mService.isPosting())
+            stopService(new Intent(this, BatmanService.class));
+        unbindService(mConnection);
     }
 
     private void initUI() {

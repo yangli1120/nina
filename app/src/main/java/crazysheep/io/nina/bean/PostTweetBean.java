@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
@@ -22,7 +21,7 @@ import crazysheep.io.nina.utils.Utils;
  */
 @ParcelablePlease
 @Table(name = "post_tweet")
-public class PostTweetBean extends Model implements Parcelable, ITweet {
+public class PostTweetBean extends BaseModel implements Parcelable, ITweet {
 
     public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_REPLY_STATUS_ID = "reply_status_id";
@@ -292,12 +291,14 @@ public class PostTweetBean extends Model implements Parcelable, ITweet {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getId());
         PostTweetBeanParcelablePlease.writeToParcel(this, dest, flags);
     }
 
     public static final Creator<PostTweetBean> CREATOR = new Creator<PostTweetBean>() {
         public PostTweetBean createFromParcel(Parcel source) {
             PostTweetBean target = new PostTweetBean();
+            target.setAaId(source.readLong());
             PostTweetBeanParcelablePlease.readFromParcel(target, source);
             return target;
         }
