@@ -141,6 +141,8 @@ public class TweetDto implements BaseDto, Parcelable, ITweet {
     public int retweet_count;
     @SerializedName("id")
     public long id;
+    @SerializedName("id_str")
+    public String idStr;
     @SerializedName("retweeted")
     public boolean retweeted;
     @SerializedName("possibly_sensitive")

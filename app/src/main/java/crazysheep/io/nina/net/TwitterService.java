@@ -13,6 +13,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
@@ -57,6 +58,12 @@ public interface TwitterService {
             @Header(CacheConfig.PARAM_CACHE_CONTROL) int cacheType,
             @Query("max_id") Long maxId,
             @Query("count") Integer count);
+
+    /**
+     * destroy a own tweet
+     * */
+    @GET("statuses/destroy/{id}.json")
+    Call<TweetDto> detroyTweet(@Path("id") Long tweetId);
 
     //////////////////// favorites ///////////////////////
 

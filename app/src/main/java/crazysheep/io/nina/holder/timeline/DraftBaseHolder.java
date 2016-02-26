@@ -125,6 +125,12 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
         }
     }
 
+    @Override
+    public boolean isSwipeEnable() {
+        // if draft post failed, then user can swipe to dismiss draft to delete it from database
+        return mPostTweetBean.isFailed();
+    }
+
     private void showRemoveDraftDialog() {
         DialogUtils.showConfirmDialog(
                 (Activity) mContext, null, mContext.getString(R.string.remove_draft),

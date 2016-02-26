@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
+import crazysheep.io.nina.widget.recyclerviewhelper.SimpleItemTouchHelperCallback;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
 import rx.Observable;
@@ -135,6 +137,12 @@ public class TimelineFragment extends BaseNetworkFragment {
                 requestNextPage();
             }
         });
+
+        // let recyclerview support swipe dismiss
+        SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        callback.setSwipeEnable(true);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(mTimelineRv.getRefreshableView());
     }
 
     // when we back to app, make drafts post state is 'post_failed'

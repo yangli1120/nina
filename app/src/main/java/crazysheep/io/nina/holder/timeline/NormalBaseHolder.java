@@ -2,7 +2,6 @@ package crazysheep.io.nina.holder.timeline;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.TimeUtils;
@@ -49,6 +49,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
 
     protected Context mContext;
     protected TweetDto mTweetDto;
+    protected UserPrefs mUserPrefs;
 
     public NormalBaseHolder(@NonNull ViewGroup parent) {
         super(parent);
@@ -60,6 +61,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         contentFl.addView(contentView, params);
 
         mContext = parent.getContext();
+        mUserPrefs = new UserPrefs(mContext);
     }
 
     public abstract int getContentViewRes();
@@ -120,6 +122,12 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         likeCountTv.setText(String.valueOf(mTweetDto.user.favourites_count));
         likeIv.setImageResource(mTweetDto.favorited
                 ? R.drawable.ic_favorite_black : R.drawable.ic_un_favorite_grey);
+    }
+
+    @Override
+    public boolean isSwipeEnable() {
+        // if this tweet's author is myself, then I can delete it if I'm happy
+        return mUserPrefs.getUserScreenName().equals(mTweetDto.user.screen_name);
     }
 
     @Override
