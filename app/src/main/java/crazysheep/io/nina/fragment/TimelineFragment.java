@@ -227,7 +227,8 @@ public class TimelineFragment extends BaseNetworkFragment {
                     public List<ITweet> call(List<TweetDto> tweetDtos) {
                         return new ArrayList<ITweet>(tweetDtos);
                     }
-                });
+                })
+                .observeOn(AndroidSchedulers.mainThread());
         mTimelineObser.subscribe(new Action1<List<ITweet>>() {
             @Override
             public void call(List<ITweet> iTweets) {

@@ -126,4 +126,6 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:core:0.8.5.4@aar') {
         transitive = true
     }
+    // replace f**king videoview
+    compile 'com.sprylab.android.texturevideoview:texturevideoview:1.1.1'
 }

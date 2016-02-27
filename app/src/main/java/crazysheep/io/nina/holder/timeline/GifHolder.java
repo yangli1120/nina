@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.sprylab.android.widget.TextureVideoView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -30,7 +30,7 @@ public class GifHolder extends NormalBaseHolder
         implements RecyclerViewBaseAdapter.OnViewHolderLifeCallback<GifHolder> {
 
     @Bind(R.id.tweet_video_fl) FrameLayout mVideoFl;
-    @Bind(R.id.tweet_video_vv) VideoView mVideoVv;
+    @Bind(R.id.tweet_video_vv) TextureVideoView mVideoVv;
     @Bind(R.id.tweet_gif_label_tv) TextView mLabelTv;
 
     public GifHolder(@NonNull ViewGroup view) {
