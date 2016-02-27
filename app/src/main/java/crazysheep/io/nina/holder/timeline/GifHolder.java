@@ -9,17 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.sprylab.android.widget.TextureVideoView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.adapter.RecyclerViewBaseAdapter;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.widget.GlideSimpleViewTarget;
+import im.ene.lab.toro.widget.ToroVideoView;
 
 /**
  * timeline view holder for "animated_gif" type tweets
@@ -30,7 +30,8 @@ public class GifHolder extends NormalBaseHolder
         implements RecyclerViewBaseAdapter.OnViewHolderLifeCallback<GifHolder> {
 
     @Bind(R.id.tweet_video_fl) FrameLayout mVideoFl;
-    @Bind(R.id.tweet_video_vv) TextureVideoView mVideoVv;
+    @Bind(R.id.tweet_video_vv) ToroVideoView mVideoVv;
+    @Bind(R.id.tweet_video_preview_iv) ImageView mVideoPreviewIv;
     @Bind(R.id.tweet_gif_label_tv) TextView mLabelTv;
 
     public GifHolder(@NonNull ViewGroup view) {
@@ -61,15 +62,13 @@ public class GifHolder extends NormalBaseHolder
         super.bindData(position, tweetDto);
 
         mLabelTv.setVisibility(View.VISIBLE);
-        Glide.clear(mVideoVv);
-        Glide.with(mContext)
-                .load(mTweetDto.extended_entities.media.get(0).media_url_https)
-                .placeholder(R.color.place_holder_bg)
-                .into(GlideSimpleViewTarget.createViewTarget(mVideoVv));
+        mVideoVv.setVisibility(View.GONE);
+        mVideoPreviewIv.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onViewRecycled(GifHolder holder) {
+        mVideoPreviewIv.setVisibility(View.VISIBLE);
         mVideoVv.stopPlayback();
         mVideoVv.setVisibility(View.GONE);
     }
@@ -77,6 +76,14 @@ public class GifHolder extends NormalBaseHolder
     @Override
     public void onViewAttached(GifHolder holder) {
         animateLabel();
+
+        mVideoPreviewIv.setVisibility(View.VISIBLE);
+        Glide.clear(mVideoPreviewIv);
+        Glide.with(mContext)
+                .load(mTweetDto.extended_entities.media.get(0).media_url_https)
+                .placeholder(R.color.place_holder_bg)
+                .into(mVideoPreviewIv);
+
         mVideoVv.setVisibility(View.VISIBLE);
         mVideoVv.setVideoURI(Uri.parse(
                 mTweetDto.extended_entities.media.get(0).video_info.variants.get(0).url));
@@ -84,9 +91,9 @@ public class GifHolder extends NormalBaseHolder
         mVideoVv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                Glide.clear(mVideoVv);
+                Glide.clear(mVideoPreviewIv);
+                mVideoPreviewIv.setVisibility(View.GONE);
                 clearLabelAnimation();
-                mVideoVv.setBackground(null);
             }
         });
         mVideoVv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -158,5 +165,7 @@ public class GifHolder extends NormalBaseHolder
                 .cancel();
         ViewCompat.setAlpha(mLabelTv, 1f);
     }
+
+
 
 }

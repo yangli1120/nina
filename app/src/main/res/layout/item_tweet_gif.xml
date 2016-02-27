@@ -4,10 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.sprylab.android.widget.TextureVideoView
+    <im.ene.lab.toro.widget.ToroVideoView
         android:id="@id/tweet_video_vv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+    <ImageView
+        android:id="@id/tweet_video_preview_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"/>
     <TextView
         android:id="@id/tweet_gif_label_tv"
         android:layout_width="wrap_content"

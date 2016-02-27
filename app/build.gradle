@@ -127,5 +127,5 @@ dependencies {
         transitive = true
     }
     // replace f**king videoview
-    compile 'com.sprylab.android.texturevideoview:texturevideoview:1.1.1'
+    compile 'com.github.eneim:Toro:1.0.0'
 }
