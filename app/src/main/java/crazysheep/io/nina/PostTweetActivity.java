@@ -23,6 +23,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import crazysheep.io.nina.GalleryActivity.Options;
 import crazysheep.io.nina.adapter.PreviewGalleryAdapter;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.bean.PostTweetBean;
@@ -173,7 +174,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         ActivityUtils.startResult(this, REQUEST_CHOOSE_IMAGE,
                 ActivityUtils.prepare(this, GalleryActivity.class)
                         .putParcelableArrayListExtra(BundleConstants.EXTRA_SELECTED_IMAGES,
-                                mSelectedImages));
+                                mSelectedImages)
+                        .putExtra(BundleConstants.EXTRA_GALLERY_OPTIONS,
+                                new Options.Builder().chooseImage().takePhoto().build()));
     }
 
     @OnClick(R.id.send_tweet_btn)

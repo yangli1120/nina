@@ -3,7 +3,11 @@ package crazysheep.io.nina;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,16 +18,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import crazysheep.io.nina.adapter.SelectableGalleryAdapter;
 import crazysheep.io.nina.adapter.RecyclerViewBaseAdapter;
+import crazysheep.io.nina.adapter.SelectableGalleryAdapter;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.db.RxDB;
+import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.CameraUtils;
 import crazysheep.io.nina.utils.SystemUIHelper;
 import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
@@ -36,11 +46,88 @@ import crazysheep.io.nina.utils.Utils;
 public class GalleryActivity extends BaseSwipeBackActivity
         implements RecyclerViewBaseAdapter.OnItemClickListener {
 
+    ///////////////////////// api //////////////////////////////
+
+    @ParcelablePlease
+    public static class Options implements Parcelable {
+
+        public static final Options DEFAULT = new Options.Builder().chooseImage().build();
+
+        private static final int FLAG_CHOOSE_IMAGE = 0x0001;
+        private static final int FLAG_TAKE_PHOTO = 0x0010;
+
+        protected int flag = FLAG_CHOOSE_IMAGE;
+
+        public Options() {}
+
+        private Options(int flag) {
+            this.flag = flag;
+        }
+
+        public boolean chooseImage() {
+            return (flag & FLAG_CHOOSE_IMAGE) != 0;
+        }
+
+        public boolean takePhoto() {
+            return (flag & FLAG_TAKE_PHOTO) != 0;
+        }
+
+        public static class Builder {
+
+            private int flag = FLAG_CHOOSE_IMAGE;
+
+            public Builder() {}
+
+            public Builder chooseImage() {
+                flag |= FLAG_CHOOSE_IMAGE;
+                return this;
+            }
+
+            public Builder takePhoto() {
+                flag |= FLAG_TAKE_PHOTO;
+                return this;
+            }
+
+            public Options build() {
+                return new Options(flag);
+            }
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            crazysheep.io.nina.OptionsParcelablePlease.writeToParcel(this, dest, flags);
+        }
+
+        public static final Creator<Options> CREATOR = new Creator<Options>() {
+            public Options createFromParcel(Parcel source) {
+                Options target = new Options();
+                crazysheep.io.nina.OptionsParcelablePlease.readFromParcel(target, source);
+                return target;
+            }
+
+            public Options[] newArray(int size) {
+                return new Options[size];
+            }
+        };
+    }
+    ////////////////////////////////////////////////////////////
+
+    private static final int REQUEST_TAKE_PHOTO = 111;
+
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) RecyclerView mGalleryRv;
     private SelectableGalleryAdapter mAdapter;
 
     private ArrayList<MediaStoreImageBean> mSelectedImages;
+
+    private Options mOptions;
+
+    private File mPhotoFile;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +137,9 @@ public class GalleryActivity extends BaseSwipeBackActivity
 
         mSelectedImages = getIntent().getParcelableArrayListExtra(
                 BundleConstants.EXTRA_SELECTED_IMAGES);
+        mOptions = getIntent().getParcelableExtra(BundleConstants.EXTRA_GALLERY_OPTIONS);
+        if(Utils.isNull(mOptions))
+            mOptions = Options.DEFAULT;
 
         setSupportActionBar(mToolbar);
         if(!Utils.isNull(getSupportActionBar())) {
@@ -66,7 +156,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
         }
         GridLayoutManager layoutMgr = new GridLayoutManager(this, 4);
         mGalleryRv.setLayoutManager(layoutMgr);
-        mAdapter = new SelectableGalleryAdapter(this, null);
+        mAdapter = new SelectableGalleryAdapter(this, null, mOptions.takePhoto());
         mAdapter.setOnItemClickListener(this);
         mGalleryRv.setAdapter(mAdapter);
         // how to set recyclerview's padding,
@@ -129,9 +219,49 @@ public class GalleryActivity extends BaseSwipeBackActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_TAKE_PHOTO: {
+                    if(!Utils.isNull(mPhotoFile)) {
+                        // return to request activity
+                        Intent result = new Intent();
+                        MediaStoreImageBean imageBean = new MediaStoreImageBean();
+                        imageBean.filepath = mPhotoFile.getAbsolutePath();
+                        imageBean.title = mPhotoFile.getName();
+                        ArrayList<MediaStoreImageBean> images = new ArrayList<>(1);
+                        images.add(imageBean);
+                        result.putExtra(BundleConstants.EXTRA_SELECTED_IMAGES, images);
+                        setResult(Activity.RESULT_OK, result);
+                        finish();
+                    }
+                }break;
+            }
+        }
+    }
+
+    @Override
     public void onItemClick(View view, int position) {
-        mAdapter.toggleSelection(position);
-        invalidateOptionsMenu();
+        if(mOptions.takePhoto() && position == 0) {
+            Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(!Utils.isNull(takePhotoIntent.resolveActivity(getPackageManager()))) {
+                mPhotoFile = null;
+                try {
+                    mPhotoFile = CameraUtils.createImageFile();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+                if(!Utils.isNull(mPhotoFile)) {
+                    takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
+                    ActivityUtils.startResult(this, REQUEST_TAKE_PHOTO, takePhotoIntent);
+                }
+            }
+        } else {
+            mAdapter.toggleSelection(position);
+            invalidateOptionsMenu();
+        }
     }
 
     private int calculateSystemUIHeight() {

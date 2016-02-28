@@ -20,20 +20,48 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
+import crazysheep.io.nina.utils.Utils;
 
 /**
  * gallery adapter
  *
  * Created by crazysheep on 16/2/23.
  */
-public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<SelectableGalleryAdapter.ImageHolder,
-        MediaStoreImageBean> {
+public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
+        SelectableGalleryAdapter.ImageHolder, MediaStoreImageBean> {
 
     private SparseBooleanArray mSelectMap = new SparseBooleanArray();
     private static int MAX_SELECTION = 4;
+    private boolean showCameraButton = false;
 
-    public SelectableGalleryAdapter(@NonNull Context context, List<MediaStoreImageBean> items) {
+    public SelectableGalleryAdapter(@NonNull Context context, List<MediaStoreImageBean> items,
+                                    boolean showCameraButton) {
         super(context, items);
+        this.showCameraButton = showCameraButton;
+
+        if(showCameraButton) {
+            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(items) + 1);
+            // a invalid data, just place for take photo button
+            tempItems.add(new MediaStoreImageBean());
+            if(!Utils.isNull(items))
+                tempItems.addAll(items);
+
+            mItems = tempItems;
+        }
+    }
+
+    @Override
+    public void setData(List<MediaStoreImageBean> items) {
+        if(showCameraButton) {
+            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(items) + 1);
+            // a invalid data, just place for take photo button
+            tempItems.add(new MediaStoreImageBean());
+            if(!Utils.isNull(items))
+                tempItems.addAll(items);
+            super.setData(tempItems);
+        } else {
+            super.setData(items);
+        }
     }
 
     public void setMaxSelection(int max) {
@@ -42,18 +70,28 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<Selectable
 
     @Override
     public void onBindViewHolder(ImageHolder holder, int position) {
-        MediaStoreImageBean imageBean = getItem(position);
+        if(showCameraButton && isHeader(position)) {
+            holder.imgTv.setVisibility(View.GONE);
 
-        Glide.clear(holder.imgIv);
-        Glide.with(mContext)
-                .load(new File(imageBean.filepath))
-                .placeholder(R.color.place_holder_bg)
-                .fitCenter()
-                .into(holder.imgIv);
+            Glide.clear(holder.imgIv);
+            Glide.with(mContext)
+                    .load(R.drawable.ic_photo_camera)
+                    .into(holder.imgIv);
+        } else {
+            MediaStoreImageBean imageBean = getItem(position);
 
-        holder.imgTv.setText(imageBean.title);
+            Glide.clear(holder.imgIv);
+            Glide.with(mContext)
+                    .load(new File(imageBean.filepath))
+                    .placeholder(R.color.place_holder_bg)
+                    .fitCenter()
+                    .into(holder.imgIv);
 
-        holder.selectedV.setVisibility(isSelected(position) ? View.VISIBLE : View.GONE);
+            holder.imgTv.setVisibility(View.VISIBLE);
+            holder.imgTv.setText(imageBean.title);
+
+            holder.selectedV.setVisibility(isSelected(position) ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
