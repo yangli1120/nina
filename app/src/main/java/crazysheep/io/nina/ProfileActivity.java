@@ -150,7 +150,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
         if(!Utils.isNull(user)) {
             Glide.clear(mUserAvatar);
             Glide.with(this)
-                    .load(user.profile_image_url_https)
+                    .load(user.originalProfileImageUrlHttps())
                     .into(mUserAvatar);
 
             Glide.clear(mHeaderIv);

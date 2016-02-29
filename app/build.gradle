@@ -128,4 +128,6 @@ dependencies {
     }
     // replace f**king videoview
     compile 'com.github.eneim:Toro:1.0.0'
+    // java verbal expressions
+    compile 'ru.lanwen.verbalregex:java-verbal-expressions:1.4'
 }

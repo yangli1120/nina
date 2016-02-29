@@ -2,6 +2,7 @@ package crazysheep.io.nina.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
@@ -138,6 +139,58 @@ public class UserDto implements BaseDto, Parcelable {
     public String name;
     @SerializedName("screen_name")
     public String screen_name;
+
+    public String originalProfileImageUrlHttps() {
+        return profileImageUrlHttps(TYPE_ORIGIN);
+    }
+
+    public String biggerProfileImageUrlHttps() {
+        return profileImageUrlHttps(TYPE_BIGGER);
+    }
+
+    public String miniProfileImageUrlHttps() {
+        return profileImageUrlHttps(TYPE_MINI);
+    }
+
+    /**
+     * twitter profile image format just like:
+     *      [filename]_normal.png
+     *      [filename]_mini.png
+     *      [filename]_bigger.png
+     *      [filename].png
+     * */
+    private static final int TYPE_ORIGIN = 1;
+    private static final int TYPE_BIGGER = 2;
+    private static final int TYPE_MINI = 3;
+    private String profileImageUrlHttps(int type) {
+        if(!TextUtils.isEmpty(profile_image_url_https)) {
+            String findStr = "_normal";
+            int startIndex = profile_image_url_https.lastIndexOf(findStr);
+            if(startIndex > 0) {
+                String replaceStr;
+                switch (type) {
+                    case TYPE_ORIGIN:
+                        replaceStr = "";break;
+
+                    case TYPE_MINI:
+                        replaceStr = "_mini";break;
+
+                    case TYPE_BIGGER:
+                        replaceStr = "_bigger";break;
+
+                    default:
+                        replaceStr = "_normal";break;
+                }
+
+                return new StringBuilder(profile_image_url_https.substring(0, startIndex))
+                        .append(replaceStr)
+                        .append(profile_image_url_https.substring(startIndex + findStr.length()))
+                        .toString();
+            }
+        }
+
+        return profile_image_url_https;
+    }
 
     /////////////////////////////////// Parcelable /////////////////////////////////
 

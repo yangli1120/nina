@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivity
                         mUserPrefs.setUsername(response.body().name);
                         mUserNameTv.setText(response.body().name);
                     }
-                    String profileImageUrl = response.body().profile_image_url_https;
+                    String profileImageUrl = response.body().originalProfileImageUrlHttps();
                     if (!TextUtils.isEmpty(profileImageUrl)
                             && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
                         mUserPrefs.setUserAvatar(profileImageUrl);
