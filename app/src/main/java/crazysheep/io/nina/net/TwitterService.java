@@ -98,4 +98,12 @@ public interface TwitterService {
     Call<UploadMediaDto> uploadPhoto(@Url String uploadUrl,
                                      @Part("media\"; filename=\"image.jpg\" ")RequestBody body);
 
+    /////////////////////// friendship //////////////////////
+
+    @POST("friendships/create.json")
+    Call<UserDto> follow(@Query("screen_name") String screenName);
+
+    @POST("friendships/destroy.json")
+    Call<UserDto> unfollow(@Query("screen_name") String screenName);
+
 }

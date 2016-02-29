@@ -29,6 +29,10 @@
     <string name="profile_follower">%s follower</string>
     <string name="profile_follower_s">%s followers</string>
     <string name="profile_following">%s following</string>
+    <string name="follow_successful">follow %s successful</string>
+    <string name="follow_failed">follow %s failed</string>
+    <string name="unfollow_successful">unfollow %s successful</string>
+    <string name="unfollow_failed">unfollow %s failed</string>
 
     <!-- timeline -->
     <string name="tag_gif">Gif</string>

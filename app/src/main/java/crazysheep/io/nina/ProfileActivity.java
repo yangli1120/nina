@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.TextViewCompat;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.ProfilePagerAdapter;
 import crazysheep.io.nina.bean.UserDto;
@@ -65,6 +67,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
     private String mScreenName;
 
     private Call<UserDto> mUserCall;
+    private UserDto mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +151,8 @@ public class ProfileActivity extends BaseSwipeBackActivity
 
     private void updateUserUI(UserDto user) {
         if(!Utils.isNull(user)) {
+            mUser = user;
+
             Glide.clear(mUserAvatar);
             Glide.with(this)
                     .load(user.originalProfileImageUrlHttps())
@@ -179,6 +184,50 @@ public class ProfileActivity extends BaseSwipeBackActivity
             mFollowingTv.setText(
                     getString(R.string.profile_following,
                             StringUtils.formatCount(user.friends_count)));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @OnClick(R.id.action_fab)
+    protected void clickFollowFab() {
+        if(!Utils.isNull(mUser)) {
+            if(mUser.following)
+                mTwitter.unfollow(mUser.screen_name).enqueue(new NiceCallback<UserDto>() {
+                    @Override
+                    public void onRespond(Response<UserDto> response) {
+                        Snackbar.make(mContentVp,
+                                getString(R.string.unfollow_successful, mUser.screen_name),
+                                Snackbar.LENGTH_LONG)
+                                .show();
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                        Snackbar.make(mContentVp,
+                                getString(R.string.unfollow_failed, mUser.screen_name),
+                                Snackbar.LENGTH_LONG).show();
+                    }
+                });
+            else
+                mTwitter.follow(mUser.screen_name).enqueue(new NiceCallback<UserDto>() {
+                    @Override
+                    public void onRespond(Response<UserDto> response) {
+                        Snackbar.make(mContentVp,
+                                getString(R.string.follow_successful, mUser.screen_name),
+                                Snackbar.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                        Snackbar.make(mContentVp,
+                                getString(R.string.follow_failed, mUser.screen_name),
+                                Snackbar.LENGTH_LONG).show();
+                    }
+                });
+
+            mUser.following = !mUser.following;
+            mFab.setImageResource(mUser.following
+                    ? R.drawable.ic_following_white_24dp : R.drawable.ic_unfollow_white_24dp);
         }
     }
 

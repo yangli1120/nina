@@ -11,6 +11,18 @@ import retrofit2.Response;
  */
 public abstract class NiceCallback<T> implements retrofit2.Callback<T> {
 
+    /////////////////////// empty nice callback ////////////////////////
+    public static class EmptyNiceCallback<T> extends NiceCallback<T> {
+        @Override
+        public void onFailed(Throwable t) {
+        }
+
+        @Override
+        public void onRespond(Response<T> response) {
+        }
+    }
+    ////////////////////////////////////////////////////////////////////
+
     @Override
     public void onResponse(Call<T> call, Response<T> response) {
         if(response.code() == HttpConstants.CODE_200)
