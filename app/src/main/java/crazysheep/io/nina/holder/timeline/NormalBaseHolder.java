@@ -77,7 +77,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         Glide.clear(avatarIv);
         // start current request
         Glide.with(mContext)
-                .load(mTweetDto.user.profile_image_url_https)
+                .load(mTweetDto.user.biggerProfileImageUrlHttps())
                 .into(avatarIv);
         avatarIv.setOnClickListener(this);
 

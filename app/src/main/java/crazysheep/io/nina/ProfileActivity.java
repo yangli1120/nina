@@ -159,6 +159,9 @@ public class ProfileActivity extends BaseSwipeBackActivity
                     .error(R.color.colorPrimary)
                     .into(mHeaderIv);
 
+            mFab.setImageResource(user.following
+                    ? R.drawable.ic_following_white_24dp : R.drawable.ic_unfollow_white_24dp);
+
             mUserNameTv.setText(user.name);
             mUserScreenNameTv.setText(getString(R.string.screen_name, user.screen_name));
             mUserIntroductionTv.setText(user.description);

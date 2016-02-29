@@ -139,6 +139,8 @@ public class UserDto implements BaseDto, Parcelable {
     public String name;
     @SerializedName("screen_name")
     public String screen_name;
+    @SerializedName("following")
+    public boolean following;
 
     public String originalProfileImageUrlHttps() {
         return profileImageUrlHttps(TYPE_ORIGIN);
