@@ -11,17 +11,23 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.TimeUtils;
+import crazysheep.io.nina.widget.TwitterLikeImageView;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Response;
 
 /**
  * base viewholder for timeline, implements base layout
@@ -30,6 +36,21 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         implements View.OnClickListener {
+
+    ////////////////// like event /////////////////////////
+
+    public static class EventLikeStatus {
+        private TweetDto tweetDto;
+
+        public TweetDto getTweetDto() {
+            return tweetDto;
+        }
+
+        public EventLikeStatus(@NonNull TweetDto tweetDto) {
+            this.tweetDto = tweetDto;
+        }
+    }
+    ///////////////////////////////////////////////////////
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
     @Bind(R.id.retweet_author_tv) TextView retweetAuthorTv;
@@ -44,7 +65,8 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
     @Bind(R.id.action_retweet_iv) ImageView retweetIv;
     @Bind(R.id.action_retweet_count_tv) TextView retweetCountTv;
     @Bind(R.id.action_like_ll) View likeLl;
-    @Bind(R.id.action_like_iv) ImageView likeIv;
+    @Bind(R.id.action_like_iv)
+    TwitterLikeImageView likeIv;
     @Bind(R.id.action_like_count_tv) TextView likeCountTv;
 
     protected Context mContext;
@@ -113,15 +135,48 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             }
         });
         retweetCountTv.setText(String.valueOf(tweetDto.retweet_count));
+
+        // like action
         likeLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DebugHelper.toast(mContext, "click like");
+                if(mTweetDto.favorited) {
+                    HttpClient.getInstance()
+                            .getTwitterService()
+                            .like(Long.parseLong(mTweetDto.idStr))
+                            .enqueue(new NiceCallback<TweetDto>() {
+                                @Override
+                                public void onRespond(Response<TweetDto> response) {
+                                    EventBus.getDefault().post(
+                                            new EventLikeStatus(response.body()));
+                                }
+
+                                @Override
+                                public void onFailed(Throwable t) {}
+                            });
+                    likeIv.unlike();
+                } else {
+                    HttpClient.getInstance()
+                            .getTwitterService()
+                            .unlike(Long.parseLong(mTweetDto.idStr))
+                            .enqueue(new NiceCallback<TweetDto>() {
+                                @Override
+                                public void onRespond(Response<TweetDto> response) {
+                                    EventBus.getDefault().post(
+                                            new EventLikeStatus(response.body()));
+                                }
+
+                                @Override
+                                public void onFailed(Throwable t) {}
+                            });
+                    likeIv.like();
+                }
             }
         });
-        likeCountTv.setText(String.valueOf(mTweetDto.user.favourites_count));
+        likeCountTv.setText(String.valueOf(mTweetDto.favorite_count));
+        likeIv.setHeartRes(R.drawable.ic_like_red_18dp, R.drawable.ic_un_like_grey_18dp);
         likeIv.setImageResource(mTweetDto.favorited
-                ? R.drawable.ic_favorite_black : R.drawable.ic_un_favorite_grey);
+                ? R.drawable.ic_like_red_18dp : R.drawable.ic_un_like_grey_18dp);
     }
 
     @Override

@@ -106,4 +106,12 @@ public interface TwitterService {
     @POST("friendships/destroy.json")
     Call<UserDto> unfollow(@Query("screen_name") String screenName);
 
+    ////////////////////// favorites ///////////////////////
+
+    @POST("favorites/create.json")
+    Call<TweetDto> like(@Query("id") Long id);
+
+    @POST("favorites/destroy.json")
+    Call<TweetDto> unlike(@Query("id") Long id);
+
 }

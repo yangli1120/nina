@@ -168,7 +168,7 @@ public class TimelineFragment extends BaseNetworkFragment {
                                 .all()
                                 .from(PostTweetBean.class)
                                 .execute();
-                        if(Utils.size(drafts) > 0)
+                        if (Utils.size(drafts) > 0)
                             for (PostTweetBean postTweet : drafts) {
                                 postTweet.setFailed();
                                 postTweet.save();

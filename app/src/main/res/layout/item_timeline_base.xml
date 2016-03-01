@@ -140,11 +140,11 @@
                 android:background="@drawable/button_bg"
                 android:orientation="horizontal"
                 android:gravity="center">
-                <ImageView
+                <crazysheep.io.nina.widget.TwitterLikeImageView
                     android:id="@id/action_like_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_un_favorite_grey"
+                    android:src="@drawable/ic_un_like_grey_18dp"
                     android:scaleType="center" />
                 <TextView
                     android:id="@id/action_like_count_tv"

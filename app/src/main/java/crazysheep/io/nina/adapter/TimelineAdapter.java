@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import crazysheep.io.nina.bean.ITweet;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.holder.timeline.BaseHolder;
+import crazysheep.io.nina.holder.timeline.NormalBaseHolder;
 import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
@@ -57,6 +60,15 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
         return drafts;
     }
 
+    public List<TweetDto> getTweets() {
+        List<TweetDto> tweets = new ArrayList<>();
+        for(ITweet iTweet : getData())
+            if(iTweet instanceof TweetDto)
+                tweets.add((TweetDto)iTweet);
+
+        return tweets;
+    }
+
     @Override
     public void onItemDismiss(int position) {
         // swipe to delete failed draft or my own tweet
@@ -96,5 +108,16 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         return false;
+    }
+
+    @SuppressWarnings("unused, unchecked")
+    @Subscribe
+    public void onEvent(NormalBaseHolder.EventLikeStatus event) {
+        for(TweetDto tweetDto : getTweets())
+            if(event.getTweetDto().id == tweetDto.id) {
+                tweetDto.favorite_count++;
+                tweetDto.favorited = true;
+                notifyItemChanged(findItemPosition(tweetDto));
+            }
     }
 }

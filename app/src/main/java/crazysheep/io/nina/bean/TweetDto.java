@@ -151,6 +151,8 @@ public class TweetDto implements BaseDto, Parcelable, ITweet {
     public UserDto user;
     @SerializedName("retweeted_status")
     public TweetDto retweeted_status;
+    @SerializedName("favorite_count")
+    public int favorite_count;
 
     ////////////////////////////////// Parcelable //////////////////////////////////
 
