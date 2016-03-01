@@ -1,6 +1,8 @@
 package crazysheep.io.nina.utils;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
 /**
@@ -35,6 +37,30 @@ public class SystemUIHelper {
         }
 
         return result;
+    }
+
+    /**
+     * check device have NavigationBar
+     * */
+    public static boolean hasNavBar(@NonNull Resources resources) {
+        int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+        return id > 0 && resources.getBoolean(id);
+    }
+
+    public static int getNavBarSize(@NonNull Resources resources) {
+        int id = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (id > 0) {
+            return resources.getDimensionPixelSize(id);
+        }
+        return 0;
+    }
+
+    /**
+     * check if NavigationBar is translucent mode
+     * */
+    public static boolean isNavBarTranslucent(@NonNull Resources resources) {
+        int id = resources.getIdentifier("config_enableTranslucentDecor", "bool", "android");
+        return id > 0 && resources.getBoolean(id);
     }
 
 }
