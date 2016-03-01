@@ -120,4 +120,18 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
                 notifyItemChanged(findItemPosition(tweetDto));
             }
     }
+
+    @SuppressWarnings("unused, unchecked")
+    @Subscribe
+    public void onEvent(NormalBaseHolder.EventUnLikeStatus event) {
+        for(TweetDto tweetDto : getTweets())
+            if(tweetDto.id == event.getTweetDto().id) {
+                tweetDto.favorited = false;
+                tweetDto.favorite_count--;
+                if(tweetDto.favorite_count < 0)
+                    tweetDto.favorite_count = 0;
+                notifyItemChanged(findItemPosition(tweetDto));
+            }
+    }
+
 }

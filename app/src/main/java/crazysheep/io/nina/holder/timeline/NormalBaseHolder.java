@@ -50,6 +50,18 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             this.tweetDto = tweetDto;
         }
     }
+
+    public static class EventUnLikeStatus {
+        private TweetDto tweetDto;
+
+        public TweetDto getTweetDto() {
+            return tweetDto;
+        }
+
+        public EventUnLikeStatus(@NonNull TweetDto tweetDto) {
+            this.tweetDto = tweetDto;
+        }
+    }
     ///////////////////////////////////////////////////////
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
@@ -163,7 +175,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                                 @Override
                                 public void onRespond(Response<TweetDto> response) {
                                     EventBus.getDefault().post(
-                                            new EventLikeStatus(response.body()));
+                                            new EventUnLikeStatus(response.body()));
                                 }
 
                                 @Override
