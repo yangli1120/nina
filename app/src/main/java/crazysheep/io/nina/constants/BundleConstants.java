@@ -15,5 +15,7 @@ public class BundleConstants {
     public static final String EXTRA_POST_TWEET = "extra_post_tweet";
     public static final String EXTRA_SELECTED_IMAGES = "extra_selected_images";
     public static final String EXTRA_GALLERY_OPTIONS = "extra_gallery_options";
+    public static final String EXTRA_PHOTO_URL = "extra_photo_url";
+    public static final String EXTRA_PHOTO_THUMBNAIL_SIZE = "extra_photo_thumbnail_size";
 
 }

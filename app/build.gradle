@@ -130,4 +130,6 @@ dependencies {
     compile 'com.github.eneim:Toro:1.0.0'
     // java verbal expressions
     compile 'ru.lanwen.verbalregex:java-verbal-expressions:1.4'
+    // chris banes' photoview
+    compile 'com.commit451:PhotoView:1.2.4'
 }

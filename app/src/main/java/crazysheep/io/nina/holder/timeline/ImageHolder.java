@@ -1,17 +1,27 @@
 package crazysheep.io.nina.holder.timeline;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.PhotoActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.TweetMediaDto;
+import crazysheep.io.nina.compat.APICompat;
+import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.widget.imagegroup.GridGalleryLayout;
 
 /**
@@ -57,13 +67,17 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
     }
 
     @Override
-    public void onAttach(int position, ImageView view) {
+    public void onAttach(int childIndex, ImageView view) {
         // cancel before task and clear before images
         Glide.clear(view);
         view.setImageResource(0);
-        // load new one
+
+        TweetMediaDto mediaDto = mTweetDto.extended_entities.media.get(childIndex);
+        // in timeline, photo should use small size to save memory, make timeline smooth
         Glide.with(mContext)
-                .load(mTweetDto.extended_entities.media.get(position).media_url_https)
+                .load(mediaDto.media_url_https)
+                .override(mediaDto.sizes.small.w, mediaDto.sizes.small.h)
+                .centerCrop()
                 .into(view);
     }
 
@@ -75,9 +89,25 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onClick(int position, ImageView view) {
-        // TODO view big image
-        Toast.makeText(mContext, "click position: " + position, Toast.LENGTH_SHORT).show();
+        if(APICompat.api21()) {
+            // transition animation
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    (Activity) mContext,
+                    new Pair<View, String>(view, PhotoActivity.SHARED_ELEMENT_PHOTO));
+            TweetMediaDto mediaDto = mTweetDto.extended_entities.media.get(position);
+            Intent intent = new Intent(mContext, PhotoActivity.class);
+            intent.putExtra(BundleConstants.EXTRA_PHOTO_URL, mediaDto.media_url_https);
+            intent.putExtra(BundleConstants.EXTRA_PHOTO_THUMBNAIL_SIZE,
+                    new int[]{mediaDto.sizes.small.w, mediaDto.sizes.small.h});
+            ActivityCompat.startActivity((Activity)mContext, intent, options.toBundle());
+        } else {
+            ActivityUtils.start(mContext,
+                    ActivityUtils.prepare(mContext, PhotoActivity.class)
+                            .putExtra(BundleConstants.EXTRA_PHOTO_URL, mTweetDto.extended_entities
+                                    .media.get(position).media_url_https));
+        }
     }
 
 }
