@@ -16,7 +16,6 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,10 +23,9 @@ import crazysheep.io.nina.constants.PermissionConstants;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.RxWorker;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import rx.Observable;
-import rx.functions.Action1;
 
 /**
  * splash activity
@@ -110,15 +108,15 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void goMain() {
-        Observable.just(true)
-                .delay(2000, TimeUnit.MILLISECONDS)
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        ActivityUtils.start(getActivity(), MainActivity.class);
-                        finish();
-                    }
-                });
+        // attention, for avoid weird activity transition animation, make sure start activity action
+        // run on UI thread
+        // see{@link http://stackoverflow.com/questions/4633543/overridependingtransition-does-not-work-when-flag-activity-reorder-to-front-is-u}
+        RxWorker.delayOnUI(this, 1000, new Runnable() {
+            @Override
+            public void run() {
+                ActivityUtils.finishStart(getActivity(), MainActivity.class);
+            }
+        });
     }
 
     @AfterPermissionGranted(PermissionConstants.RC_EXTERNAL_STORAGE)

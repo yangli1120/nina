@@ -16,6 +16,12 @@ import crazysheep.io.nina.R;
  */
 public class ActivityUtils {
 
+    public static void finishStart(@NonNull Activity activity, @NonNull Class<? extends Activity> clazz) {
+        activity.startActivity(new Intent(activity, clazz));
+        activity.finish();
+        activity.overridePendingTransition(R.anim.slide_left_in, android.R.anim.fade_out);
+    }
+
     /**
      * start target activity
      * */
