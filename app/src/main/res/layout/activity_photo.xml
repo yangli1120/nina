@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drag_dismiss_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/black">
+    android:background="@android:color/black"
+    app:dragDismissDistance="112dp"
+    app:dragDismissScale="0.95">
 
-    <uk.co.senab.photoview.PhotoView
-        android:id="@+id/image_pv"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:clickable="true"
-        android:layout_gravity="center"/>
-    <ImageView
-        android:id="@+id/transition_image_iv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:visibility="gone"/>
-</FrameLayout>
+        android:fillViewport="true">
+
+        <ImageView
+            android:id="@+id/image_iv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"/>
+    </android.support.v4.widget.NestedScrollView>
+</com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout>

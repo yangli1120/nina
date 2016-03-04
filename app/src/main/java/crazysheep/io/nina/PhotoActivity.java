@@ -2,18 +2,18 @@ package crazysheep.io.nina;
 
 import android.annotation.TargetApi;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.transition.Transition;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout;
+import com.commit451.elasticdragdismisslayout.ElasticDragDismissListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -22,7 +22,7 @@ import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.SimpleTransitionListener;
-import uk.co.senab.photoview.PhotoView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * show big photo
@@ -33,8 +33,8 @@ public class PhotoActivity extends BaseActivity {
 
     public static final String SHARED_ELEMENT_PHOTO = "shared:element:photo";
 
-    @Bind(R.id.image_pv) PhotoView mPhotoPv;
-    @Bind(R.id.transition_image_iv) ImageView mTransitionIv;
+    @Bind(R.id.drag_dismiss_layout) ElasticDragDismissFrameLayout mDragDismissFl;
+    @Bind(R.id.image_iv) ImageView mPhotoIv;
 
     private String photoUrl;
     private int[] thumbnailSizes;
@@ -52,25 +52,22 @@ public class PhotoActivity extends BaseActivity {
                 BundleConstants.EXTRA_PHOTO_THUMBNAIL_SIZE);
 
         if(APICompat.api21() && addTransitionListener()) {
-            mTransitionIv.setVisibility(View.VISIBLE);
-            mTransitionIv.getViewTreeObserver().addOnGlobalLayoutListener(
-                    new OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            mTransitionIv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-
-                            ViewGroup.LayoutParams params = mTransitionIv.getLayoutParams();
-                            params.height = Math.round(mTransitionIv.getMeasuredWidth()
-                                    * thumbnailSizes[1] * 1f / thumbnailSizes[0]);
-                            mTransitionIv.setLayoutParams(params);
-                        }
-                    });
-
-            ViewCompat.setTransitionName(mTransitionIv, SHARED_ELEMENT_PHOTO);
             loadThumbnailImage();
+            ViewCompat.setTransitionName(mPhotoIv, SHARED_ELEMENT_PHOTO);
         } else {
             loadFullSizeImage();
         }
+        mDragDismissFl.addListener(new ElasticDragDismissListener() {
+            @Override
+            public void onDrag(float elasticOffset, float elasticOffsetPixels,
+                               float rawOffset, float rawOffsetPixels) {
+            }
+
+            @Override
+            public void onDragDismissed() {
+                finishWithTransitionIfNeed();
+            }
+        });
     }
 
     @TargetApi(APICompat.L)
@@ -100,35 +97,29 @@ public class PhotoActivity extends BaseActivity {
                 .load(photoUrl)
                 .dontAnimate()
                 .fitCenter()
-                .listener(new RequestListener<String, GlideDrawable>() {
+                .into(new SimpleTarget<GlideDrawable>() {
                     @Override
-                    public boolean onException(
-                            Exception e, String model, Target<GlideDrawable> target,
-                            boolean isFirstResource) {
-                        return false;
+                    public void onResourceReady(
+                            GlideDrawable resource,
+                            GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        mPhotoIv.setImageDrawable(resource);
+                        PhotoViewAttacher attacher = new PhotoViewAttacher(mPhotoIv);
+                        attacher.update();
                     }
-
-                    @Override
-                    public boolean onResourceReady(
-                            GlideDrawable resource, String model, Target<GlideDrawable> target,
-                            boolean isFromMemoryCache, boolean isFirstResource) {
-                        Glide.clear(mTransitionIv);
-                        mTransitionIv.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .into(mPhotoPv);
+                });
     }
 
     private void loadThumbnailImage() {
         Glide.with(this)
                 .load(photoUrl)
                 .override(thumbnailSizes[0], thumbnailSizes[1])
-                .into(mTransitionIv);
+                .fitCenter()
+                .dontAnimate()
+                .into(mPhotoIv);
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.image_pv)
+    @OnClick(R.id.image_iv)
     public void clickPhoto() {
         finishWithTransitionIfNeed();
     }
@@ -140,12 +131,7 @@ public class PhotoActivity extends BaseActivity {
 
     private void finishWithTransitionIfNeed() {
         if(APICompat.api21()) {
-            // because mTransitionIv have the shared element id, let mTransitionIv visible to start
-            // return transition animation
-            mPhotoPv.setVisibility(View.GONE);
-            mTransitionIv.setVisibility(View.VISIBLE);
-
-            finishAfterTransition();
+            ActivityCompat.finishAfterTransition(this);
         } else {
             finish();
         }
