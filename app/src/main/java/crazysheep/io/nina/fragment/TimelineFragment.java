@@ -159,6 +159,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     // when we back to app, make drafts post state is 'post_failed'
     private void setPostTweetFailedFirstTime() {
+        showLoading();
         Observable.just(true)
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<Boolean, Boolean>() {
@@ -205,6 +206,7 @@ public class TimelineFragment extends BaseNetworkFragment {
                 .subscribe(new Subscriber<List<ITweet>>() {
                     @Override
                     public void onCompleted() {
+                        hideLoading();
                         mTimelineRv.setRefreshing(false);
 
                         mAdapter.setData(draftsAndTweets);
@@ -213,6 +215,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
                     @Override
                     public void onError(Throwable e) {
+                        hideLoading();
                         showError();
                         L.d(e.toString());
                     }
@@ -275,6 +278,7 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     @Override
     protected void onErrorClick() {
+        showLoading();
         requestFirstPage();
     }
 

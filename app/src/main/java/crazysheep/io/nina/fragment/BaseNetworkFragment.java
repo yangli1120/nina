@@ -54,6 +54,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
         mLoadingMsgTv = ButterKnife.findById(rootView, R.id._base_network_ft_loading_msg_tv);
         mErrorFl = ButterKnife.findById(rootView, R.id._base_network_ft_error_stub);
         mErrorMsgTv = ButterKnife.findById(rootView, R.id._base_network_ft_error_msg_tv);
+        mErrorMsgTv.setOnClickListener(this);
 
         View contentView = onCreateView(inflater, container);
         if(!Utils.isNull(contentView)) {
@@ -73,7 +74,7 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
         switch (v.getId()) {
             case R.id._base_network_ft_error_msg_tv: {
                 onErrorClick();
-            }
+            }break;
         }
     }
 

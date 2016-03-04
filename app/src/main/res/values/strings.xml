@@ -19,7 +19,7 @@
     <string name="time_min">%smin</string>
     <string name="time_min_s">%smins</string>
 
-    <string name="err_load_failed">load failed</string>
+    <string name="err_load_failed">load failed\nclick to try again</string>
 
     <!-- profile -->
     <string name="profile_title">profile</string>
