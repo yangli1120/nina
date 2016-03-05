@@ -76,15 +76,16 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
         // in timeline, photo should use small size to save memory, make timeline smooth
         Glide.with(mContext)
                 .load(mediaDto.media_url_https)
-                .override(mediaDto.sizes.small.w, mediaDto.sizes.small.h)
+                .override(mediaDto.sizes.medium.w, mediaDto.sizes.medium.h)
                 .centerCrop()
                 .into(view);
     }
 
     @Override
     public void onDetach(int position, ImageView view) {
-        // cancel
-        Glide.clear(view);
+        // cancel, in RecyclerView, not need use clear(),
+        // see{@link https://github.com/bumptech/glide/issues/550}
+        //Glide.clear(view);
         view.setImageResource(0);
     }
 
@@ -100,7 +101,7 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
             Intent intent = new Intent(mContext, PhotoActivity.class);
             intent.putExtra(BundleConstants.EXTRA_PHOTO_URL, mediaDto.media_url_https);
             intent.putExtra(BundleConstants.EXTRA_PHOTO_THUMBNAIL_SIZE,
-                    new int[]{mediaDto.sizes.small.w, mediaDto.sizes.small.h});
+                    new int[]{mediaDto.sizes.medium.w, mediaDto.sizes.medium.h});
             ActivityCompat.startActivity((Activity)mContext, intent, options.toBundle());
         } else {
             ActivityUtils.start(mContext,

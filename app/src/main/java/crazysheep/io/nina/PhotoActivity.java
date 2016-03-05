@@ -9,6 +9,7 @@ import android.transition.Transition;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -110,10 +111,18 @@ public class PhotoActivity extends BaseActivity {
     }
 
     private void loadThumbnailImage() {
+        // be careful, to reuse thumbnail bitmap in memory cache as soon as possible,
+        // all request options must same as {@link crazysheep.io.nina.holder.timeline.ImageHolder}
+        // dose, in ImageHolder.onAttach(), I used override(w, h) and centerCrop(),
+        // so here must use same options to let Glide know I want the cache in memory as soon as
+        // possible for nice transition animation use, if I use fitCenter() or other options here
+        // not same as before, Glide will load another bitmap when play transition animation,
+        // that's weird
         Glide.with(this)
                 .load(photoUrl)
                 .override(thumbnailSizes[0], thumbnailSizes[1])
-                .fitCenter()
+                .priority(Priority.IMMEDIATE)
+                .centerCrop()
                 .dontAnimate()
                 .into(mPhotoIv);
     }
