@@ -15,6 +15,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,6 +36,7 @@ import butterknife.OnClick;
 import crazysheep.io.nina.MainActivity;
 import crazysheep.io.nina.PostTweetActivity;
 import crazysheep.io.nina.R;
+import crazysheep.io.nina.SearchActivity;
 import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.bean.ITweet;
 import crazysheep.io.nina.bean.PostTweetBean;
@@ -105,6 +109,7 @@ public class TimelineFragment extends BaseNetworkFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         EventBus.getDefault().register(this);
         getActivity().bindService(new Intent(getActivity(), BatmanService.class), mConnection,
@@ -117,6 +122,23 @@ public class TimelineFragment extends BaseNetworkFragment {
 
         EventBus.getDefault().unregister(this);
         getActivity().unbindService(mConnection);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_timeline, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search: {
+                ActivityUtils.start(getActivity(), SearchActivity.class);
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initUI() {

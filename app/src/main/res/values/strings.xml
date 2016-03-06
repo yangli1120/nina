@@ -52,4 +52,9 @@
     <string name="gallery">Gallery</string>
     <string name="select_done">done(%s)</string>
     <string name="toast_select_no_image">no image selected</string>
+
+    <!-- search twitter -->
+    <string name="search_twitter">Search twitter</string>
+    <string name="trend_nearby">trend nearby</string>
+    <string name="trend_global">trend global</string>
 </resources>
