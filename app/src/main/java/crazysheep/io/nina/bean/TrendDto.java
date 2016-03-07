@@ -16,13 +16,12 @@ public class TrendDto implements BaseDto, Parcelable {
 
     /*
           {
-            "tweet_volume": 3700,
-            "events": null,
-            "name": "Premium Rush",
-            "promoted_content": null,
-            "query": "%22Premium%20Rush%22",
-            "url": "http://twitter.com/search/?q=%22Premium%20Rush%22"
-          }
+                "name": "#UFC196",
+                "url": "http://twitter.com/search?q=%23UFC196",
+                "promoted_content": null,
+                "query": "%23UFC196",
+                "tweet_volume": 874943
+            }
     * */
     @SerializedName("tweet_volume")
     public int tweet_volume;

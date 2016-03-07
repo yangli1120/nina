@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.List;
 
 import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -31,6 +32,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     public static String TAG = BaseActivity.class.getSimpleName();
 
     protected TwitterService mTwitter;
+    protected RxTwitterService mRxTwitter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +40,10 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
         TAG = this.getClass().getSimpleName();
 
-        if(this instanceof ITwitterServiceActivity)
+        if(this instanceof ITwitterServiceActivity) {
             mTwitter = HttpClient.getInstance().getTwitterService();
+            mRxTwitter = HttpClient.getInstance().getRxTwitterService();
+        }
     }
 
     protected final Activity getActivity() {

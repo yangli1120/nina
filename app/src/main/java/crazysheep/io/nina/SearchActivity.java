@@ -3,13 +3,17 @@ package crazysheep.io.nina;
 import android.Manifest;
 import android.animation.Animator;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.view.View;
 import android.view.ViewTreeObserver.OnPreDrawListener;
@@ -23,18 +27,27 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.adapter.TrendAdapter;
+import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
+import crazysheep.io.nina.bean.TrendDto;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.PermissionConstants;
-import crazysheep.io.nina.net.NiceCallback;
-import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.DialogUtils;
+import crazysheep.io.nina.utils.ImeUtils;
 import crazysheep.io.nina.utils.Utils;
+import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.Call;
-import retrofit2.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.exceptions.Exceptions;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * search twitter activity
@@ -48,19 +61,24 @@ public class SearchActivity extends BaseSwipeBackActivity
     // see{@link https://dev.twitter.com/rest/reference/get/trends/place}
     private static final long WOEID_GLOBAL = 1;
 
+    private static final int REQUEST_LOCATION_SETTINGS = 100;
+
     private final String[] mPers = new String[] {
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private LocationManager mLocationMgr;
 
+    private boolean isRequestingEnableLocationSettings = false;
+
     @Bind(R.id.coordinator_layout) CoordinatorLayout mCoordinatorLayout;
-    @Bind(R.id.data_rv) RecyclerView mResultRv;
+    @Bind(R.id.data_rv) LoadMoreRecyclerView mDataRv;
     @Bind(R.id.search_view) SearchView mSearchView;
     @Bind(R.id.trend_nearby_iv) View mNearbyIv;
     @Bind(R.id.trend_global_iv) View mGlobalIv;
     @Bind(R.id.trend_ll) View mTrendLl;
 
-    private Call<List<PlaceTrendResultDto>> mTrendCall;
+    private TrendAdapter mTrendAdapter;
+    private Observable<List<PlaceTrendResultDto>> mTrendObser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +138,28 @@ public class SearchActivity extends BaseSwipeBackActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        mNearbyIv.setOnClickListener(this);
+        mGlobalIv.setOnClickListener(this);
+
+        mDataRv.setLayoutManager(new LinearLayoutManager(this));
+        mTrendAdapter = new TrendAdapter(this, null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(isRequestingEnableLocationSettings) {
+            isRequestingEnableLocationSettings = false;
+            queryLocation();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releaseLocationListener();
     }
 
     @Override
@@ -147,23 +187,37 @@ public class SearchActivity extends BaseSwipeBackActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.trend_nearby_iv: {
+                ImeUtils.hide(this);
+
                 requestLocationPermission();
             }break;
 
             case R.id.trend_global_iv: {
-                if(!Utils.isNull(mTrendCall))
-                    mTrendCall.cancel();
-                mTrendCall = mTwitter.trend(WOEID_GLOBAL);
-                mTrendCall.enqueue(new NiceCallback<List<PlaceTrendResultDto>>() {
-                    @Override
-                    public void onRespond(Response<List<PlaceTrendResultDto>> response) {
-                        // TODO show global trends
-                    }
+                ImeUtils.hide(this);
 
-                    @Override
-                    public void onFailed(Throwable t) {
-                    }
-                });
+                if(!Utils.isNull(mTrendObser))
+                    mTrendObser.unsubscribeOn(AndroidSchedulers.mainThread());
+                mTrendObser = mRxTwitter.trend(WOEID_GLOBAL)
+                        .subscribeOn(Schedulers.io());
+                mTrendObser.observeOn(AndroidSchedulers.mainThread())
+                        .map(new Func1<List<PlaceTrendResultDto>, List<TrendDto>>() {
+                            @Override
+                            public List<TrendDto> call(
+                                    List<PlaceTrendResultDto> placeTrendResultDtos) {
+                                return Utils.size(placeTrendResultDtos) > 0
+                                        ? placeTrendResultDtos.get(0).getTrends() : null;
+                            }
+                        })
+                        .subscribe(new Action1<List<TrendDto>>() {
+                            @Override
+                            public void call(List<TrendDto> trendDtos) {
+                                // show global trends
+                                mTrendLl.setVisibility(View.GONE);
+
+                                mTrendAdapter.setData(trendDtos);
+                                mDataRv.setAdapter(mTrendAdapter);
+                            }
+                        });
             }break;
         }
     }
@@ -184,9 +238,18 @@ public class SearchActivity extends BaseSwipeBackActivity
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             criteria.setPowerRequirement(Criteria.POWER_LOW);
+            criteria.setAltitudeRequired(false);
+            criteria.setCostAllowed(false);
+            criteria.setBearingRequired(false);
             List<String> providers = mLocationMgr.getProviders(criteria, false);
-            for(String provider : providers)
+            for(String provider : providers) {
+                Location location = mLocationMgr.getLastKnownLocation(provider);
+                if(!Utils.isNull(location)) {
+                    requestNearbyTrend(location);
+                    return;
+                }
                 mLocationMgr.requestLocationUpdates(provider, 5 * 1000, 5, this);
+            }
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -194,24 +257,99 @@ public class SearchActivity extends BaseSwipeBackActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        // TODO search place id, then search popular nearby
-        DebugHelper.log("onLocationChanged(), geo: " + String.format("[%1s, %2s]",
-                location.getLatitude(), location.getLongitude()));
+        releaseLocationListener();
+
+        requestNearbyTrend(location);
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        DebugHelper.log("onStatusChanged(), status: " + status + ", provider: " + provider);
+        releaseLocationListener();
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        DebugHelper.log("onProviderEnabled, provider: " + provider);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        DebugHelper.log("onProviderDisabled, provider: " + provider);
+        // user has disable location settings, show dialog if user want enable
+        DialogUtils.showConfirmDialog(this,
+                "location setting is disable", "want enable location settings?",
+                new DialogUtils.ButtonAction() {
+                    @Override
+                    public String getTitle() {
+                        return getString(R.string.ok_btn);
+                    }
+
+                    @Override
+                    public void onClick(DialogInterface dialog) {
+                        isRequestingEnableLocationSettings = true;
+                        ActivityUtils.startResult(getActivity(), REQUEST_LOCATION_SETTINGS,
+                                new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                },
+                new DialogUtils.ButtonAction() {
+                    @Override
+                    public String getTitle() {
+                        return getString(R.string.cancel_btn);
+                    }
+
+                    @Override
+                    public void onClick(DialogInterface dialog) {
+                    }
+                });
+    }
+
+    private void requestNearbyTrend(@NonNull Location location) {
+        if(!Utils.isNull(mTrendObser))
+            mTrendObser.unsubscribeOn(AndroidSchedulers.mainThread());
+        mTrendObser = mRxTwitter.closest(location.getLatitude(), location.getLongitude())
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<List<LocationDto>, LocationDto>() {
+                    @Override
+                    public LocationDto call(List<LocationDto> locationDtos) {
+                        if(Utils.size(locationDtos) > 0)
+                            return locationDtos.get(0);
+                        else
+                            throw Exceptions.propagate(
+                                    new Throwable("api \"closest()\" request failed"));
+                    }
+                })
+                .flatMap(new Func1<LocationDto, Observable<List<PlaceTrendResultDto>>>() {
+                    @Override
+                    public Observable<List<PlaceTrendResultDto>> call(LocationDto locationDto) {
+                        return mRxTwitter.trend(locationDto.woeid);
+                    }
+                });
+        mTrendObser.observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<List<PlaceTrendResultDto>, List<TrendDto>>() {
+                    @Override
+                    public List<TrendDto> call(List<PlaceTrendResultDto> placeTrendResultDtos) {
+                        return Utils.size(placeTrendResultDtos) > 0
+                                ? placeTrendResultDtos.get(0).getTrends() : null;
+                    }
+                })
+                .subscribe(new Action1<List<TrendDto>>() {
+                    @Override
+                    public void call(List<TrendDto> trendDtos) {
+                        // show nearby trend
+                        mTrendLl.setVisibility(View.GONE);
+
+                        mTrendAdapter.setData(trendDtos);
+                        mDataRv.setAdapter(mTrendAdapter);
+                    }
+                });
+    }
+
+    private void releaseLocationListener() {
+        if(!Utils.isNull(mLocationMgr))
+            try {
+                mLocationMgr.removeUpdates(this);
+                mLocationMgr = null;
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
     }
 
 }

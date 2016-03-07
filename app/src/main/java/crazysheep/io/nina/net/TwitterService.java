@@ -2,7 +2,7 @@ package crazysheep.io.nina.net;
 
 import java.util.List;
 
-import crazysheep.io.nina.bean.GeoQueryDto;
+import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UploadMediaDto;
@@ -116,14 +116,12 @@ public interface TwitterService {
     @POST("favorites/destroy.json")
     Call<TweetDto> unlike(@Query("id") Long id);
 
-    ////////////////////// geo //////////////////////////
-
-    @GET("geo/search.json")
-    Call<GeoQueryDto> geo(@Query("lat") double latitude, @Query("long") double longitude);
-
     ///////////////////// trends ////////////////////////
 
     @GET("trends/place.json")
-    Call<List<PlaceTrendResultDto>> trend(@Query("id") Long id);
+    Call<List<PlaceTrendResultDto>> trend(@Query("id") Long woeid);
+
+    @GET("trends/closest.json")
+    Call<List<LocationDto>> closest(@Query("lat") double latitude, @Query("long") double longitude);
 
 }

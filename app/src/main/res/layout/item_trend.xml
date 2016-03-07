@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/space_8"
+    android:paddingRight="@dimen/space_8"
+    android:gravity="center"
+    android:background="?selectableItemBackground">
+
+    <TextView
+        android:id="@+id/trend_name_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textSize="@dimen/text_17"
+        android:textColor="#45a6dd"/>
+    <TextView
+        android:id="@+id/trend_count_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_14"
+        android:textColor="@color/color_day_text_secondary"/>
+</LinearLayout>

@@ -2,6 +2,8 @@ package crazysheep.io.nina.net;
 
 import java.util.List;
 
+import crazysheep.io.nina.bean.LocationDto;
+import crazysheep.io.nina.bean.PlaceTrendResultDto;
 import crazysheep.io.nina.bean.TweetDto;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -24,5 +26,14 @@ public interface RxTwitterService {
             @Header(HttpCache.CacheConfig.PARAM_CACHE_CONTROL) int cacheType,
             @Query("max_id") Long maxId,
             @Query("count") Integer count);
+
+    ///////////////////// trends ////////////////////////
+
+    @GET("trends/place.json")
+    Observable<List<PlaceTrendResultDto>> trend(@Query("id") Long woeid);
+
+    @GET("trends/closest.json")
+    Observable<List<LocationDto>> closest(@Query("lat") double latitude,
+                                          @Query("long") double longitude);
 
 }

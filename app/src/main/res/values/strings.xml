@@ -57,4 +57,5 @@
     <string name="search_twitter">Search twitter</string>
     <string name="trend_nearby">trend nearby</string>
     <string name="trend_global">trend global</string>
+    <string name="trend_count">%d tweets</string>
 </resources>
