@@ -4,6 +4,7 @@ import java.util.List;
 
 import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
+import crazysheep.io.nina.bean.SearchResultDto;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.UploadMediaDto;
 import crazysheep.io.nina.bean.UserDto;
@@ -123,5 +124,10 @@ public interface TwitterService {
 
     @GET("trends/closest.json")
     Call<List<LocationDto>> closest(@Query("lat") double latitude, @Query("long") double longitude);
+
+    ///////////////////// search //////////////////////////
+
+    @GET("search/tweets.json")
+    Call<SearchResultDto> search(@Query("q") String q);
 
 }

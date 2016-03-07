@@ -1,5 +1,10 @@
 package crazysheep.io.nina.utils;
 
+import android.text.TextUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * string utils
  *
@@ -16,4 +21,19 @@ public class StringUtils {
         else
             return String.valueOf(count);
     }
+
+    /**
+     * url encode
+     * */
+    public static String urlEncode(String s) {
+        if(!TextUtils.isEmpty(s))
+            try {
+                return URLEncoder.encode(s, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+        return s;
+    }
+
 }

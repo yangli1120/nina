@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.view.animation.AccelerateInterpolator;
@@ -22,26 +23,36 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import crazysheep.io.nina.adapter.TimelineAdapter;
 import crazysheep.io.nina.adapter.TrendAdapter;
 import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
+import crazysheep.io.nina.bean.SearchResultDto;
 import crazysheep.io.nina.bean.TrendDto;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.PermissionConstants;
+import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.DialogUtils;
 import crazysheep.io.nina.utils.ImeUtils;
+import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.swiperefresh.LoadMoreRecyclerView;
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Response;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.exceptions.Exceptions;
@@ -70,15 +81,19 @@ public class SearchActivity extends BaseSwipeBackActivity
 
     private boolean isRequestingEnableLocationSettings = false;
 
+    @Bind(R.id.sliding_up_panel) SlidingUpPanelLayout mSlidingUpPanel;
     @Bind(R.id.coordinator_layout) CoordinatorLayout mCoordinatorLayout;
     @Bind(R.id.data_rv) LoadMoreRecyclerView mDataRv;
+    @Bind(R.id.search_result_rv) LoadMoreRecyclerView mSearchResultRv;
     @Bind(R.id.search_view) SearchView mSearchView;
     @Bind(R.id.trend_nearby_iv) View mNearbyIv;
     @Bind(R.id.trend_global_iv) View mGlobalIv;
     @Bind(R.id.trend_ll) View mTrendLl;
 
+    private TimelineAdapter mSearchResultAdapter;
     private TrendAdapter mTrendAdapter;
     private Observable<List<PlaceTrendResultDto>> mTrendObser;
+    private Call<SearchResultDto> mSearchCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +131,19 @@ public class SearchActivity extends BaseSwipeBackActivity
         mSearchView.setIconifiedByDefault(false);
         mSearchView.setIconified(false);
         mSearchView.setQueryHint(getString(R.string.search_twitter));
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                DebugHelper.log("onQueryTextSubmit, query: " + query);
+                doSearch(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         ImageView iconIv = ButterKnife.findById(mSearchView,
                 android.support.v7.appcompat.R.id.search_mag_icon);
         iconIv.setImageResource(
@@ -144,6 +172,10 @@ public class SearchActivity extends BaseSwipeBackActivity
 
         mDataRv.setLayoutManager(new LinearLayoutManager(this));
         mTrendAdapter = new TrendAdapter(this, null);
+
+        mSearchResultRv.setLayoutManager(new LinearLayoutManager(this));
+        mSearchResultAdapter = new TimelineAdapter(this, null);
+        mSearchResultRv.setAdapter(mSearchResultAdapter);
     }
 
     @Override
@@ -350,6 +382,27 @@ public class SearchActivity extends BaseSwipeBackActivity
             } catch (SecurityException e) {
                 e.printStackTrace();
             }
+    }
+
+    // TODO search
+    @SuppressWarnings("unchecked")
+    private void doSearch(@NonNull final String query) {
+        if(!Utils.isNull(mSearchCall) && !mSearchCall.isCanceled())
+            mSearchCall.cancel();
+
+        mSlidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        mSearchCall = mTwitter.search(StringUtils.urlEncode(query));
+        mSearchCall.enqueue(new NiceCallback<SearchResultDto>() {
+            @Override
+            public void onRespond(Response<SearchResultDto> response) {
+                mSearchResultAdapter.setData(response.body().getStatuses());
+            }
+
+            @Override
+            public void onFailed(Throwable t) {
+                L.d(String.format("search %s failed: %s", query, Log.getStackTraceString(t)));
+            }
+        });
     }
 
 }
