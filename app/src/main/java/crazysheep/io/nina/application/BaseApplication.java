@@ -1,6 +1,7 @@
 package crazysheep.io.nina.application;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
@@ -27,6 +28,8 @@ public class BaseApplication extends com.activeandroid.app.Application {
         super.onCreate();
 
         mContext = this;
+
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
 
         // init logger
         Logger.init(TAG);

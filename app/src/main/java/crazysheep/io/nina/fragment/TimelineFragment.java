@@ -174,8 +174,7 @@ public class TimelineFragment extends BaseNetworkFragment {
             RecyclerView rv = mTimelineRv.getRefreshableView();
             rv.setClipToPadding(false);
             rv.setPadding(rv.getPaddingLeft(), rv.getPaddingTop(), rv.getPaddingRight(),
-                    rv.getPaddingBottom() + SystemUIHelper.getNavBarSize(getResources())
-                            + Math.round(Utils.dp2px(getResources(), 4)));
+                    rv.getPaddingBottom() + SystemUIHelper.getNavBarSize(getResources()));
         }
     }
 
