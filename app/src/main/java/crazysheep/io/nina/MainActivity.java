@@ -11,8 +11,10 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.prefs.SettingPrefs;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
@@ -35,10 +38,12 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity
-        implements BaseActivity.ITwitterServiceActivity, View.OnClickListener {
+        implements BaseActivity.ITwitterServiceActivity, View.OnClickListener,
+                   NavigationView.OnNavigationItemSelectedListener {
 
     @Bind(R.id.drawer) DrawerLayout mDrawer;
     @Bind(R.id.nav_layout) NavigationView mNav;
+    private SwitchCompat mThemeSwitchBtn;
     private CircleImageView mAvatarCiv;
     private TextView mUserNameTv;
     private TextView mUserScreenNameTv;
@@ -56,6 +61,7 @@ public class MainActivity extends BaseActivity
     };
 
     private UserPrefs mUserPrefs;
+    private SettingPrefs mSettingPrefs;
 
     private Call<UserDto> mUserCall;
 
@@ -66,6 +72,7 @@ public class MainActivity extends BaseActivity
         ButterKnife.bind(this);
 
         mUserPrefs = new UserPrefs(this);
+        mSettingPrefs = new SettingPrefs(this);
 
         initUI();
 
@@ -118,6 +125,30 @@ public class MainActivity extends BaseActivity
         unbindService(mConnection);
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_night_theme: {
+                if(mSettingPrefs.isNightTheme())
+                    mSettingPrefs.switchDayTheme();
+                else
+                    mSettingPrefs.switchNightTheme();
+
+                mThemeSwitchBtn.setChecked(mSettingPrefs.isNightTheme());
+
+                mDrawer.closeDrawer(GravityCompat.START);
+                RxWorker.delayOnUI(this, 300, new Runnable() {
+                    @Override
+                    public void run() {
+                        switchTheme();
+                        recreate();
+                    }
+                });
+            }break;
+        }
+        return true;
+    }
+
     private void initUI() {
         //init nav view, NavigationView can not use ButterKnife...
         //see{@link https://code.google.com/p/android/issues/detail?id=190226}
@@ -125,6 +156,9 @@ public class MainActivity extends BaseActivity
         mUserScreenNameTv = ButterKnife.findById(mNav.getHeaderView(0), R.id.user_screen_name_tv);
         mAvatarCiv = ButterKnife.findById(mNav.getHeaderView(0), R.id.avatar_iv);
         mAvatarCiv.setOnClickListener(this);
+        mThemeSwitchBtn = ButterKnife.findById(
+                mNav.getMenu().findItem(R.id.nav_night_theme).getActionView(), R.id.theme_switch);
+        mThemeSwitchBtn.setChecked(mSettingPrefs.isNightTheme());
 
         mUserNameTv.setText(mUserPrefs.getUsername());
         mUserScreenNameTv.setText(getString(R.string.screen_name, mUserPrefs.getUserScreenName()));
@@ -136,6 +170,8 @@ public class MainActivity extends BaseActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_ft, new TimelineFragment(), TimelineFragment.TAG)
                 .commitAllowingStateLoss();
+
+        mNav.setNavigationItemSelectedListener(this);
     }
 
     public void setToolbar(@NonNull Toolbar toolbar) {

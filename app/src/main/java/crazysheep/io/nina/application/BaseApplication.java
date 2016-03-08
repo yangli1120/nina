@@ -19,6 +19,10 @@ import io.fabric.sdk.android.Fabric;
  */
 public class BaseApplication extends com.activeandroid.app.Application {
 
+    static {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
     private static BaseApplication mContext;
 
     public static final String TAG = "nina";
@@ -28,8 +32,6 @@ public class BaseApplication extends com.activeandroid.app.Application {
         super.onCreate();
 
         mContext = this;
-
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
 
         // init logger
         Logger.init(TAG);

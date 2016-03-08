@@ -21,6 +21,9 @@
 
     <string name="err_load_failed">load failed\nclick to try again</string>
 
+    <!-- navigation view -->
+    <string name="nav_switch_theme">night theme</string>
+
     <!-- profile -->
     <string name="profile_title">profile</string>
     <string name="profile_tab_tweet">tweet</string>

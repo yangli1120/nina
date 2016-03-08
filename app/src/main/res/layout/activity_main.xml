@@ -24,6 +24,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.DayNight"
+        app:itemTextColor="?color_text_primary"
+        app:itemBackground="?android:colorBackground"
+        app:menu="@menu/menu_main"
         app:headerLayout="@layout/layout_nav_header" />
 
 </android.support.v4.widget.DrawerLayout>

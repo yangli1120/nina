@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import java.util.List;
 
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
+import crazysheep.io.nina.prefs.SettingPrefs;
+import crazysheep.io.nina.utils.Utils;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -38,6 +41,10 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // init theme
+        if(Utils.isNull(savedInstanceState))
+            switchTheme();
+
         TAG = this.getClass().getSimpleName();
 
         if(this instanceof ITwitterServiceActivity) {
@@ -48,6 +55,11 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     protected final Activity getActivity() {
         return this;
+    }
+
+    protected final void switchTheme() {
+        getDelegate().setLocalNightMode(new SettingPrefs(this).isNightTheme() ?
+                AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     @Override
