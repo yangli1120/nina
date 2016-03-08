@@ -8,8 +8,6 @@
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
     android:orientation="vertical"
-    android:theme="@style/AppTheme.DayNight"
-    app:cardBackgroundColor="?android:colorBackground"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -19,7 +17,9 @@
         android:paddingRight="10dp"
         android:paddingTop="10dp"
         android:orientation="vertical"
-        android:background="?selectableItemBackground">
+        android:theme="@style/AppTheme.DayNight"
+        android:foreground="?selectableItemBackground"
+        android:background="?android:colorBackground">
 
         <!-- header -->
         <RelativeLayout

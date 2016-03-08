@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
+    android:theme="@style/AppTheme.DayNight"
+    android:background="?android:colorBackground"
     app:umanoPanelHeight="0dp"
     app:umanoParallaxOffset="0dp"
     app:umanoOverlay="true"
