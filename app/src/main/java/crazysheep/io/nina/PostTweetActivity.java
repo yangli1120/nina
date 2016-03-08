@@ -85,7 +85,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
             getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_clear_grey);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_clear_24dp);
         }
 
         mSendBtn.setEnabled(false);

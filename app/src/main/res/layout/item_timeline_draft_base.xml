@@ -64,7 +64,7 @@
                 android:layout_alignParentRight="true"
                 android:adjustViewBounds="true"
                 android:scaleType="center"
-                android:src="@drawable/ic_clear_red_18dp"
+                app:srcCompat="@drawable/ic_clear_red_24dp"
                 android:visibility="gone"
                 android:background="@drawable/button_bg"/>
             <ProgressBar

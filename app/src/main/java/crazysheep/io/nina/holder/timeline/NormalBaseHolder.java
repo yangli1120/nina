@@ -186,9 +186,9 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             }
         });
         likeCountTv.setText(String.valueOf(mTweetDto.favorite_count));
-        likeIv.setHeartRes(R.drawable.ic_like_red_18dp, R.drawable.ic_un_like_grey_18dp);
+        likeIv.setHeartRes(R.drawable.ic_like_red_24dp, R.drawable.ic_unlike_grey_24dp);
         likeIv.setImageResource(mTweetDto.favorited
-                ? R.drawable.ic_like_red_18dp : R.drawable.ic_un_like_grey_18dp);
+                ? R.drawable.ic_like_red_24dp : R.drawable.ic_unlike_grey_24dp);
     }
 
     @Override

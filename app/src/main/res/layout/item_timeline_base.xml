@@ -109,7 +109,7 @@
                     android:id="@id/action_reply_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_reply_grey"
+                    app:srcCompat="@drawable/ic_reply_grey_24dp"
                     android:scaleType="center" />
             </LinearLayout>
             <LinearLayout
@@ -124,7 +124,7 @@
                     android:id="@id/action_retweet_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_forward_grey"
+                    app:srcCompat="@drawable/ic_forward_grey_24dp"
                     android:scaleType="center" />
                 <TextView
                     android:id="@id/action_retweet_count_tv"
@@ -146,7 +146,7 @@
                     android:id="@id/action_like_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_un_like_grey_18dp"
+                    app:srcCompat="@drawable/ic_unlike_grey_24dp"
                     android:scaleType="center" />
                 <TextView
                     android:id="@id/action_like_count_tv"

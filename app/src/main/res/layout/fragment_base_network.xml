@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_error_red_36dp"/>
+                    app:srcCompat="@drawable/ic_error_outline_red_24dp"/>
                 <TextView
                     android:id="@id/_base_network_ft_error_msg_tv"
                     android:layout_width="wrap_content"

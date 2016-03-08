@@ -173,7 +173,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
             if(!TextUtils.isEmpty(user.location)) {
                 mUserLocationTv.setText(user.location);
                 TextViewCompat.setCompoundDrawablesRelativeWithIntrinsicBounds(mUserLocationTv,
-                        R.drawable.ic_location_grey, 0, 0, 0);
+                        R.drawable.ic_location_grey_24dp, 0, 0, 0);
             } else {
                 mUserLocationTv.setVisibility(View.GONE);
             }

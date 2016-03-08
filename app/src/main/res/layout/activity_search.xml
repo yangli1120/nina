@@ -65,7 +65,7 @@
                         android:id="@+id/trend_nearby_iv"
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@drawable/ic_trend_nearby_light_grey_48dp"
+                        app:srcCompat="@drawable/ic_trend_nearby_light_grey_48dp"
                         android:scaleType="center"
                         android:background="@drawable/light_grey_circle_bg"
                         android:foreground="?selectableItemBackground"/>
@@ -87,7 +87,7 @@
                         android:id="@+id/trend_global_iv"
                         android:layout_width="64dp"
                         android:layout_height="64dp"
-                        android:src="@drawable/ic_trend_global_light_grey_48dp"
+                        app:srcCompat="@drawable/ic_trend_global_light_grey_48dp"
                         android:scaleType="center"
                         android:background="@drawable/light_grey_circle_bg"
                         android:foreground="?selectableItemBackground"/>

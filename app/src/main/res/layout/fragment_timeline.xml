@@ -33,7 +33,7 @@
         android:id="@id/action_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_create"
+        app:srcCompat="@drawable/ic_add_36dp"
         app:fabSize="normal"
         app:elevation="4dp"
         app:pressedTranslationZ="4dp"

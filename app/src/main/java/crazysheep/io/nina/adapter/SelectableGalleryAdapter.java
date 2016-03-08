@@ -2,6 +2,7 @@ package crazysheep.io.nina.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -74,9 +75,7 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
             holder.imgTv.setVisibility(View.GONE);
 
             Glide.clear(holder.imgIv);
-            Glide.with(mContext)
-                    .load(R.drawable.ic_photo_camera)
-                    .into(holder.imgIv);
+            holder.imgIv.setImageResource(R.drawable.ic_photo_camera_48dp);
         } else {
             MediaStoreImageBean imageBean = getItem(position);
 
