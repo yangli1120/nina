@@ -8,11 +8,16 @@ import android.support.v7.app.AppCompatDelegate;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.prefs.SettingPrefs;
+import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.Utils;
+import dagger.Lazy;
 import pub.devrel.easypermissions.EasyPermissions;
 
 /**
@@ -34,12 +39,17 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     public static String TAG = BaseActivity.class.getSimpleName();
 
+    @Inject protected Lazy<UserPrefs> mUserPrefs;
+    @Inject protected Lazy<SettingPrefs> mSettingPrefs;
     protected TwitterService mTwitter;
     protected RxTwitterService mRxTwitter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // dagger2 inject
+        BaseApplication.from(this).getComponent().inject(this);
 
         // init theme
         if(Utils.isNull(savedInstanceState))
@@ -58,7 +68,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     protected final void switchTheme() {
-        getDelegate().setLocalNightMode(new SettingPrefs(this).isNightTheme() ?
+        getDelegate().setLocalNightMode(mSettingPrefs.get().isNightTheme() ?
                 AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
     }
 

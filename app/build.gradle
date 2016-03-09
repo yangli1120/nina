@@ -75,6 +75,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 dependencies {
@@ -99,8 +103,11 @@ dependencies {
     // rx java
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'io.reactivex:rxandroid:1.0.1'
-    // inject view
+    // inject
     compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.google.dagger:dagger:2.0.2'
+    apt 'com.google.dagger:dagger-compiler:2.0.2'
+    compile "org.glassfish:javax.annotation:10.0-b28"
     // twitter
     compile('com.twitter.sdk.android:twitter:1.12.0@aar') {
         transitive = true;

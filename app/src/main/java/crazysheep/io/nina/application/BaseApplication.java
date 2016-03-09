@@ -1,6 +1,8 @@
 package crazysheep.io.nina.application;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
@@ -9,6 +11,10 @@ import com.orhanobut.logger.Logger;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 
+import crazysheep.io.nina.dagger2.component.BaseComponent;
+import crazysheep.io.nina.dagger2.component.DaggerBaseComponent;
+import crazysheep.io.nina.dagger2.module.ApplicationModule;
+import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpConstants;
 import io.fabric.sdk.android.Fabric;
 
@@ -27,11 +33,18 @@ public class BaseApplication extends com.activeandroid.app.Application {
 
     public static final String TAG = "nina";
 
+    private BaseComponent mAppComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         mContext = this;
+
+        mAppComponent = DaggerBaseComponent.builder()
+                .applicationModule(new ApplicationModule(this))
+                .prefsModule(new PrefsModule(this))
+                .build();
 
         // init logger
         Logger.init(TAG);
@@ -47,6 +60,14 @@ public class BaseApplication extends com.activeandroid.app.Application {
 
     public static Application getAppContext() {
         return mContext;
+    }
+
+    public BaseComponent getComponent() {
+        return mAppComponent;
+    }
+
+    public static BaseApplication from(@NonNull Context context) {
+        return (BaseApplication) context.getApplicationContext();
     }
 
 }
