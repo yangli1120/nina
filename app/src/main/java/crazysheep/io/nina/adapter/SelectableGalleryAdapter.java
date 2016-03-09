@@ -2,7 +2,6 @@ package crazysheep.io.nina.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -12,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.github.florent37.glidepalette.BitmapPalette;
+import com.github.florent37.glidepalette.GlidePalette;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onBindViewHolder(ImageHolder holder, int position) {
         if(showCameraButton && isHeader(position)) {
             holder.imgTv.setVisibility(View.GONE);
@@ -82,7 +84,11 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
             Glide.clear(holder.imgIv);
             Glide.with(mContext)
                     .load(new File(imageBean.filepath))
+                    .asBitmap()
                     .placeholder(R.color.place_holder_bg)
+                    .listener(GlidePalette.with(imageBean.filepath)
+                            .use(GlidePalette.Profile.VIBRANT)
+                            .intoBackground(holder.imgTv))
                     .fitCenter()
                     .into(holder.imgIv);
 
