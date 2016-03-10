@@ -1,5 +1,6 @@
 package crazysheep.io.nina.net;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -19,7 +20,6 @@ import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.Utils;
-import io.fabric.sdk.android.services.network.PinningInfoProvider;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -40,55 +40,58 @@ public class HttpClient {
 
     private static HttpClient mHttpClient;
 
-    private Retrofit mRetrofit;
-    private TwitterService mTwitterService;
-    private RxTwitterService mRxTwitterService;
-
-    private HttpClient(@NonNull Retrofit retrofit) {
-        mRetrofit = retrofit;
-    }
-
     public static HttpClient getInstance() {
         if(Utils.isNull(mHttpClient))
             synchronized (HttpClient.class) {
                 if (Utils.isNull(mHttpClient)) {
-                    UserPrefs userPrefs = new UserPrefs(BaseApplication.getAppContext());
-                    OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(
-                            HttpConstants.NINA_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_SECRET);
-                    consumer.setTokenWithSecret(userPrefs.getAuthToken(), userPrefs.getSecret());
-
-                    OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                            // ssl socket factory for twitter
-                            .sslSocketFactory(
-                                    getSSLSocketFactory(new TwitterPinningInfoProvider(
-                                            BaseApplication.getAppContext())))
-                            // config timeout
-                            .connectTimeout(30, TimeUnit.SECONDS)
-                            .readTimeout(30, TimeUnit.SECONDS)
-                            // external cache
-                            .cache(HttpCache.getInstance().okhttpCache())
-                            // authorization interceptor
-                            .addInterceptor(new SigningInterceptor(consumer))
-                            // cache control interceptor
-                            .addInterceptor(mCacheControlInterceptor)
-                            .addNetworkInterceptor(mCacheControlNetworkInterceptor)
-                            // use stetho debug network request
-                            .addNetworkInterceptor(new StethoInterceptor())
-                            .build();
-
-                    Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl(HttpConstants.BASE_URL)
-                            .addConverterFactory(GsonConverterFactory.create())
-                            // use rxjava
-                            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                            .client(okHttpClient)
-                            .build();
-
-                    mHttpClient = new HttpClient(retrofit);
+                    mHttpClient = new HttpClient();
                 }
             }
 
         return mHttpClient;
+    }
+
+    /////////////////////////////////////////////////////////////
+
+    private OkHttpClient mOkHttpClient;
+    private Retrofit mRetrofit;
+    private TwitterService mTwitterService;
+    private RxTwitterService mRxTwitterService;
+
+    private HttpClient() {
+        UserPrefs userPrefs = new UserPrefs(BaseApplication.getAppContext());
+        OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(
+                HttpConstants.NINA_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_SECRET);
+        consumer.setTokenWithSecret(userPrefs.getAuthToken(), userPrefs.getSecret());
+
+        mOkHttpClient = new OkHttpClient.Builder()
+                // ssl socket factory for twitter
+                .sslSocketFactory(getSSLSocketFactory(BaseApplication.getAppContext()))
+                // config timeout
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                // external cache
+                .cache(HttpCache.getInstance().okhttpCache())
+                // authorization interceptor
+                .addInterceptor(new SigningInterceptor(consumer))
+                // cache control interceptor
+                .addInterceptor(mCacheControlInterceptor)
+                .addNetworkInterceptor(mCacheControlNetworkInterceptor)
+                // use stetho debug network request
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
+
+        mRetrofit = new Retrofit.Builder()
+                .baseUrl(HttpConstants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                // use rxjava
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(mOkHttpClient)
+                .build();
+    }
+
+    public OkHttpClient getOkHttpClient() {
+        return mOkHttpClient;
     }
 
     public TwitterService getTwitterService() {
@@ -164,7 +167,8 @@ public class HttpClient {
         return CacheConfig.getCacheControl(cacheType);
     }
 
-    private static SSLSocketFactory getSSLSocketFactory(PinningInfoProvider provider) {
+    private static SSLSocketFactory getSSLSocketFactory(@NonNull Context context) {
+        TwitterPinningInfoProvider provider = new TwitterPinningInfoProvider(context);
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             SystemKeyStore keystore = new SystemKeyStore(provider.getKeyStoreStream(),
