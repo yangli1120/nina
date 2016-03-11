@@ -2,8 +2,12 @@ package crazysheep.io.nina.dagger2.module;
 
 import android.support.annotation.NonNull;
 
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
+
 import javax.inject.Singleton;
 
+import crazysheep.io.nina.BuildConfig;
 import crazysheep.io.nina.application.BaseApplication;
 import dagger.Module;
 import dagger.Provides;
@@ -26,6 +30,12 @@ public class ApplicationModule {
     @Singleton
     public BaseApplication provideApplication() {
         return mApplication;
+    }
+
+    @Provides
+    @Singleton
+    public RefWatcher provideRefWatcher() {
+        return BuildConfig.DEBUG ? LeakCanary.install(mApplication) : RefWatcher.DISABLED;
     }
 
 }

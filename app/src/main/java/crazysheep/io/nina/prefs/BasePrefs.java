@@ -14,17 +14,14 @@ public class BasePrefs {
 
     public static String PREFS_NAME = "nina";
 
-    private Context mContext;
     private SharedPreferences mSharedPrefs;
 
     public BasePrefs(Context context) {
-        mContext = context;
-
         Class<? extends BasePrefs> clazz = getClass();
         try {
             Field field = clazz.getField("PREFS_NAME");
 
-            mSharedPrefs = mContext.getSharedPreferences((String)field.get(null),
+            mSharedPrefs = context.getSharedPreferences((String) field.get(null),
                     Context.MODE_PRIVATE);
         } catch (NoSuchFieldException nsfe) {
             nsfe.printStackTrace();

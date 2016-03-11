@@ -1,5 +1,7 @@
 package crazysheep.io.nina.dagger2.component;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import javax.inject.Singleton;
 
 import crazysheep.io.nina.application.BaseApplication;
@@ -15,5 +17,8 @@ import dagger.Component;
 @Component(modules = {ApplicationModule.class})
 public interface ApplicationComponent {
 
+    void inject(BaseApplication baseApplication);
+
     BaseApplication getContext();
+    RefWatcher getRefWatcher();
 }

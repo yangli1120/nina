@@ -3,6 +3,8 @@ package crazysheep.io.nina.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import javax.inject.Inject;
 
 import crazysheep.io.nina.application.BaseApplication;
@@ -31,6 +33,7 @@ public class BaseFragment extends Fragment {
     public static String TAG = BaseFragment.class.getSimpleName();
 
     @Inject protected Lazy<HttpClient> mHttpClient;
+    @Inject protected RefWatcher mRefWatcher;
     protected TwitterService mTwitter;
 
     @Override
@@ -49,4 +52,10 @@ public class BaseFragment extends Fragment {
             mTwitter = mHttpClient.get().getTwitterService();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mRefWatcher.watch(this);
+    }
 }
