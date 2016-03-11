@@ -1,28 +1,33 @@
 package crazysheep.io.nina.dagger2.component;
 
-import javax.inject.Singleton;
-
 import crazysheep.io.nina.BaseActivity;
-import crazysheep.io.nina.dagger2.module.ApplicationModule;
+import crazysheep.io.nina.dagger2.module.NetworkModule;
 import crazysheep.io.nina.dagger2.module.PrefsModule;
+import crazysheep.io.nina.dagger2.scope.DaggerActivity;
 import crazysheep.io.nina.fragment.BaseFragment;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.prefs.SettingPrefs;
+import crazysheep.io.nina.prefs.UserPrefs;
 import dagger.Component;
 
 /**
- * application component
+ * base component
  *
- * Created by crazysheep on 16/3/9.
+ * Created by crazysheep on 16/3/11.
  */
-@Singleton
+@DaggerActivity
 @Component(
+        dependencies = ApplicationComponent.class,
         modules = {
-                ApplicationModule.class, PrefsModule.class
+                NetworkModule.class, PrefsModule.class
         }
 )
 public interface BaseComponent {
 
-    void inject(BaseActivity baseActivity);
+    void inject(BaseActivity activity);
+    void inject(BaseFragment fragment);
 
-    void inject(BaseFragment baseFragment);
-
+    HttpClient httpClient();
+    UserPrefs userPrefs();
+    SettingPrefs settingPrefs();
 }

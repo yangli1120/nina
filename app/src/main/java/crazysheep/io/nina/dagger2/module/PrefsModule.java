@@ -1,9 +1,7 @@
 package crazysheep.io.nina.dagger2.module;
 
-import android.app.Application;
-
-import javax.inject.Singleton;
-
+import crazysheep.io.nina.application.BaseApplication;
+import crazysheep.io.nina.dagger2.scope.DaggerActivity;
 import crazysheep.io.nina.prefs.SettingPrefs;
 import crazysheep.io.nina.prefs.UserPrefs;
 import dagger.Module;
@@ -17,24 +15,16 @@ import dagger.Provides;
 @Module
 public class PrefsModule {
 
-    private UserPrefs mUserPrefs;
-    private SettingPrefs mSettingPrefs;
-
-    public PrefsModule(Application application) {
-        mUserPrefs = new UserPrefs(application);
-        mSettingPrefs = new SettingPrefs(application);
+    @Provides
+    @DaggerActivity
+    public UserPrefs provideUserPrefs(BaseApplication context) {
+        return new UserPrefs(context);
     }
 
     @Provides
-    @Singleton
-    public UserPrefs provideUserPrefs() {
-        return mUserPrefs;
-    }
-
-    @Provides
-    @Singleton
-    public SettingPrefs provideSettingPrefs() {
-        return mSettingPrefs;
+    @DaggerActivity
+    public SettingPrefs provideSettingPrefs(BaseApplication context) {
+        return new SettingPrefs(context);
     }
 
 }

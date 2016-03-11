@@ -11,11 +11,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import crazysheep.io.nina.application.BaseApplication;
+import crazysheep.io.nina.dagger2.component.DaggerBaseComponent;
+import crazysheep.io.nina.dagger2.module.NetworkModule;
+import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.prefs.SettingPrefs;
-import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.Utils;
 import dagger.Lazy;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -39,8 +41,8 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     public static String TAG = BaseActivity.class.getSimpleName();
 
-    @Inject protected Lazy<UserPrefs> mUserPrefs;
     @Inject protected Lazy<SettingPrefs> mSettingPrefs;
+    @Inject protected Lazy<HttpClient> mHttpClient;
     protected TwitterService mTwitter;
     protected RxTwitterService mRxTwitter;
 
@@ -48,8 +50,12 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // dagger2 inject
-        BaseApplication.from(this).getComponent().inject(this);
+        DaggerBaseComponent.builder()
+                .applicationComponent(BaseApplication.from(this).getComponent())
+                .prefsModule(new PrefsModule())
+                .networkModule(new NetworkModule())
+                .build()
+                .inject(this);
 
         // init theme
         if(Utils.isNull(savedInstanceState))
@@ -58,8 +64,8 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
         TAG = this.getClass().getSimpleName();
 
         if(this instanceof ITwitterServiceActivity) {
-            mTwitter = HttpClient.getInstance().getTwitterService();
-            mRxTwitter = HttpClient.getInstance().getRxTwitterService();
+            mTwitter = mHttpClient.get().getTwitterService();
+            mRxTwitter = mHttpClient.get().getRxTwitterService();
         }
     }
 

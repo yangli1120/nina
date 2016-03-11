@@ -6,10 +6,10 @@ import android.support.v4.app.Fragment;
 import javax.inject.Inject;
 
 import crazysheep.io.nina.application.BaseApplication;
+import crazysheep.io.nina.dagger2.component.DaggerBaseComponent;
+import crazysheep.io.nina.dagger2.module.NetworkModule;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.TwitterService;
-import crazysheep.io.nina.prefs.SettingPrefs;
-import crazysheep.io.nina.prefs.UserPrefs;
 import dagger.Lazy;
 
 /**
@@ -30,22 +30,23 @@ public class BaseFragment extends Fragment {
 
     public static String TAG = BaseFragment.class.getSimpleName();
 
-    @Inject protected Lazy<UserPrefs> mUserPrefs;
-    @Inject protected Lazy<SettingPrefs> mSettingPrefs;
-
+    @Inject protected Lazy<HttpClient> mHttpClient;
     protected TwitterService mTwitter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // dagger2 inject
-        BaseApplication.from(getContext()).getComponent().inject(this);
-
         TAG = getClass().getSimpleName();
 
+        DaggerBaseComponent.builder()
+                .applicationComponent(BaseApplication.from(getActivity()).getComponent())
+                .networkModule(new NetworkModule())
+                .build()
+                .inject(this);
+
         if(this instanceof INetworkFragment)
-            mTwitter = HttpClient.getInstance().getTwitterService();
+            mTwitter = mHttpClient.get().getTwitterService();
     }
 
 }
