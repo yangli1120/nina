@@ -5,6 +5,7 @@
     <group android:id="@+id/first_ground" android:checkableBehavior="single">
         <item android:id="@+id/nav_night_theme"
             android:title="@string/nav_switch_theme"
+            android:icon="@drawable/ic_night_white_24dp"
             app:actionLayout="@layout/nav_item_switch_theme"
             app:showAsAction="always"/>
     </group>
