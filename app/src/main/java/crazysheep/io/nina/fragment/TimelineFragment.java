@@ -44,6 +44,7 @@ import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.holder.timeline.DraftBaseHolder;
+import crazysheep.io.nina.holder.timeline.NormalBaseHolder;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.service.BatmanService;
@@ -319,7 +320,7 @@ public class TimelineFragment extends BaseNetworkFragment {
                         postTweetBean = Model.load(PostTweetBean.class, postTweetBean.getId());
 
                         mAdapter.addDataToFirst(postTweetBean);
-                        mTimelineRv.getRefreshableView().smoothScrollToPosition(0);
+                        mTimelineRv.getRefreshableView().scrollToPosition(0);
                     }
                 }break;
             }
@@ -372,6 +373,16 @@ public class TimelineFragment extends BaseNetworkFragment {
                 mAdapter.notifyItemChanged(mAdapter.findItemPosition(postTweetBean));
                 mService.postTweet(postTweetBean);
             }
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onEvent(@NonNull NormalBaseHolder.EventReplyTweet event) {
+        ActivityUtils.startResult(this, REQUEST_POST_TWEET,
+                ActivityUtils.prepare(getActivity(), PostTweetActivity.class)
+                        .putStringArrayListExtra(BundleConstants.EXTRA_METIONED_NAMES,
+                                event.getMetionedNames())
+                        .putExtra(BundleConstants.EXTRA_REPLY_STATUS_ID, event.getReplyStatusId()));
     }
 
 }

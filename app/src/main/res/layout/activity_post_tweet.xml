@@ -22,6 +22,17 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/metioned_tips_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:paddingLeft="@dimen/space_8"
+                android:textColor="?color_text_secondary"
+                android:textSize="@dimen/text_12"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_arrow_down_grey_18dp"
+                android:visibility="gone"/>
+
             <EditText
                 android:id="@id/edit_tweet_et"
                 android:layout_width="match_parent"

@@ -43,9 +43,10 @@
     <string name="tap_to_re_send">tap to re-send tweet</string>
     <string name="remove_draft">remove this draft?</string>
 
-    <!-- create tweet -->
+    <!-- post tweet -->
     <string name="hint_edit_tweet">What\'s happening...</string>
     <string name="tweet">Tweet</string>
+    <string name="metioned_user">reply to @%s</string>
 
     <!-- dialog -->
     <string name="ok_btn">OK</string>

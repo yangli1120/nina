@@ -119,6 +119,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+    compile 'com.twitter:twitter-text:1.6.1'
     // oauth support
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'se.akerfeldt:okhttp-signpost:1.1.0'

@@ -14,8 +14,10 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +48,14 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.edit_tweet_et) EditText mTweetEt;
+    @Bind(R.id.metioned_tips_tv) TextView mMetionedTipsTv;
     @Bind(R.id.send_tweet_btn) Button mSendBtn;
     @Bind(R.id.image_preview_rv) RecyclerView mPreviewRv;
     private PreviewGalleryAdapter mPreviewAdapter;
 
     // if post a reply tweet
     private long replayStatusId;
+    private List<String> metionedScreenNames;
 
     private ArrayList<MediaStoreImageBean> mSelectedImages;
 
@@ -78,6 +82,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         ButterKnife.bind(this);
 
         replayStatusId = getIntent().getLongExtra(BundleConstants.EXTRA_REPLY_STATUS_ID, -1);
+        metionedScreenNames = getIntent().getStringArrayListExtra(
+                BundleConstants.EXTRA_METIONED_NAMES);
 
         setSupportActionBar(mToolbar);
         if(!Utils.isNull(getSupportActionBar())) {
@@ -90,6 +96,17 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
         mSendBtn.setEnabled(false);
         mTweetEt.addTextChangedListener(this);
+        if(Utils.size(metionedScreenNames) > 0) {
+            mMetionedTipsTv.setVisibility(View.VISIBLE);
+            mMetionedTipsTv.setText(getString(R.string.metioned_user, metionedScreenNames.get(0)));
+
+            StringBuilder sb = new StringBuilder();
+            for(String screenName: metionedScreenNames)
+                sb.append("@").append(screenName).append(" ");
+            mTweetEt.setText(sb.toString());
+            mTweetEt.setSelection(sb.length());
+        }
+
         mPreviewAdapter = new PreviewGalleryAdapter(this, null);
         mPreviewAdapter.setOnItemRemoveListener(new PreviewGalleryAdapter.OnItemRemoveListener() {
             @Override
@@ -191,6 +208,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         }
         if(!TextUtils.isEmpty(mTweetEt.getEditableText().toString()))
             builder.setStatus(mTweetEt.getEditableText().toString());
+        if(replayStatusId > 0)
+            builder.setReplyStatusId(replayStatusId);
         PostTweetBean postTweet = builder.build();
         mBatmanService.postTweet(postTweet);
 

@@ -10,8 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.twitter.Extractor;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -62,6 +65,25 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             this.tweetDto = tweetDto;
         }
     }
+
+    public static class EventReplyTweet {
+        private long replyStatusId;
+        private ArrayList<String> metionedNames;
+
+        public long getReplyStatusId() {
+            return replyStatusId;
+        }
+
+        public ArrayList<String> getMetionedNames() {
+            return metionedNames;
+        }
+
+        public EventReplyTweet(@NonNull ArrayList<String> metionedNames, long replyStatusId) {
+            this.metionedNames = metionedNames;
+            this.replyStatusId = replyStatusId;
+        }
+    }
+
     ///////////////////////////////////////////////////////
 
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
@@ -103,7 +125,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
     /**
      * base holder implement common ui, sub-holder implement itself ui
      * */
-    public void bindData(int position, @NonNull TweetDto tweetDto) {
+    public void bindData(int position, @NonNull final TweetDto tweetDto) {
         mTweetDto = tweetDto.isRetweeted() ? tweetDto.retweeted_status : tweetDto;
 
         /* top header */
@@ -137,7 +159,23 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         replyLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DebugHelper.toast(mContext, "click reply");
+                Extractor extractor = new Extractor();
+                ArrayList<String> metionedNames = new ArrayList<>();
+                if(tweetDto.isRetweeted()) {
+                    metionedNames.add(tweetDto.retweeted_status.user.screen_name);
+                    for(String metionedName : extractor.extractMentionedScreennames(
+                            tweetDto.retweeted_status.text))
+                        if(!metionedNames.contains(metionedName))
+                            metionedNames.add(metionedName);
+                }
+                if(!metionedNames.contains(mTweetDto.user.screen_name))
+                    metionedNames.add(mTweetDto.user.screen_name);
+                for(String metionedName : extractor.extractMentionedScreennames(tweetDto.text))
+                    if(!metionedNames.contains(metionedName))
+                        metionedNames.add(metionedName);
+
+                // TODO reply this tweet
+                EventBus.getDefault().post(new EventReplyTweet(metionedNames, tweetDto.id));
             }
         });
         retweetLl.setOnClickListener(new View.OnClickListener() {

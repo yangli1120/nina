@@ -35,7 +35,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public RefWatcher provideRefWatcher() {
-        return BuildConfig.DEBUG ? LeakCanary.install(mApplication) : RefWatcher.DISABLED;
+        return false ? LeakCanary.install(mApplication) : RefWatcher.DISABLED;
     }
 
 }
