@@ -88,6 +88,24 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
         init();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        for(int index = 0; index < getChildCount(); index++)
+            detachChild(index);
+
+        // ensure if no view in pool is used, release them
+        boolean needReleased = true;
+        for(boolean bool : mUsedMap)
+            if(bool)
+                needReleased = false;
+        if(needReleased) {
+            mUsedMap.clear();
+            mAllGalleryIvs.clear();
+        }
+    }
+
     private void init() {
         mPaint.setTextSize(InnerUtils.dp2Px(getContext(), 14));
         mPaint.setColor(Color.BLACK);
@@ -231,7 +249,7 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
     }
 
     private void attachNewChild(int position) {
-        ImageView child = new ImageView(getContext());
+        ImageView child = new ImageView(getContext().getApplicationContext());
         child.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         // add to pool and tag it's used
@@ -283,14 +301,6 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
     public void onClick(View v) {
         if(mOnClickListener != null)
             mOnClickListener.onClick(indexOfChild(v), (ImageView) v);
-    }
-
-    /**
-     * if GridGalleryLayout not use, should release ImageViews pool
-     * */
-    public static void release() {
-        mAllGalleryIvs.clear();
-        mUsedMap.clear();
     }
 
 }
