@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.twitter.Extractor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +57,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     // if post a reply tweet
     private long replayStatusId;
+    private Extractor mTweetExtractor;
     private List<String> metionedScreenNames;
 
     private ArrayList<MediaStoreImageBean> mSelectedImages;
@@ -84,6 +87,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         replayStatusId = getIntent().getLongExtra(BundleConstants.EXTRA_REPLY_STATUS_ID, -1);
         metionedScreenNames = getIntent().getStringArrayListExtra(
                 BundleConstants.EXTRA_METIONED_NAMES);
+        mTweetExtractor = new Extractor();
 
         setSupportActionBar(mToolbar);
         if(!Utils.isNull(getSupportActionBar())) {
@@ -208,7 +212,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         }
         if(!TextUtils.isEmpty(mTweetEt.getEditableText().toString()))
             builder.setStatus(mTweetEt.getEditableText().toString());
-        if(replayStatusId > 0)
+        if(replayStatusId > 0
+                && !TextUtils.isEmpty(mTweetExtractor.extractReplyScreenname(
+                    mTweetEt.getEditableText().toString())))
             builder.setReplyStatusId(replayStatusId);
         PostTweetBean postTweet = builder.build();
         mBatmanService.postTweet(postTweet);

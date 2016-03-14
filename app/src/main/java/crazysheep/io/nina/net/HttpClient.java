@@ -19,8 +19,10 @@ import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
 import okhttp3.CacheControl;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -77,6 +79,7 @@ public class HttpClient {
                 // cache control interceptor
                 .addInterceptor(mCacheControlInterceptor)
                 .addNetworkInterceptor(mCacheControlNetworkInterceptor)
+                .addNetworkInterceptor(mUrlEncodeInterceptor)
                 // use stetho debug network request
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();
@@ -155,6 +158,32 @@ public class HttpClient {
             respBuilder.header("cache-control", cacheControl);
 
             return respBuilder.build();
+        }
+    };
+
+    /*
+    * retrofit2 cannot encode url query parameters, I must do myself
+    * see{@link http://stackoverflow.com/questions/32948083/is-there-a-way-to-add-query-parameter-to-every-request-with-retrofit-2}
+    * **/
+    private static Interceptor mUrlEncodeInterceptor = new Interceptor() {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            HttpUrl url = chain.request().url();
+            if(!TextUtils.isEmpty(url.query())) {
+                HttpUrl.Builder newUrlBuilder = url.newBuilder();
+                for(int i = 0; i < url.querySize(); i++)
+                    newUrlBuilder.setEncodedQueryParameter(
+                            StringUtils.urlEncode(url.queryParameterName(i)),
+                            StringUtils.urlEncode(url.queryParameterValue(i)));
+
+                return chain.proceed(chain.request()
+                        .newBuilder()
+                        .url(newUrlBuilder
+                                .build())
+                        .build());
+            } else {
+                return chain.proceed(chain.request());
+            }
         }
     };
 

@@ -37,8 +37,7 @@ public class BatmanService extends Service {
 
     private static final int MSG_POST_TWEET = 9527;
     private LinkedList<PostTweetBean> mPostQueue = new LinkedList<>();
-
-    private boolean hasTweetPosting = false;
+    private boolean isPostingATweetNow = false;
 
     private Selina mHandler = new Selina(this);
     private static class Selina extends Handler {
@@ -55,7 +54,7 @@ public class BatmanService extends Service {
                     if(!Utils.isNull(reference.get()) && reference.get().mPostQueue.size() > 0) {
                         PostTweetBean postTweetBean = reference.get().mPostQueue.poll();
                         if(!Utils.isNull(postTweetBean)) {
-                            reference.get().hasTweetPosting = true;
+                            reference.get().isPostingATweetNow = true;
                             // do request
                             postTweetBean.setPosting();
                             RxTweeting.postTweet(postTweetBean);
@@ -94,28 +93,28 @@ public class BatmanService extends Service {
         // save post tweet bean to database
         postTweetBean.save();
 
-        if(!hasTweetPosting)
+        if(!isPostingATweetNow)
             mHandler.sendEmptyMessage(MSG_POST_TWEET);
     }
 
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetSuccess event) {
+        isPostingATweetNow = false;
         // post tweet success, delete draft from database
         event.getPostTweetBean().delete();
         DebugHelper.log(String.format("post tweet \"%s\" successful, delete model %s",
                 event.getPostTweetBean().getStatus(), event.getPostTweetBean().getId()));
 
         // notify queue to post next tweet
-        if(!ensureIfNeedStopSelf()) {
-            hasTweetPosting = false;
+        if(!ensureIfNeedStopSelf())
             mHandler.sendEmptyMessage(MSG_POST_TWEET);
-        }
     }
 
     @SuppressWarnings("unused")
     @Subscribe(priority = EventBusConstants.PRIORITY_HIGH)
     public void onEvent(@NonNull RxTweeting.EventPostTweetFailed event) {
+        isPostingATweetNow = false;
         // update draft in database, why? because maybe this post tweet have more photo files,
         // and background task had upload photos successful but post tweet failed, then table column
         // "media_ids" and "photo_files" will be update, so that we do not need upload files
@@ -126,10 +125,8 @@ public class BatmanService extends Service {
                 event.getPostTweetBean().getStatus(), event.getPostTweetBean().getId()));
 
         // notify queue to post next tweet
-        if(!ensureIfNeedStopSelf()) {
-            hasTweetPosting = false;
+        if(!ensureIfNeedStopSelf())
             mHandler.sendEmptyMessage(MSG_POST_TWEET);
-        }
     }
 
     public boolean isPosting() {
