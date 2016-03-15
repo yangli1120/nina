@@ -124,7 +124,7 @@
                     android:id="@id/action_retweet_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_forward_grey_24dp"
+                    app:srcCompat="@drawable/ic_retweet_grey_24dp"
                     android:scaleType="center" />
                 <TextView
                     android:id="@id/action_retweet_count_tv"

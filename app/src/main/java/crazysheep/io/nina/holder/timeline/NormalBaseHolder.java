@@ -26,7 +26,6 @@ import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
-import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.TimeUtils;
 import crazysheep.io.nina.widget.TwitterLikeImageView;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -161,29 +160,51 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             public void onClick(View v) {
                 Extractor extractor = new Extractor();
                 ArrayList<String> metionedNames = new ArrayList<>();
-                if(tweetDto.isRetweeted()) {
+                if (tweetDto.isRetweeted()) {
                     metionedNames.add(tweetDto.retweeted_status.user.screen_name);
-                    for(String metionedName : extractor.extractMentionedScreennames(
+                    for (String metionedName : extractor.extractMentionedScreennames(
                             tweetDto.retweeted_status.text))
-                        if(!metionedNames.contains(metionedName))
+                        if (!metionedNames.contains(metionedName))
                             metionedNames.add(metionedName);
                 }
-                if(!metionedNames.contains(mTweetDto.user.screen_name))
+                if (!metionedNames.contains(mTweetDto.user.screen_name))
                     metionedNames.add(mTweetDto.user.screen_name);
-                for(String metionedName : extractor.extractMentionedScreennames(tweetDto.text))
-                    if(!metionedNames.contains(metionedName))
+                for (String metionedName : extractor.extractMentionedScreennames(tweetDto.text))
+                    if (!metionedNames.contains(metionedName))
                         metionedNames.add(metionedName);
 
-                // TODO reply this tweet
                 EventBus.getDefault().post(new EventReplyTweet(metionedNames, tweetDto.id));
             }
         });
-        retweetLl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DebugHelper.toast(mContext, "click retweet");
-            }
-        });
+        // if this tweet is own by myself, cannot retweet
+        if(mUserPrefs.getUserScreenName().equals(mTweetDto.user.screen_name)) {
+            retweetIv.setImageResource(R.drawable.ic_retweet_light_grey_24dp);
+
+            replyLl.setOnClickListener(null);
+        } else {
+            retweetIv.setImageResource(mTweetDto.retweeted ? R.drawable.ic_retweeted_green_24dp
+                    : R.drawable.ic_retweet_grey_24dp);
+
+            retweetLl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!mTweetDto.retweeted)
+                        HttpClient.getInstance()
+                                .getTwitterService()
+                                .retweet(mTweetDto.id)
+                                .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
+                    else
+                        HttpClient.getInstance()
+                                .getTwitterService()
+                                .unretweet(mTweetDto.id)
+                                .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
+
+                    mTweetDto.retweeted = !mTweetDto.retweeted;
+                    retweetIv.setImageResource(mTweetDto.retweeted
+                            ? R.drawable.ic_retweeted_green_24dp : R.drawable.ic_retweet_grey_24dp);
+                }
+            });
+        }
         retweetCountTv.setText(String.valueOf(tweetDto.retweet_count));
 
         // like action

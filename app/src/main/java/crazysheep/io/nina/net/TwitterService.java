@@ -68,6 +68,12 @@ public interface TwitterService {
     @GET("statuses/destroy/{id}.json")
     Call<TweetDto> detroyTweet(@Path("id") Long tweetId);
 
+    @POST("statuses/retweet/{id}.json")
+    Call<TweetDto> retweet(@Path("id") Long tweetId);
+
+    @POST("statuses/unretweet/{id}.json")
+    Call<TweetDto> unretweet(@Path("id") Long tweetId);
+
     //////////////////// favorites ///////////////////////
 
     /**
