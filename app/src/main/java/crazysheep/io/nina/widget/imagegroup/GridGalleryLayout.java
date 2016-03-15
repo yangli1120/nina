@@ -158,8 +158,8 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
                 if(!attachReuseChild(position))
                     attachNewChild(position);
             }
-            invalidate();
             requestLayout();
+            invalidate();
         }
 
         // update child imageview's click listener
