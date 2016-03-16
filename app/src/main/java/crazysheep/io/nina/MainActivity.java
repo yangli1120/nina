@@ -145,6 +145,10 @@ public class MainActivity extends BaseActivity
                     }
                 });
             }break;
+
+            case R.id.nav_react_native: {
+                ActivityUtils.start(this, HelloReactNativeActivity.class);
+            }break;
         }
         return true;
     }

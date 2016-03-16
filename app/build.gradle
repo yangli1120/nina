@@ -13,6 +13,7 @@ buildscript {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url '$projectDir/../../../node_modules/react-native/android' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
@@ -32,6 +33,7 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url '$projectDir/../../../node_modules/react-native/android' }
     }
 }
 
@@ -45,6 +47,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        multiDexEnabled true
 
         // Gradle Plugin 1.5
         // disable limited support for vector drawables fro Android Studio 1.4
@@ -81,20 +85,24 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = "23.2.0"
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     // Support Libraries
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.android.support:cardview-v7:23.2.0'
-    compile 'com.android.support:design:23.2.0'
-    compile 'com.android.support:gridlayout-v7:23.2.0'
-    compile 'com.android.support:palette-v7:23.2.0'
-    compile 'com.android.support:recyclerview-v7:23.2.0'
-    compile 'com.android.support:support-annotations:23.2.0'
-    compile 'com.android.support:support-v13:23.2.0'
-    compile 'com.android.support:support-v4:23.2.0'
-    compile 'com.android.support:percent:23.2.0'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:cardview-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:gridlayout-v7:${supportLibVersion}"
+    compile "com.android.support:palette-v7:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.android.support:support-v13:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:percent:${supportLibVersion}"
     // network layer: okhttp3 + retrofit2
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
@@ -164,4 +172,6 @@ dependencies {
     }
     // sliding up panel
     compile 'com.sothree.slidinguppanel:library:3.3.0'
+    // react native!
+    compile 'com.facebook.react:react-native:+'
 }

@@ -8,5 +8,9 @@
             android:icon="@drawable/ic_night_white_24dp"
             app:actionLayout="@layout/nav_item_switch_theme"
             app:showAsAction="always"/>
+        <item android:id="@+id/nav_react_native"
+            android:title="go to react native world"
+            app:showAsAction="always"
+            android:icon="@drawable/ic_new_world_black_24dp" />
     </group>
 </menu>
