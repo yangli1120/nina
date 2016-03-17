@@ -31,7 +31,9 @@ import crazysheep.io.nina.fragment.ProfileLikeFragment;
 import crazysheep.io.nina.fragment.ProfileMediaFragment;
 import crazysheep.io.nina.fragment.ProfileTimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.FabUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
@@ -106,6 +108,10 @@ public class ProfileActivity extends BaseSwipeBackActivity
         mContentVp.setOffscreenPageLimit(2);
         mContentVp.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.setupWithViewPager(mContentVp);
+
+        // if this profile is my own, let fab gone
+        if(new UserPrefs(this).getUserScreenName().equals(mScreenName))
+            FabUtils.gone(mFab);
     }
 
     /*
@@ -136,7 +142,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
             mUserCall.cancel();
 
         mUserCall = mTwitter.getUserInfo(screenName);
-        mUserCall.enqueue(new NiceCallback<UserDto>() {
+        mUserCall.enqueue(new NiceCallback<UserDto>(this) {
             @Override
             public void onRespond(Response<UserDto> response) {
                 updateUserUI(response.body());
@@ -192,7 +198,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
     protected void clickFollowFab() {
         if(!Utils.isNull(mUser)) {
             if(mUser.following)
-                mTwitter.unfollow(mUser.screen_name).enqueue(new NiceCallback<UserDto>() {
+                mTwitter.unfollow(mUser.screen_name).enqueue(new NiceCallback<UserDto>(this) {
                     @Override
                     public void onRespond(Response<UserDto> response) {
                         Snackbar.make(mContentVp,
@@ -209,7 +215,7 @@ public class ProfileActivity extends BaseSwipeBackActivity
                     }
                 });
             else
-                mTwitter.follow(mUser.screen_name).enqueue(new NiceCallback<UserDto>() {
+                mTwitter.follow(mUser.screen_name).enqueue(new NiceCallback<UserDto>(this) {
                     @Override
                     public void onRespond(Response<UserDto> response) {
                         Snackbar.make(mContentVp,

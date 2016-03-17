@@ -88,7 +88,7 @@ public class ProfileLikeFragment extends BaseFragment
         if(!Utils.isNull(mTimelineCall))
             mTimelineCall.cancel();
         mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, null, PAGE_SIZE);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 if (response.body().size() > PAGE_SIZE_WANTED) {
@@ -113,7 +113,7 @@ public class ProfileLikeFragment extends BaseFragment
             mTimelineCall.cancel();
         long maxId = ((TweetDto)mAdapter.getItem(mAdapter.getItemCount() - 1)).id;
         mTimelineCall = mTwitter.getFavoritesTimeline(mScreenName, maxId, PAGE_SIZE);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {

@@ -1,5 +1,9 @@
 package crazysheep.io.nina.net;
 
+import android.app.Activity;
+
+import java.lang.ref.WeakReference;
+
 import crazysheep.io.nina.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -13,6 +17,11 @@ public abstract class NiceCallback<T> implements retrofit2.Callback<T> {
 
     /////////////////////// empty nice callback ////////////////////////
     public static class EmptyNiceCallback<T> extends NiceCallback<T> {
+
+        public EmptyNiceCallback() {
+            super(null);
+        }
+
         @Override
         public void onFailed(Throwable t) {
         }
@@ -23,8 +32,22 @@ public abstract class NiceCallback<T> implements retrofit2.Callback<T> {
     }
     ////////////////////////////////////////////////////////////////////
 
+    private WeakReference<Activity> mActivityRef;
+
+    public NiceCallback(Activity activity) {
+        mActivityRef = new WeakReference<>(activity);
+    }
+
+    private boolean checkIfActivityIsFinished() {
+        return Utils.isNull(mActivityRef) || Utils.isNull(mActivityRef.get())
+                || mActivityRef.get().isFinishing();
+    }
+
     @Override
     public void onResponse(Call<T> call, Response<T> response) {
+        if(checkIfActivityIsFinished())
+            return;
+
         if(response.code() == HttpConstants.CODE_200)
             onRespond(response);
         else
@@ -37,6 +60,9 @@ public abstract class NiceCallback<T> implements retrofit2.Callback<T> {
 
     @Override
     public void onFailure(Call<T> call, Throwable t) {
+        if(checkIfActivityIsFinished())
+            return;
+
         onFailed(t);
         onDone();
     }

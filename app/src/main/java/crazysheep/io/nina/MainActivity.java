@@ -88,7 +88,7 @@ public class MainActivity extends BaseActivity
             mUserCall.cancel();
 
         mUserCall = mTwitter.getUserInfo(mUserPrefs.getUserScreenName());
-        mUserCall.enqueue(new NiceCallback<UserDto>() {
+        mUserCall.enqueue(new NiceCallback<UserDto>(this) {
             @Override
             public void onRespond(Response<UserDto> response) {
                 if (!Utils.isNull(response.body())) {

@@ -91,7 +91,7 @@ public class ProfileTimelineFragment extends BaseFragment
 
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_IF_HIT, mScreenName,
                 PAGE_SIZE, null);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 // if server return tweet count equal PAGE_SIZE,
@@ -120,7 +120,7 @@ public class ProfileTimelineFragment extends BaseFragment
         long maxId = ((TweetDto)mTimelineAdapter.getItem(mTimelineAdapter.getItemCount() - 1)).id;
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
                 maxId);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 if (response.body().size() > PAGE_SIZE_WANTED)

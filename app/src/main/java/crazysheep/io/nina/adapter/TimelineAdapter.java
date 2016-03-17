@@ -85,7 +85,7 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
             HttpClient.getInstance()
                     .getTwitterService()
                     .detroyTweet(tweetDto.id)
-                    .enqueue(new NiceCallback<TweetDto>() {
+                    .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                         @Override
                         public void onRespond(Response<TweetDto> response) {
                             Snackbar.make(((Activity)mContext).getWindow().getDecorView(),

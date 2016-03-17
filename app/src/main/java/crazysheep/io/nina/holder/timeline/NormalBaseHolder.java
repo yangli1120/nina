@@ -1,5 +1,6 @@
 package crazysheep.io.nina.holder.timeline;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -214,8 +215,8 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                 if(mTweetDto.favorited) {
                     HttpClient.getInstance()
                             .getTwitterService()
-                            .like(Long.parseLong(mTweetDto.idStr))
-                            .enqueue(new NiceCallback<TweetDto>() {
+                            .like(mTweetDto.id)
+                            .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                                 @Override
                                 public void onRespond(Response<TweetDto> response) {
                                     EventBus.getDefault().post(
@@ -223,14 +224,15 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                                 }
 
                                 @Override
-                                public void onFailed(Throwable t) {}
+                                public void onFailed(Throwable t) {
+                                }
                             });
                     likeIv.unlike();
                 } else {
                     HttpClient.getInstance()
                             .getTwitterService()
-                            .unlike(Long.parseLong(mTweetDto.idStr))
-                            .enqueue(new NiceCallback<TweetDto>() {
+                            .unlike(mTweetDto.id)
+                            .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                                 @Override
                                 public void onRespond(Response<TweetDto> response) {
                                     EventBus.getDefault().post(
@@ -238,7 +240,8 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                                 }
 
                                 @Override
-                                public void onFailed(Throwable t) {}
+                                public void onFailed(Throwable t) {
+                                }
                             });
                     likeIv.like();
                 }

@@ -87,6 +87,9 @@ android {
 
 ext {
     supportLibVersion = "23.2.0"
+    retrofitVersion = "2.0.0-beta4"
+    leakcanaryVersion = "1.4-beta1"
+    dagger2Version = "2.0.2"
 }
 
 dependencies {
@@ -105,20 +108,20 @@ dependencies {
     compile "com.android.support:percent:${supportLibVersion}"
     // network layer: okhttp3 + retrofit2
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
-    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
+    compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
     // rx java
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'io.reactivex:rxandroid:1.0.1'
     // leakcanary
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta1'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakcanaryVersion}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}"
+    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}"
     // inject
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.google.dagger:dagger:2.0.2'
-    apt 'com.google.dagger:dagger-compiler:2.0.2'
+    compile "com.google.dagger:dagger:${dagger2Version}"
+    apt "com.google.dagger:dagger-compiler:${dagger2Version}"
     compile "org.glassfish:javax.annotation:10.0-b28"
     // twitter
     compile('com.twitter.sdk.android:twitter:1.12.0@aar') {

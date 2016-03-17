@@ -93,7 +93,7 @@ public class ProfileMediaFragment extends BaseFragment
 
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
                 null);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {
@@ -119,7 +119,7 @@ public class ProfileMediaFragment extends BaseFragment
         long maxId = (mMediaAdapter.getItem(mMediaAdapter.getItemCount() - 1)).id;
         mTimelineCall = mTwitter.getUserTimeline(HttpCache.CACHE_NETWORK, mScreenName, PAGE_SIZE,
                 maxId);
-        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>() {
+        mTimelineCall.enqueue(new NiceCallback<List<TweetDto>>(getActivity()) {
             @Override
             public void onRespond(Response<List<TweetDto>> response) {
                 if(response.body().size() > PAGE_SIZE_WANTED) {

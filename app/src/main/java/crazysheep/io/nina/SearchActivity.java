@@ -392,7 +392,7 @@ public class SearchActivity extends BaseSwipeBackActivity
 
         mSlidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         mSearchCall = mTwitter.search(StringUtils.urlEncode(query));
-        mSearchCall.enqueue(new NiceCallback<SearchResultDto>() {
+        mSearchCall.enqueue(new NiceCallback<SearchResultDto>(this) {
             @Override
             public void onRespond(Response<SearchResultDto> response) {
                 mSearchResultAdapter.setData(response.body().getStatuses());
