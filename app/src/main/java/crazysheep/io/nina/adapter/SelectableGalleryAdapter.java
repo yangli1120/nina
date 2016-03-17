@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.github.florent37.glidepalette.BitmapPalette;
 import com.github.florent37.glidepalette.GlidePalette;
 
 import java.io.File;
@@ -35,18 +34,30 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
     private SparseBooleanArray mSelectMap = new SparseBooleanArray();
     private static int MAX_SELECTION = 4;
     private boolean showCameraButton = false;
+    private boolean showCaptureVideoButton = false;
 
     public SelectableGalleryAdapter(@NonNull Context context, List<MediaStoreImageBean> items,
-                                    boolean showCameraButton) {
+                                    boolean showCameraButton, boolean showCaptureVideoButton) {
         super(context, items);
         this.showCameraButton = showCameraButton;
+        this.showCaptureVideoButton = showCaptureVideoButton;
 
+        mItems = items;
+        if(showCaptureVideoButton) {
+            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(mItems) + 1);
+            // a capture video item
+            tempItems.add(new MediaStoreImageBean());
+            if(!Utils.isNull(mItems))
+                tempItems.addAll(mItems);
+
+            mItems = tempItems;
+        }
         if(showCameraButton) {
-            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(items) + 1);
+            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(mItems) + 1);
             // a invalid data, just place for take photo button
             tempItems.add(new MediaStoreImageBean());
-            if(!Utils.isNull(items))
-                tempItems.addAll(items);
+            if(!Utils.isNull(mItems))
+                tempItems.addAll(mItems);
 
             mItems = tempItems;
         }
@@ -54,16 +65,26 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
 
     @Override
     public void setData(List<MediaStoreImageBean> items) {
+        if(showCaptureVideoButton) {
+            List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(items) + 1);
+            // a capture video item
+            tempItems.add(new MediaStoreImageBean());
+            if(!Utils.isNull(items))
+                tempItems.addAll(items);
+
+            items = tempItems;
+        }
         if(showCameraButton) {
             List<MediaStoreImageBean> tempItems = new ArrayList<>(Utils.size(items) + 1);
             // a invalid data, just place for take photo button
             tempItems.add(new MediaStoreImageBean());
             if(!Utils.isNull(items))
                 tempItems.addAll(items);
-            super.setData(tempItems);
-        } else {
-            super.setData(items);
+
+            items = tempItems;
         }
+
+        super.setData(items);
     }
 
     public void setMaxSelection(int max) {
@@ -78,6 +99,11 @@ public class SelectableGalleryAdapter extends RecyclerViewBaseAdapter<
 
             Glide.clear(holder.imgIv);
             holder.imgIv.setImageResource(R.drawable.ic_photo_camera_48dp);
+        } else if(showCaptureVideoButton && position == 1) {
+            holder.imgTv.setVisibility(View.GONE);
+
+            Glide.clear(holder.imgIv);
+            holder.imgIv.setImageResource(R.drawable.ic_capture_video_48dp);
         } else {
             MediaStoreImageBean imageBean = getItem(position);
 

@@ -197,7 +197,11 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                         .putParcelableArrayListExtra(BundleConstants.EXTRA_SELECTED_IMAGES,
                                 mSelectedImages)
                         .putExtra(BundleConstants.EXTRA_GALLERY_OPTIONS,
-                                new Options.Builder().chooseImage().takePhoto().build()));
+                                new Options.Builder()
+                                        .chooseImage()
+                                        .takePhoto()
+                                        .captureVideo()
+                                        .build()));
     }
 
     @OnClick(R.id.send_tweet_btn)

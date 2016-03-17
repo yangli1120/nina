@@ -55,6 +55,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
 
         private static final int FLAG_CHOOSE_IMAGE = 0x0001;
         private static final int FLAG_TAKE_PHOTO = 0x0010;
+        private static final int FLAG_CAPTURE_VIDEO = 0x0100;
 
         protected int flag = FLAG_CHOOSE_IMAGE;
 
@@ -72,6 +73,10 @@ public class GalleryActivity extends BaseSwipeBackActivity
             return (flag & FLAG_TAKE_PHOTO) != 0;
         }
 
+        public boolean captureVideo() {
+            return (flag & FLAG_CAPTURE_VIDEO) != 0;
+        }
+
         public static class Builder {
 
             private int flag = FLAG_CHOOSE_IMAGE;
@@ -85,6 +90,11 @@ public class GalleryActivity extends BaseSwipeBackActivity
 
             public Builder takePhoto() {
                 flag |= FLAG_TAKE_PHOTO;
+                return this;
+            }
+
+            public Builder captureVideo() {
+                flag |= FLAG_CAPTURE_VIDEO;
                 return this;
             }
 
@@ -118,6 +128,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
     ////////////////////////////////////////////////////////////
 
     private static final int REQUEST_TAKE_PHOTO = 111;
+    private static final int REQUEST_CAPTURE_VIDEO = 112;
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) RecyclerView mGalleryRv;
@@ -155,9 +166,10 @@ public class GalleryActivity extends BaseSwipeBackActivity
             getSupportActionBar().setHomeAsUpIndicator(
                     android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
         }
-        GridLayoutManager layoutMgr = new GridLayoutManager(this, 4);
+        GridLayoutManager layoutMgr = new GridLayoutManager(this, 3);
         mGalleryRv.setLayoutManager(layoutMgr);
-        mAdapter = new SelectableGalleryAdapter(this, null, mOptions.takePhoto());
+        mAdapter = new SelectableGalleryAdapter(this, null, mOptions.takePhoto(),
+                mOptions.captureVideo());
         mAdapter.setOnItemClickListener(this);
         mGalleryRv.setAdapter(mAdapter);
         // how to set recyclerview's padding,
@@ -239,6 +251,10 @@ public class GalleryActivity extends BaseSwipeBackActivity
                         finish();
                     }
                 }break;
+
+                case REQUEST_CAPTURE_VIDEO: {
+                    // TODO handle capture video
+                }break;
             }
         }
     }
@@ -259,6 +275,9 @@ public class GalleryActivity extends BaseSwipeBackActivity
                     ActivityUtils.startResult(this, REQUEST_TAKE_PHOTO, takePhotoIntent);
                 }
             }
+        } else if(mOptions.captureVideo() && position == 1) {
+            ActivityUtils.startResult(this, REQUEST_CAPTURE_VIDEO,
+                    ActivityUtils.prepare(this, CaptureVideoActivity.class));
         } else {
             mAdapter.toggleSelection(position);
             invalidateOptionsMenu();
