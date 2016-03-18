@@ -47,6 +47,7 @@
     <string name="hint_edit_tweet">What\'s happening...</string>
     <string name="tweet">Tweet</string>
     <string name="metioned_user">reply to @%s</string>
+    <string name="camera_permission_denied">camera permission denied</string>
 
     <!-- dialog -->
     <string name="ok_btn">OK</string>

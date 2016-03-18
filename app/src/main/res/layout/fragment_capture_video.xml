@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <crazysheep.io.nina.widget.AutoFitTextureView
+        android:id="@+id/video_auto_fit_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <FrameLayout
+        android:id="@+id/action_ll"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom"
+        android:background="@android:color/holo_blue_light">
+
+        <TextView
+            android:id="@+id/capture_tv"
+            android:layout_width="98dp"
+            android:layout_height="98dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="start"
+            android:textSize="@dimen/text_19"
+            android:textColor="@android:color/white"
+            android:background="@drawable/video_record_btn"/>
+    </FrameLayout>
+</FrameLayout>
