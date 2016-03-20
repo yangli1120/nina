@@ -19,7 +19,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class CaptureVideoActivity extends BaseActivity {
 
     private final String[] PERMISSIONS = new String[] {
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
     };
 
     @Override
@@ -56,7 +57,7 @@ public class CaptureVideoActivity extends BaseActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_ft, new Camera2CaptureVideoFragment(),
                             Camera2CaptureVideoFragment.class.getSimpleName())
-                    .commit();
+                    .commitAllowingStateLoss();
         }
     }
 

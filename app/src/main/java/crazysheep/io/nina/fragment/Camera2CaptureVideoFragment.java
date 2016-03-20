@@ -1,10 +1,7 @@
 package crazysheep.io.nina.fragment;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -15,8 +12,10 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
+import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -32,6 +31,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.TextView;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,7 @@ import crazysheep.io.nina.R;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.grafika.FullFrameRect;
 import crazysheep.io.nina.grafika.Texture2dProgram;
+import crazysheep.io.nina.grafika.TextureMovieEncoder;
 import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.Utils;
@@ -79,6 +80,7 @@ public class Camera2CaptureVideoFragment extends Fragment
 
     private boolean isCameraOpened = false;
     private boolean isPreviewSurfaceCreated = false;
+    private boolean isRecordingVideo = false;
 
     private static class CameraHandler extends Handler {
 
@@ -123,8 +125,6 @@ public class Camera2CaptureVideoFragment extends Fragment
             isCameraOpened = true;
             mCameraDevice = camera;
             ensureIfCanStartPreview();
-            if(!Utils.isNull(mGLSurface))
-                configureTransform(mGLSurface.getWidth(), mGLSurface.getHeight());
         }
 
         @Override
@@ -163,7 +163,9 @@ public class Camera2CaptureVideoFragment extends Fragment
         });
         mGLSurface.setEGLContextClientVersion(2);
         mCameraHandler = new CameraHandler(this);
-        mCameraRenderer = new CameraRenderer(mCameraHandler);
+        mCameraRenderer = new CameraRenderer(mCameraHandler, new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                "nina_record.mp4"));
         mGLSurface.setRenderer(mCameraRenderer);
         mGLSurface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
@@ -216,7 +218,15 @@ public class Camera2CaptureVideoFragment extends Fragment
     @SuppressWarnings("unused")
     @OnClick(R.id.capture_tv)
     protected void clickCapture() {
-        DebugHelper.toast(getActivity(), "start capture");
+        DebugHelper.toast(getActivity(), isRecordingVideo ? "stop" : "start");
+        isRecordingVideo = !isRecordingVideo;
+        mCaptureTv.setPressed(isRecordingVideo);
+        mGLSurface.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mCameraRenderer.changeRecordingState(isRecordingVideo);
+            }
+        });
     }
 
     @Override
@@ -315,30 +325,6 @@ public class Camera2CaptureVideoFragment extends Fragment
         }
     }
 
-    // transform video size to preview size
-    private void configureTransform(int viewWidth, int viewHeight) {
-        Activity activity = getActivity();
-        if (null == mGLSurface || null == mPreviewSize || null == activity) {
-            return;
-        }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getWidth(), mPreviewSize.getHeight());
-        float centerX = viewRect.centerX();
-        float centerY = viewRect.centerY();
-        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-        }
-        // TODO mGLSurface.setTransform(matrix);
-    }
-
     private void startBackgroundThread() {
         mBackgroundHandlerThread = new HandlerThread("I work for no money!");
         mBackgroundHandlerThread.start();
@@ -367,6 +353,15 @@ public class Camera2CaptureVideoFragment extends Fragment
 
     static class CameraRenderer implements GLSurfaceView.Renderer {
 
+        public static final int RECORDING_OFF = 0;
+        public static final int RECORDING_ON = 1;
+        public static final int RECORDING_RESUMED = 2;
+
+        private boolean isRecording = false;
+        private int mRecordingStatus = RECORDING_OFF;
+        private TextureMovieEncoder mVideoEncoder = new TextureMovieEncoder();
+        private File mOutputFile;
+
         private CameraHandler mCameraHandler;
 
         private FullFrameRect mFullFrameRect;
@@ -379,8 +374,9 @@ public class Camera2CaptureVideoFragment extends Fragment
 
         private final float[] mSTMatrix = new float[16];
 
-        public CameraRenderer(CameraHandler cameraHandler) {
+        public CameraRenderer(CameraHandler cameraHandler, File outputFile) {
             mCameraHandler = cameraHandler;
+            mOutputFile = outputFile;
 
             mIncomingWidth = -1;
             mIncomingHeight = -1;
@@ -405,9 +401,61 @@ public class Camera2CaptureVideoFragment extends Fragment
             mIncomingWidth = mIncomingHeight = -1;
         }
 
+        public void changeRecordingState(boolean recording) {
+            isRecording = recording;
+        }
+
         @Override
         public void onDrawFrame(GL10 gl) {
             mSurfaceTexture.updateTexImage();
+
+            // TODO video record
+            if(isRecording) {
+                switch (mRecordingStatus) {
+                    case RECORDING_OFF: {
+                        DebugHelper.log("CameraRenderer.onDrawFrame(), START recording");
+
+                        mVideoEncoder.startRecording(new TextureMovieEncoder.EncoderConfig(
+                                mOutputFile, 480, 640, 1000 * 1000, EGL14.eglGetCurrentContext()));
+                        mRecordingStatus = RECORDING_ON;
+                    }break;
+
+                    case RECORDING_RESUMED: {
+                        DebugHelper.log("CameraRenderer.onDrawFrame(), RESUME recording");
+
+                        mVideoEncoder.updateSharedContext(EGL14.eglGetCurrentContext());
+                        mRecordingStatus = RECORDING_ON;
+                    }break;
+
+                    case RECORDING_ON: {
+                        // do nothing
+                    }break;
+
+                    default:
+                        throw new RuntimeException("WTF, unknow recording status: "
+                                + mRecordingStatus);
+                }
+            } else {
+                switch (mRecordingStatus) {
+                    case RECORDING_ON:
+                    case RECORDING_RESUMED: {
+                        DebugHelper.log("CameraRenderer.onDrawFrame(), STOP recording");
+
+                        mVideoEncoder.stopRecording();
+                        mRecordingStatus = RECORDING_OFF;
+                    }break;
+
+                    case RECORDING_OFF: {
+                        // do nothing
+                    }break;
+
+                    default:
+                        throw new RuntimeException("WTF, unknow recording status: "
+                                + mRecordingStatus);
+                }
+            }
+            mVideoEncoder.setTextureId(mTextureId);
+            mVideoEncoder.frameAvailable(mSurfaceTexture);
 
             if(mIncomingWidth <= 0 || mIncomingHeight <= 0)
                 return;
@@ -426,6 +474,13 @@ public class Camera2CaptureVideoFragment extends Fragment
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             DebugHelper.log("CameraRenderer.onSurfaceCreated()");
+
+            // TODO update video record state
+            isRecording = mVideoEncoder.isRecording();
+            if(isRecording)
+                mRecordingStatus = RECORDING_RESUMED;
+            else
+                mRecordingStatus = RECORDING_OFF;
 
             // TODO surface texture is ready, notify to start camera preview
             mFullFrameRect = new FullFrameRect(
