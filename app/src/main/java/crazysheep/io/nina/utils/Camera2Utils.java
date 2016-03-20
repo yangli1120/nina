@@ -66,7 +66,7 @@ public class Camera2Utils {
         int h = aspectRatio.getHeight();
         for (Size option : choices) {
             if (option.getHeight() == option.getWidth() * h / w &&
-                    option.getWidth() >= width && option.getHeight() >= height) {
+                    option.getWidth() >= width) {
                 bigEnough.add(option);
             }
         }
