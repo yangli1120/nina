@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="@android:color/black">
 
-    <android.opengl.GLSurfaceView
+    <TextureView
         android:id="@+id/video_auto_fit_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

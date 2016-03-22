@@ -18,7 +18,7 @@ import crazysheep.io.nina.compat.APICompat;
 @TargetApi(APICompat.L)
 public class Camera2Utils {
 
-    public final static int DEFAULT_VIDEO_SIZE = 720;
+    public final static int DEFAULT_VIDEO_SIZE = 1280;
 
     /**
      * Compares two {@code Size}s based on their areas.
