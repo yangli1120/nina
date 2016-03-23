@@ -177,4 +177,6 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     // react native!
     compile 'com.facebook.react:react-native:+'
+    // apache common io, google's guava is too large...
+    compile "commons-io:commons-io:2.4"
 }

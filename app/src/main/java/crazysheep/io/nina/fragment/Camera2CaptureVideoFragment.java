@@ -2,6 +2,7 @@ package crazysheep.io.nina.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -18,18 +19,20 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.TextView;
+import android.widget.Button;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +46,9 @@ import crazysheep.io.nina.R;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
+import crazysheep.io.nina.utils.VideoRecorderHelper;
 
 /**
  * use camera2 api capture video
@@ -54,17 +59,10 @@ import crazysheep.io.nina.utils.Utils;
 public class Camera2CaptureVideoFragment extends Fragment
         implements TextureView.SurfaceTextureListener {
 
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
-
     @Bind(R.id.video_auto_fit_tv) TextureView mTextureView;
     @Bind(R.id.action_ll) View mActionLl;
-    @Bind(R.id.capture_tv) TextView mCaptureTv;
+    @Bind(R.id.capture_btn) Button mCaptureBtn;
+    @Bind(R.id.capture_done_btn) Button mCaptureDoneBtn;
 
     private Size mVideoSize;
 
@@ -75,14 +73,12 @@ public class Camera2CaptureVideoFragment extends Fragment
     private HandlerThread mBackgroundHandlerThread;
     private Handler mBackgroundHandler;
 
-    private MediaRecorder mMediaRecorder = new MediaRecorder();
     private boolean isRecordingVideo = false;
-
-    private int mVideoPartIndex = 0;
+    private VideoRecorderHelper mRecorderHelper;
 
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
-        public void onOpened(CameraDevice camera) {
+        public void onOpened(@NonNull CameraDevice camera) {
             DebugHelper.log("state callback, onOpened");
 
             mCameraDevice = camera;
@@ -92,19 +88,41 @@ public class Camera2CaptureVideoFragment extends Fragment
         }
 
         @Override
-        public void onDisconnected(CameraDevice camera) {
+        public void onDisconnected(@NonNull CameraDevice camera) {
             camera.close();
             mCameraDevice = null;
         }
 
         @Override
-        public void onError(CameraDevice camera, int error) {
+        public void onError(@NonNull CameraDevice camera, int error) {
             camera.close();
             mCameraDevice = null;
             if(!Utils.isNull(getActivity()) && !getActivity().isFinishing())
                 getActivity().finish();
         }
     };
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        File outputDir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
+                getString(R.string.app_name));
+        if(!outputDir.isDirectory()) {
+            try {
+                FileUtils.forceDelete(outputDir);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        if(!outputDir.exists())
+            outputDir.mkdirs();
+        mRecorderHelper = new VideoRecorderHelper(getActivity(),
+                new VideoRecorderHelper.RecorderConfig.Builder()
+                        .outputDir(outputDir)
+                        .build());
+    }
 
     @Nullable
     @Override
@@ -150,7 +168,7 @@ public class Camera2CaptureVideoFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
 
-        releaseMediaRecorder();
+        mRecorderHelper.release();
     }
 
     @Override
@@ -173,23 +191,42 @@ public class Camera2CaptureVideoFragment extends Fragment
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.capture_tv)
+    @OnClick(R.id.capture_btn)
     protected void clickCapture() {
         DebugHelper.toast(getActivity(), isRecordingVideo ? "stop" : "start");
         isRecordingVideo = !isRecordingVideo;
-        mCaptureTv.setPressed(isRecordingVideo);
+        mCaptureBtn.setBackgroundResource(isRecordingVideo
+                ? R.drawable.capture_button_pressed : R.drawable.video_record_btn);
+        mCaptureBtn.setText(getString(isRecordingVideo
+                ? R.string.camera_stop_record : R.string.camera_start_record));
+        mCaptureBtn.setTextColor(isRecordingVideo ? Color.RED : Color.WHITE);
 
         if(isRecordingVideo) {
             try {
-                startVideoRecording();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
+                mRecorderHelper.startRecording();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
 
-                DebugHelper.log("start record video failed: " + Log.getStackTraceString(ioe));
+                DebugHelper.log("start record video failed: " + Log.getStackTraceString(e));
             }
         } else {
-            stopVideoRecording();
+            mRecorderHelper.stopRecording();
+            startPreview(); // start preview again
         }
+    }
+
+    @SuppressWarnings("unused")
+    @OnClick(R.id.capture_done_btn)
+    protected void clickDone() {
+        // TODO merge multi part video record files to one
+        if(Utils.size(mRecorderHelper.getRecordedFiles()) <= 0) {
+            ToastUtils.t(getActivity(), getString(R.string.toast_not_recorded_video_file));
+
+            return;
+        }
+
+        DebugHelper.toast(getActivity(), "handling record files, please waiting...");
+        DebugHelper.log(String.format("recorded files: [ %s ]", mRecorderHelper.getRecordedFiles()));
     }
 
     // step 1, open camera
@@ -202,8 +239,11 @@ public class Camera2CaptureVideoFragment extends Fragment
                     cameraId);
             StreamConfigurationMap configurationMap = cameraCharacteristics.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            mVideoSize = Camera2Utils.chooseVideoSize(
-                    configurationMap.getOutputSizes(MediaRecorder.class));
+            if(!Utils.isNull(configurationMap))
+                mVideoSize = Camera2Utils.chooseVideoSize(
+                        configurationMap.getOutputSizes(MediaRecorder.class));
+            else
+                mVideoSize = new Size(640, 480);
             DebugHelper.log("openCamera(), video size: " + mVideoSize);
             configureTransform();
 
@@ -222,8 +262,8 @@ public class Camera2CaptureVideoFragment extends Fragment
 
         DebugHelper.log("startPreview()");
         try {
-            // TODO setup recorder
-            setupMediaRecorder();
+            // setup recorder
+            mRecorderHelper.prepareRecording();
 
             mTextureView.getSurfaceTexture().setDefaultBufferSize(
                     mVideoSize.getWidth(), mVideoSize.getHeight());
@@ -234,14 +274,13 @@ public class Camera2CaptureVideoFragment extends Fragment
 
             List<Surface> surfaceList = new ArrayList<>();
             surfaceList.add(previewSurface);
-
-            // TODO add recorder surface
-            surfaceList.add(mMediaRecorder.getSurface());
-            mPreviewBuilder.addTarget(mMediaRecorder.getSurface());
+            // add recorder surface
+            surfaceList.add(mRecorderHelper.getSurface());
+            mPreviewBuilder.addTarget(mRecorderHelper.getSurface());
 
             mCameraDevice.createCaptureSession(surfaceList, new CameraCaptureSession.StateCallback() {
                 @Override
-                public void onConfigured(CameraCaptureSession session) {
+                public void onConfigured(@NonNull CameraCaptureSession session) {
                     mPreviewSession = session;
 
                     try {
@@ -257,7 +296,7 @@ public class Camera2CaptureVideoFragment extends Fragment
                 }
 
                 @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
+                public void onConfigureFailed(@NonNull CameraCaptureSession session) {
                     DebugHelper.toast(getActivity(), "create capture session failed");
                 }
             }, mBackgroundHandler);
@@ -321,61 +360,8 @@ public class Camera2CaptureVideoFragment extends Fragment
         matrix.preScale(bufferRectF.height() * 1f / viewRectF.width(),
                 bufferRectF.width() * 1f / viewRectF.height());
         matrix.postScale(maxScale, maxScale, viewRectF.centerX(), viewRectF.centerY());
-        DebugHelper.log("configureTransform(), viewRectF: " + viewRectF
-                + ", bufferRectF: " + bufferRectF);
 
         mTextureView.setTransform(matrix);
-    }
-
-    private void setupMediaRecorder() throws IOException {
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
-                String.format("nina_record_%s.mp4", mVideoPartIndex)).getAbsolutePath());
-        mMediaRecorder.setVideoEncodingBitRate(1000 * 1000 * 5);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-        int orientation = ORIENTATIONS.get(rotation);
-        mMediaRecorder.setOrientationHint(orientation);
-        mMediaRecorder.prepare();
-    }
-
-    private void startVideoRecording() throws IOException {
-        try {
-            mMediaRecorder.start();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-
-            DebugHelper.log("startVideoRecording failed: " + Log.getStackTraceString(e));
-        }
-    }
-
-    private void stopVideoRecording() {
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
-
-        mVideoPartIndex++; // new next video part file
-        startPreview();
-        DebugHelper.log("stop video recording");
-    }
-
-    private void releaseMediaRecorder() {
-        if(!Utils.isNull(mMediaRecorder)) {
-            try {
-                mMediaRecorder.stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                DebugHelper.log("releaseMediaRecorder failed: " + Log.getStackTraceString(e));
-            }
-            mMediaRecorder.release();
-            mMediaRecorder = null;
-        }
     }
 
 }

@@ -78,4 +78,16 @@ public class TimeUtils {
         return context.getString(R.string.time_just_now);
     }
 
+    /**
+     * format timestamp as human readable date pattern, such like "yyyy-MM-dd"
+     * */
+    public static String formatDate(long timestamp, String pattern) {
+        return new SimpleDateFormat(pattern, Locale.getDefault())
+                .format(new Date(timestamp));
+    }
+
+    public static String formatDate(long timestamp) {
+        return formatDate(timestamp, "yyyy-MM-dd HH:mm:ss");
+    }
+
 }

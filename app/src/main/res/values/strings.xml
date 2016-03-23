@@ -48,6 +48,10 @@
     <string name="tweet">Tweet</string>
     <string name="metioned_user">reply to @%s</string>
     <string name="camera_permission_denied">camera permission denied</string>
+    <string name="camera_start_record">start</string>
+    <string name="camera_stop_record">stop</string>
+    <string name="camera_record_done">done</string>
+    <string name="toast_not_recorded_video_file">have no recorded video file</string>
 
     <!-- dialog -->
     <string name="ok_btn">OK</string>
