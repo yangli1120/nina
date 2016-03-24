@@ -66,6 +66,9 @@
         <activity android:name=".HelloReactNativeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
+        <activity android:name=".RecordVideoPreviewActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.DayNight"/>
 
         <service android:name=".service.BatmanService" android:exported="false" />
     </application>

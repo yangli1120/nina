@@ -43,7 +43,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.R;
+import crazysheep.io.nina.RecordVideoPreviewActivity;
 import crazysheep.io.nina.compat.APICompat;
+import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.ToastUtils;
@@ -58,6 +61,8 @@ import crazysheep.io.nina.utils.VideoRecorderHelper;
 @TargetApi(APICompat.L)
 public class Camera2CaptureVideoFragment extends Fragment
         implements TextureView.SurfaceTextureListener {
+
+    private static final int REQUEST_VIDEO_PREVIEW = 1;
 
     @Bind(R.id.video_auto_fit_tv) TextureView mTextureView;
     @Bind(R.id.action_ll) View mActionLl;
@@ -149,6 +154,7 @@ public class Camera2CaptureVideoFragment extends Fragment
     public void onResume() {
         super.onResume();
 
+        mRecorderHelper.onResume();
         startBackgroundThread();
         if(mTextureView.isAvailable())
             openCamera();
@@ -160,15 +166,9 @@ public class Camera2CaptureVideoFragment extends Fragment
     public void onPause() {
         super.onPause();
 
+        mRecorderHelper.onPause();
         closeCamera();
         stopBackgroundThread();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mRecorderHelper.release();
     }
 
     @Override
@@ -215,18 +215,21 @@ public class Camera2CaptureVideoFragment extends Fragment
         }
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused, unchecked")
     @OnClick(R.id.capture_done_btn)
-    protected void clickDone() {
-        // TODO merge multi part video record files to one
+    protected void clickNextStep() {
         if(Utils.size(mRecorderHelper.getRecordedFiles()) <= 0) {
             ToastUtils.t(getActivity(), getString(R.string.toast_not_recorded_video_file));
 
             return;
         }
 
-        DebugHelper.toast(getActivity(), "handling record files, please waiting...");
-        DebugHelper.log(String.format("recorded files: [ %s ]", mRecorderHelper.getRecordedFiles()));
+        DebugHelper.log(String.format("recorded files: [ %s ]",
+                mRecorderHelper.getRecordedFilesPath()));
+        ActivityUtils.startResult(this, REQUEST_VIDEO_PREVIEW,
+                ActivityUtils.prepare(getActivity(), RecordVideoPreviewActivity.class)
+                        .putStringArrayListExtra(BundleConstants.EXTRA_VIDEO_RECORD_FILES,
+                                (ArrayList<String>)mRecorderHelper.getRecordedFilesPath()));
     }
 
     // step 1, open camera
@@ -328,7 +331,7 @@ public class Camera2CaptureVideoFragment extends Fragment
             ie.printStackTrace();
         }
     }
-    
+
     private void closeCamera() {
         if (!Utils.isNull(mCameraDevice)) {
             mCameraDevice.close();

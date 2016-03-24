@@ -154,10 +154,11 @@ public class VideoRecorderHelper {
     private List<File> mRecordedFiles;
     private int mVideoPartIndex = 0;
 
+    private boolean isRecording = false;
+
     public VideoRecorderHelper(@NonNull Activity activity, @NonNull RecorderConfig config) {
         mActivityRefs = new WeakReference<>(activity);
         mConfig = config;
-        mMediaRecorder = new MediaRecorder();
 
         mVideoPartIndex = 0;
 
@@ -181,10 +182,20 @@ public class VideoRecorderHelper {
         ArrayList<File> files = new ArrayList<>();
         for(File file : mRecordedFiles)
             files.add(file);
-        if(Utils.size(files) > 1)
+        if(Utils.size(files) >= 1)
             files.remove(files.size() - 1);
 
         return files;
+    }
+
+    public List<String> getRecordedFilesPath() {
+        ArrayList<String> filepaths = new ArrayList<>();
+        for(File file : mRecordedFiles)
+            filepaths.add(file.getAbsolutePath());
+        if(Utils.size(filepaths) >= 1)
+            filepaths.remove(filepaths.size() - 1);
+
+        return filepaths;
     }
 
     @TargetApi(APICompat.L)
@@ -217,12 +228,34 @@ public class VideoRecorderHelper {
 
     public void startRecording() throws IllegalStateException {
         mMediaRecorder.start();
+        isRecording = true;
     }
 
     public void stopRecording() throws IllegalStateException {
         mMediaRecorder.stop();
         mMediaRecorder.reset();
         mVideoPartIndex++; // new to next video part file
+        isRecording = false;
+    }
+
+    public boolean isRecording() {
+        return isRecording;
+    }
+
+    public void onResume() {
+        mMediaRecorder = new MediaRecorder();
+    }
+
+    public void onPause() {
+        if(!Utils.isNull(mMediaRecorder)) {
+            try {
+                mMediaRecorder.stop();
+            } catch (IllegalStateException ise) {
+                ise.printStackTrace();
+            }
+            mMediaRecorder.release();
+            mMediaRecorder = null;
+        }
     }
 
     public void release() {
