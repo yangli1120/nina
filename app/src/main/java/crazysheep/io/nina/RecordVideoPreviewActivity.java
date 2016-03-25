@@ -1,21 +1,21 @@
 package crazysheep.io.nina;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.constants.BundleConstants;
-import crazysheep.io.nina.utils.DebugHelper;
-import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.TextureVideoView;
 
 /**
@@ -29,7 +29,7 @@ public class RecordVideoPreviewActivity extends BaseActivity {
     @Bind(R.id.preview_tv) TextureVideoView mPreviewTvv;
     @Bind(R.id.play_iv) ImageView mPlayIv;
 
-    private List<String> mVideoFiles;
+    private String mVideoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +37,8 @@ public class RecordVideoPreviewActivity extends BaseActivity {
         setContentView(R.layout.activity_record_video_preview);
         ButterKnife.bind(this);
 
-        mVideoFiles = getIntent().getStringArrayListExtra(BundleConstants.EXTRA_VIDEO_RECORD_FILES);
-        if(Utils.size(mVideoFiles) <= 0)
+        mVideoFile = getIntent().getStringExtra(BundleConstants.EXTRA_VIDEO_RECORD_FILE);
+        if(TextUtils.isEmpty(mVideoFile))
             finish();
 
         mPreviewFl.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -52,10 +52,9 @@ public class RecordVideoPreviewActivity extends BaseActivity {
             }
         });
 
-        // TODO may be should need merge multi video files to one
-        DebugHelper.log("RecordVideoPreviewActivity.onCreate(), video file: " + mVideoFiles.get(0));
-        mPreviewTvv.setVideo(new File(mVideoFiles.get(0)));
+        // may be should need merge multi video files to one
         mPreviewTvv.setScaleType(TextureVideoView.SCALE_TYPE_CENTER_CROP);
+        mPreviewTvv.setVideo(new File(mVideoFile));
     }
 
     @SuppressWarnings("unused")
@@ -77,8 +76,10 @@ public class RecordVideoPreviewActivity extends BaseActivity {
     @SuppressWarnings("unused")
     @OnClick(R.id.done_tv)
     protected void clickDone() {
-        // TODO done
-        DebugHelper.toast(this, "done");
+        Intent data = new Intent();
+        data.putExtra(BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE, mPreviewTvv.getVideoFile());
+        setResult(Activity.RESULT_OK, data);
+        finish();
     }
 
 }

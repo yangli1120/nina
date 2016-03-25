@@ -46,9 +46,11 @@ import crazysheep.io.nina.R;
 import crazysheep.io.nina.RecordVideoPreviewActivity;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.io.RxFile;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.RxVideo;
 import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.utils.VideoRecorderHelper;
@@ -226,10 +228,44 @@ public class Camera2CaptureVideoFragment extends Fragment
 
         DebugHelper.log(String.format("recorded files: [ %s ]",
                 mRecorderHelper.getRecordedFilesPath()));
-        ActivityUtils.startResult(this, REQUEST_VIDEO_PREVIEW,
+
+        final String targetFilePath = new File(mRecorderHelper.getSessionFileDir(), "final.mp4")
+                .getAbsolutePath();
+        if(Utils.size(mRecorderHelper.getRecordedFilesPath()) > 1)
+            RxVideo.merge(mRecorderHelper.getRecordedFilesPath(),
+                    targetFilePath,
+                    new RxVideo.Callback() {
+                        @Override
+                        public void onSuccess(List<String> sources, String targetFilePath) {
+                            startForResult(targetFilePath);
+                        }
+
+                        @Override
+                        public void onFailed(String err) {
+                            DebugHelper.log(err);
+                        }
+                    });
+        else if(Utils.size(mRecorderHelper.getRecordedFilesPath()) == 1)
+            RxFile.copy(mRecorderHelper.getRecordedFiles().get(0).getAbsolutePath(), targetFilePath,
+                    new RxFile.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            startForResult(targetFilePath);
+                        }
+
+                        @Override
+                        public void onFailed(String err) {
+                            DebugHelper.log(err);
+                        }
+                    });
+        else
+            ToastUtils.t(getActivity(), getString(R.string.toast_not_recorded_video_file));
+    }
+
+    private void startForResult(String targetFilePath) {
+        ActivityUtils.startResult(Camera2CaptureVideoFragment.this, REQUEST_VIDEO_PREVIEW,
                 ActivityUtils.prepare(getActivity(), RecordVideoPreviewActivity.class)
-                        .putStringArrayListExtra(BundleConstants.EXTRA_VIDEO_RECORD_FILES,
-                                (ArrayList<String>)mRecorderHelper.getRecordedFilesPath()));
+                        .putExtra(BundleConstants.EXTRA_VIDEO_RECORD_FILE, targetFilePath));
     }
 
     // step 1, open camera

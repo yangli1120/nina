@@ -93,7 +93,8 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         DebugHelper.log("onSurfaceTextureAvailable()");
         mSurface = new Surface(surface);
-        setupMediaPlayer();
+        if(null != mVideoFile)
+            setupMediaPlayer();
 
         configureTransform();
     }
@@ -125,12 +126,8 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
         mMediaPlayer.setOnErrorListener(this);
         mMediaPlayer.setOnInfoListener(this);
         mMediaPlayer.setLooping(mPlayMode == PLAY_MODE_LOOP);
-        prepareVideo();
-    }
 
-    private void prepareVideo() {
-        if(null != mVideoFile && null != mSurface)
-            DebugHelper.log("prepareVideo()");
+        if(null != mVideoFile && null != mSurface) {
             try {
                 mMediaPlayer.setDataSource(mVideoFile.getAbsolutePath());
                 mMediaPlayer.setSurface(mSurface);
@@ -141,6 +138,7 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
                 DebugHelper.log("TextureVideo.prepareVideo() exception: "
                         + Log.getStackTraceString(ioe));
             }
+        }
     }
 
     public void setVideo(@NonNull File file) {
@@ -152,7 +150,6 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
             mMediaMetadataRetriever.setDataSource(file.getAbsolutePath());
             String mimeType = mMediaMetadataRetriever.extractMetadata(
                     MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-            DebugHelper.log("TextureVideoView.setVideo(), mimeType: " + mimeType);
             if(!TextUtils.isEmpty(mimeType) && !mimeType.startsWith("video/"))
                 throw new RuntimeException(
                         String.format("TextureVideoView.setVideo(), file %s is not a video",
@@ -169,13 +166,10 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
             lae.printStackTrace();
         }
 
+        DebugHelper.log("setVideo(), video: " + file.getAbsolutePath());
         mVideoFile = file;
-        if(null != mMediaPlayer && mMediaPlayer.isPlaying()) {
-            mMediaPlayer.stop();
-            mMediaPlayer.reset();
-
-            prepareVideo();
-        }
+        if(null != mSurface)
+            setupMediaPlayer();
     }
 
     public void setScaleType(int scaleType) {
@@ -231,6 +225,10 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
         }
 
         setTransform(matrix);
+    }
+
+    public String getVideoFile() {
+        return null != mVideoFile ? mVideoFile.getAbsolutePath() : null;
     }
 
     private void release() {

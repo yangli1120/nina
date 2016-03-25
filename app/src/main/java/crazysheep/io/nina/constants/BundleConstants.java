@@ -18,6 +18,7 @@ public class BundleConstants {
     public static final String EXTRA_PHOTO_URL = "extra_photo_url";
     public static final String EXTRA_PHOTO_THUMBNAIL_SIZE = "extra_photo_thumbnail_size";
     public static final String EXTRA_METIONED_NAMES = "extra_metioned_names";
-    public static final String EXTRA_VIDEO_RECORD_FILES = "extra_video_record_files";
+    public static final String EXTRA_VIDEO_RECORD_FILE = "extra_video_record_file";
+    public static final String EXTRA_VIDEO_RECORD_FINAL_FILE = "extra_video_record_final_file";
 
 }

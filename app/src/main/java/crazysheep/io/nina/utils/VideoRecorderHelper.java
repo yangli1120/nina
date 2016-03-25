@@ -177,6 +177,10 @@ public class VideoRecorderHelper {
         return prefix;
     }
 
+    public String getSessionFileDir() {
+        return mSessionDir.getAbsolutePath();
+    }
+
     public List<File> getRecordedFiles() {
         // last file is invalid, do not return
         ArrayList<File> files = new ArrayList<>();

@@ -179,4 +179,6 @@ dependencies {
     compile 'com.facebook.react:react-native:+'
     // apache common io, google's guava is too large...
     compile "commons-io:commons-io:2.4"
+    // merge mp4 file
+    compile "com.googlecode.mp4parser:isoparser:1.1.7"
 }
