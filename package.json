@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/YoungLeeForeverBoy/nina#readme",
   "dependencies": {
-    "react-native": "^0.21.0"
+    "react": "^0.14.7",
+    "react-native": "^0.22.2"
   }
 }
