@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_play_white_48dp">
+
+    <target
+        android:animation="@anim/play_to_pause"
+        android:name="play" />
+</animated-vector>

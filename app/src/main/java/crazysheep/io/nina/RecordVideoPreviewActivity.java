@@ -1,5 +1,6 @@
 package crazysheep.io.nina;
 
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -60,11 +61,17 @@ public class RecordVideoPreviewActivity extends BaseActivity {
     @SuppressWarnings("unused")
     @OnClick(R.id.play_iv)
     protected void clickPlay() {
-        DebugHelper.log("clickPlay(), isPlaying? " + mPreviewTvv.isPlaying());
-        if(mPreviewTvv.isPlaying())
+        if(mPreviewTvv.isPlaying()) {
+            mPlayIv.setImageResource(R.drawable.ic_animated_pause_play);
+            if(mPlayIv.getDrawable() instanceof AnimatedVectorDrawable)
+                ((AnimatedVectorDrawable)mPlayIv.getDrawable()).start();
             mPreviewTvv.pause();
-        else
+        } else {
+            mPlayIv.setImageResource(R.drawable.ic_animated_play_pause);
+            if(mPlayIv.getDrawable() instanceof AnimatedVectorDrawable)
+                ((AnimatedVectorDrawable)mPlayIv.getDrawable()).start();
             mPreviewTvv.play();
+        }
     }
 
     @SuppressWarnings("unused")
