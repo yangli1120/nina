@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
+import crazysheep.io.nina.utils.Utils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -28,6 +29,9 @@ public class RxFile {
         void onFailed(String err);
     }
 
+    /**
+     * copy source file to target file
+     * */
     public static Subscription copy(@NonNull final String source, @NonNull final String dest,
                                     @NonNull final Callback callback) {
         return Observable.just(source)
@@ -62,4 +66,44 @@ public class RxFile {
                     }
                 });
     }
+
+    /**
+     * delete target file
+     * */
+    public static Subscription delete(@NonNull File file, final Callback callback) {
+        return Observable.just(file)
+                .subscribeOn(Schedulers.io())
+                .map(new Func1<File, Boolean>() {
+                    @Override
+                    public Boolean call(File file) {
+                        try {
+                            FileUtils.forceDelete(file);
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+
+                            throw  Exceptions.propagate(ioe);
+                        }
+                        return true;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if(!Utils.isNull(callback))
+                            callback.onFailed(Log.getStackTraceString(e));
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        if(!Utils.isNull(callback))
+                            callback.onSuccess();
+                    }
+                });
+    }
+
 }

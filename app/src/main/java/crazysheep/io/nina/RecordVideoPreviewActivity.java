@@ -16,6 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.io.RxFile;
 import crazysheep.io.nina.widget.TextureVideoView;
 
 /**
@@ -82,4 +83,13 @@ public class RecordVideoPreviewActivity extends BaseActivity {
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        // user pressed back key mean give up current video, delete it
+        if(!TextUtils.isEmpty(mVideoFile)) {
+            File finalVideo = new File(mVideoFile);
+            RxFile.delete(finalVideo, null);
+        }
+        super.onBackPressed();
+    }
 }

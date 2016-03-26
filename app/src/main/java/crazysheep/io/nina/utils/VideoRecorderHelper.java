@@ -211,7 +211,7 @@ public class VideoRecorderHelper {
         mMediaRecorder.setAudioSource(mConfig.audioSource);
         mMediaRecorder.setVideoSource(mConfig.videoSource);
         mMediaRecorder.setOutputFormat(mConfig.outputFormat);
-        File newRecordFile = new File(mSessionDir, String.format("record_part_%s.mp4",
+        File newRecordFile = new File(mSessionDir, String.format("record_part_%s.mp4nina",
                 mVideoPartIndex));
         if(!mRecordedFiles.contains(newRecordFile))
             mRecordedFiles.add(newRecordFile);
