@@ -37,6 +37,13 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
      * */
     public interface ITwitterServiceActivity {}
 
+    /**
+     * give change to fragment handle onBackPressed()
+     * */
+    public interface OnBackPressedListener {
+        boolean onBackPressed();
+    }
+
     /////////////////////////////////////////////////////////////////
 
     public static String TAG = BaseActivity.class.getSimpleName();

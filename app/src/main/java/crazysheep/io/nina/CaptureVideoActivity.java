@@ -2,6 +2,7 @@ package crazysheep.io.nina;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import java.util.List;
 
@@ -50,6 +51,16 @@ public class CaptureVideoActivity extends BaseActivity {
 
         ToastUtils.t(this, getString(R.string.camera_permission_denied));
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        for(Fragment fragment : getSupportFragmentManager().getFragments())
+            if(fragment instanceof OnBackPressedListener
+                    && ((OnBackPressedListener) fragment).onBackPressed())
+                return;
+
+        super.onBackPressed();
     }
 
     private void initUI() {

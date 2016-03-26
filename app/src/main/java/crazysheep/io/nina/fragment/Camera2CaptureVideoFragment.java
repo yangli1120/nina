@@ -2,6 +2,7 @@ package crazysheep.io.nina.fragment;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -42,6 +43,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import crazysheep.io.nina.BaseActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.RecordVideoPreviewActivity;
 import crazysheep.io.nina.compat.APICompat;
@@ -50,6 +52,7 @@ import crazysheep.io.nina.io.RxFile;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
+import crazysheep.io.nina.utils.DialogUtils;
 import crazysheep.io.nina.utils.RxVideo;
 import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
@@ -62,7 +65,7 @@ import crazysheep.io.nina.utils.VideoRecorderHelper;
  */
 @TargetApi(APICompat.L)
 public class Camera2CaptureVideoFragment extends Fragment
-        implements TextureView.SurfaceTextureListener {
+        implements TextureView.SurfaceTextureListener, BaseActivity.OnBackPressedListener {
 
     private static final int REQUEST_VIDEO_PREVIEW = 1;
 
@@ -403,4 +406,34 @@ public class Camera2CaptureVideoFragment extends Fragment
         mTextureView.setTransform(matrix);
     }
 
+    @Override
+    public boolean onBackPressed() {
+        DialogUtils.showConfirmDialog(getActivity(),
+                getString(R.string.dialog_give_up_record_video), null,
+                new DialogUtils.ButtonAction() {
+                    @Override
+                    public String getTitle() {
+                        return getString(R.string.ok_btn);
+                    }
+
+                    @Override
+                    public void onClick(DialogInterface dialog) {
+                        RxFile.delete(new File(mRecorderHelper.getSessionFileDir()), null);
+                        getActivity().finish();
+                    }
+                },
+                new DialogUtils.ButtonAction() {
+                    @Override
+                    public String getTitle() {
+                        return getString(R.string.cancel_btn);
+                    }
+
+                    @Override
+                    public void onClick(DialogInterface dialog) {
+                        getActivity().finish();
+                    }
+                });
+
+        return true;
+    }
 }
