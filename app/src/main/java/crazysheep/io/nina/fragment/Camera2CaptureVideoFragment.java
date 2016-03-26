@@ -1,8 +1,10 @@
 package crazysheep.io.nina.fragment;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -404,6 +406,20 @@ public class Camera2CaptureVideoFragment extends Fragment
         matrix.postScale(maxScale, maxScale, viewRectF.centerX(), viewRectF.centerY());
 
         mTextureView.setTransform(matrix);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_VIDEO_PREVIEW: {
+                    getActivity().setResult(Activity.RESULT_OK, data);
+                    getActivity().finish();
+                }break;
+            }
+        }
     }
 
     @Override

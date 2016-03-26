@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.twitter.Extractor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import crazysheep.io.nina.adapter.PreviewGalleryAdapter;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.fragment.VideoPreviewFragment;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DebugHelper;
@@ -46,13 +48,14 @@ import me.imid.swipebacklayout.lib.SwipeBackLayout;
  */
 public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatcher {
 
-    public static final int REQUEST_CHOOSE_IMAGE = 100;
+    public static final int REQUEST_CHOOSE_IMAGE_OR_CAPTURE_VIDEO = 100;
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.edit_tweet_et) EditText mTweetEt;
     @Bind(R.id.metioned_tips_tv) TextView mMetionedTipsTv;
     @Bind(R.id.send_tweet_btn) Button mSendBtn;
-    @Bind(R.id.image_preview_rv) RecyclerView mPreviewRv;
+    @Bind(R.id.image_preview_rv) RecyclerView mPhotoPreviewRv;
+    @Bind(R.id.video_preview_fl) View mVideoPreviewFl;
     private PreviewGalleryAdapter mPreviewAdapter;
 
     // if post a reply tweet
@@ -118,8 +121,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                 updateSendButton();
             }
         });
-        mPreviewRv.setLayoutManager(new GridLayoutManager(this, 4));
-        mPreviewRv.setAdapter(mPreviewAdapter);
+        mPhotoPreviewRv.setLayoutManager(new GridLayoutManager(this, 4));
+        mPhotoPreviewRv.setAdapter(mPreviewAdapter);
 
         getSwipeBackLayout().addSwipeListener(new SwipeBackLayout.SwipeListener() {
             @Override
@@ -153,11 +156,26 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
         if(resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                case REQUEST_CHOOSE_IMAGE: {
-                    // TODO return selected images, show preview
-                    mSelectedImages = data.getParcelableArrayListExtra(
-                            BundleConstants.EXTRA_SELECTED_IMAGES);
-                    mPreviewAdapter.setData(mSelectedImages);
+                case REQUEST_CHOOSE_IMAGE_OR_CAPTURE_VIDEO: {
+                    // return selected images or capture video, show preview
+                    if(Utils.size(data.getParcelableArrayListExtra(
+                            BundleConstants.EXTRA_SELECTED_IMAGES)) > 0) {
+                        mPhotoPreviewRv.setVisibility(View.VISIBLE);
+                        mSelectedImages = data.getParcelableArrayListExtra(
+                                BundleConstants.EXTRA_SELECTED_IMAGES);
+                        mPreviewAdapter.setData(mSelectedImages);
+                    } else if(!TextUtils.isEmpty(data.getStringExtra(
+                            BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE))) {
+                        String videoFilepath = data.getStringExtra(
+                                BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE);
+                        mVideoPreviewFl.setVisibility(View.VISIBLE);
+                        VideoPreviewFragment videoFt = new VideoPreviewFragment();
+                        videoFt.setVideo(new File(videoFilepath));
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.video_preview_fl, videoFt,
+                                        VideoPreviewFragment.class.getSimpleName())
+                                .commitAllowingStateLoss();
+                    }
 
                     updateSendButton();
                 }break;
@@ -192,7 +210,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     @OnClick(R.id.add_image_iv)
     protected void addImage() {
-        ActivityUtils.startResult(this, REQUEST_CHOOSE_IMAGE,
+        ActivityUtils.startResult(this, REQUEST_CHOOSE_IMAGE_OR_CAPTURE_VIDEO,
                 ActivityUtils.prepare(this, GalleryActivity.class)
                         .putParcelableArrayListExtra(BundleConstants.EXTRA_SELECTED_IMAGES,
                                 mSelectedImages)

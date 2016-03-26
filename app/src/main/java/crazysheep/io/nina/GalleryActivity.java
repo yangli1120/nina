@@ -253,7 +253,9 @@ public class GalleryActivity extends BaseSwipeBackActivity
                 }break;
 
                 case REQUEST_CAPTURE_VIDEO: {
-                    // TODO handle capture video
+                    // handle capture video
+                    setResult(Activity.RESULT_OK, data);
+                    finish();
                 }break;
             }
         }

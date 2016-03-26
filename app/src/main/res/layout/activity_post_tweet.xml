@@ -49,7 +49,14 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@id/image_preview_rv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+            <!-- video preview -->
+            <FrameLayout
+                android:id="@+id/video_preview_fl"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:visibility="gone"/>
         </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"

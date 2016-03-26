@@ -2,13 +2,11 @@ package crazysheep.io.nina;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import java.io.File;
 
@@ -16,6 +14,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.fragment.VideoPreviewFragment;
 import crazysheep.io.nina.io.RxFile;
 import crazysheep.io.nina.widget.TextureVideoView;
 
@@ -27,10 +26,9 @@ import crazysheep.io.nina.widget.TextureVideoView;
 public class RecordVideoPreviewActivity extends BaseActivity {
 
     @Bind(R.id.preview_fl) FrameLayout mPreviewFl;
-    @Bind(R.id.preview_tv) TextureVideoView mPreviewTvv;
-    @Bind(R.id.play_iv) ImageView mPlayIv;
 
     private String mVideoFile;
+    private VideoPreviewFragment mPreviewFt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,37 +46,23 @@ public class RecordVideoPreviewActivity extends BaseActivity {
                 mPreviewFl.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 ViewGroup.LayoutParams params = mPreviewFl.getLayoutParams();
-                params.height = mPreviewTvv.getMeasuredWidth();
+                params.height = mPreviewFl.getMeasuredWidth();
                 mPreviewFl.setLayoutParams(params);
             }
         });
 
-        // may be should need merge multi video files to one
-        mPreviewTvv.setScaleType(TextureVideoView.SCALE_TYPE_CENTER_CROP);
-        mPreviewTvv.setVideo(new File(mVideoFile));
-    }
-
-    @SuppressWarnings("unused")
-    @OnClick(R.id.play_iv)
-    protected void clickPlay() {
-        if(mPreviewTvv.isPlaying()) {
-            mPlayIv.setImageResource(R.drawable.ic_animated_pause_play);
-            if(mPlayIv.getDrawable() instanceof AnimatedVectorDrawable)
-                ((AnimatedVectorDrawable)mPlayIv.getDrawable()).start();
-            mPreviewTvv.pause();
-        } else {
-            mPlayIv.setImageResource(R.drawable.ic_animated_play_pause);
-            if(mPlayIv.getDrawable() instanceof AnimatedVectorDrawable)
-                ((AnimatedVectorDrawable)mPlayIv.getDrawable()).start();
-            mPreviewTvv.play();
-        }
+        mPreviewFt = new VideoPreviewFragment();
+        mPreviewFt.setVideo(new File(mVideoFile), TextureVideoView.SCALE_TYPE_CENTER_CROP);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.preview_fl, mPreviewFt, VideoPreviewFragment.class.getSimpleName())
+                .commitAllowingStateLoss();
     }
 
     @SuppressWarnings("unused")
     @OnClick(R.id.done_tv)
     protected void clickDone() {
         Intent data = new Intent();
-        data.putExtra(BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE, mPreviewTvv.getVideoFile());
+        data.putExtra(BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE, mVideoFile);
         setResult(Activity.RESULT_OK, data);
         finish();
     }

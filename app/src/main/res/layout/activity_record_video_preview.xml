@@ -2,29 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@android:color/black">
 
     <FrameLayout
         android:id="@+id/preview_fl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <crazysheep.io.nina.widget.TextureVideoView
-            android:id="@+id/preview_tv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ImageView
-            android:id="@+id/play_iv"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:scaleType="center"
-            android:clickable="true"
-            app:srcCompat="@drawable/ic_animated_play_pause"/>
-    </FrameLayout>
+        android:layout_height="wrap_content"/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
