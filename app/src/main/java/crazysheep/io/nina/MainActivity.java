@@ -81,40 +81,6 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(!Utils.isNull(mUserCall))
-            mUserCall.cancel();
-
-        mUserCall = mTwitter.getUserInfo(mUserPrefs.getUserScreenName());
-        mUserCall.enqueue(new NiceCallback<UserDto>(this) {
-            @Override
-            public void onRespond(Response<UserDto> response) {
-                if (!Utils.isNull(response.body())) {
-                    if (!response.body().name.equals(mUserPrefs.getUsername())) {
-                        mUserPrefs.setUsername(response.body().name);
-                        mUserNameTv.setText(response.body().name);
-                    }
-                    String profileImageUrl = response.body().originalProfileImageUrlHttps();
-                    if (!TextUtils.isEmpty(profileImageUrl)
-                            && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
-                        mUserPrefs.setUserAvatar(profileImageUrl);
-                        Glide.with(getActivity())
-                                .load(profileImageUrl)
-                                .into(mAvatarCiv);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailed(Throwable t) {
-                L.d(t.toString());
-            }
-        });
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -183,7 +149,41 @@ public class MainActivity extends BaseActivity
 
         ActionBarDrawerToggle abToggle = new ActionBarDrawerToggle(this, mDrawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.setDrawerListener(abToggle);
+        mDrawer.addDrawerListener(abToggle);
+        mDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // when user open drawer, request fresh user info
+                if(!Utils.isNull(mUserCall))
+                    mUserCall.cancel();
+
+                mUserCall = mTwitter.getUserInfo(mUserPrefs.getUserScreenName());
+                mUserCall.enqueue(new NiceCallback<UserDto>(getActivity()) {
+                    @Override
+                    public void onRespond(Response<UserDto> response) {
+                        if (!Utils.isNull(response.body())) {
+                            if (!response.body().name.equals(mUserPrefs.getUsername())) {
+                                mUserPrefs.setUsername(response.body().name);
+                                mUserNameTv.setText(response.body().name);
+                            }
+                            String profileImageUrl = response.body().originalProfileImageUrlHttps();
+                            if (!TextUtils.isEmpty(profileImageUrl)
+                                    && !profileImageUrl.equals(mUserPrefs.getUserAvatar())) {
+                                mUserPrefs.setUserAvatar(profileImageUrl);
+                                Glide.with(getActivity())
+                                        .load(profileImageUrl)
+                                        .into(mAvatarCiv);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                        L.d(t.toString());
+                    }
+                });
+            }
+        });
         abToggle.syncState();
     }
 

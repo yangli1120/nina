@@ -48,7 +48,7 @@ public abstract class NiceCallback<T> implements retrofit2.Callback<T> {
         if(checkIfActivityIsFinished())
             return;
 
-        if(response.code() == HttpConstants.CODE_200)
+        if(!HttpConstants.is2xx(response.code()))
             onRespond(response);
         else
             onFailed(new Throwable("request failed, status code: " + response.code()

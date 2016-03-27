@@ -88,24 +88,6 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
         init();
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-
-        for(int index = 0; index < getChildCount(); index++)
-            detachChild(index);
-
-        // ensure if no view in pool is used, release them
-        boolean needReleased = true;
-        for(boolean bool : mUsedMap)
-            if(bool)
-                needReleased = false;
-        if(needReleased) {
-            mUsedMap.clear();
-            mAllGalleryIvs.clear();
-        }
-    }
-
     private void init() {
         mPaint.setTextSize(InnerUtils.dp2Px(getContext(), 14));
         mPaint.setColor(Color.BLACK);
