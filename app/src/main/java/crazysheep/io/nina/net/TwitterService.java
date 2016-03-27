@@ -107,6 +107,25 @@ public interface TwitterService {
     Call<UploadMediaDto> uploadPhoto(@Url String uploadUrl,
                                      @Part("media\"; filename=\"image.jpg\" ")RequestBody body);
 
+    @POST
+    Call<UploadMediaDto> uploadVideoInit(
+            @Url String uploadUrl,
+            @Query("command") String command, @Query("media_type") String mediaType,
+            @Query("total_bytes") Long totalBytes);
+
+    @Multipart
+    @POST
+    Call<Object> uploadVideoAppend(
+            @Url String uploadUrl,
+            @Query("command") String command, @Query("media_id") Long mediaId,
+            @Query("segment_index") Integer segmentIndex,
+            @Part("media\"; filename=\"video.mp4\"") RequestBody body);
+
+    @POST
+    Call<UploadMediaDto> uploadVideoFinalize(
+            @Url String uploadUrl,
+            @Query("command") String command, @Query("media_id") Long mediaId);
+
     /////////////////////// friendship //////////////////////
 
     @POST("friendships/create.json")

@@ -48,6 +48,8 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     private int mVideoWidth;
     private int mVideoHeight;
 
+    private boolean autoStart = false;
+
     public TextureVideoView(Context context) {
         super(context);
         init();
@@ -77,7 +79,10 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     }
 
     @Override
-    public void onPrepared(MediaPlayer mp) {}
+    public void onPrepared(MediaPlayer mp) {
+        if(autoStart)
+            mp.start();
+    }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -142,10 +147,17 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     }
 
     public void setVideo(@NonNull File file) {
+        setVideo(file, false);
+    }
+
+    public void setVideo(@NonNull File file, boolean autoStart) {
         if(!file.isFile())
             throw new RuntimeException(
                     String.format("TextureVideoView.setVideo(), video file %s is invalid",
                             file.getAbsolutePath()));
+
+        this.autoStart = autoStart;
+
         try {
             mMediaMetadataRetriever.setDataSource(file.getAbsolutePath());
             String mimeType = mMediaMetadataRetriever.extractMetadata(
@@ -231,7 +243,7 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
         return null != mVideoFile ? mVideoFile.getAbsolutePath() : null;
     }
 
-    private void release() {
+    public void release() {
         if(null != mSurface)
             mSurface.release();
         if(null != mMediaPlayer) {

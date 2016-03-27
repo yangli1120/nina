@@ -92,6 +92,10 @@ public class VideoPreviewFragment extends Fragment {
         }
     }
 
+    public String getVideo() {
+        return Utils.isNull(videoFile) ? null : videoFile.getAbsolutePath();
+    }
+
     public void setVideo(@NonNull File video, int scaleType) {
         videoFile = video;
         this.scaleType = scaleType;

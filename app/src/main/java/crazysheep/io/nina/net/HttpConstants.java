@@ -15,10 +15,38 @@ public class HttpConstants {
     public static final String UPLOAD_MEDIA_URL = "https://upload.twitter.com/1.1/media/upload.json";
     // twitter allow image small than 3M can attach to a tweet
     public static final int MAX_UPLOAD_PHOTO_SIZE = 3 * 1024 * 1024; // 3M
+    public static final int MAX_UPLOAD_VIDEO_SIZE = 15 * 1024 * 1024; // 15M
+
+    public static final String UPLOAD_VIDEO_MEDIA_TYPE = "video/mp4";
+    public static final String UPLOAD_VIDEO_COMMAND_INIT = "INIT";
+    public static final String UPLOAD_VIDEO_COMMAND_APPEND = "APPEND";
+    public static final String UPLOAD_VIDEO_COMMAND_FINALIZE = "FINALIZE";
 
     ////////////////////// http status code ///////////////////////////////
 
     public static final int CODE_200 = 200; // every thing is OK
+    public static final int CODE_201 = 201; // Created
+    public static final int CODE_202 = 202; // Accepted
+    public static final int CODE_203 = 203; // Non-Authoritative Information
+    public static final int CODE_204 = 204; // No Content
+    public static final int CODE_205 = 205; // Reset Content
+    public static final int CODE_206 = 206; // Partial Content
+
+    public static boolean is2xx(int code) {
+        switch (code) {
+            case CODE_200:
+            case CODE_201:
+            case CODE_202:
+            case CODE_203:
+            case CODE_204:
+            case CODE_205:
+            case CODE_206:
+                return true;
+        }
+
+        return false;
+    }
+
     public static final int code_404 = 404; // Not Found
     public static final int code_403 = 403; // Forbidden
 

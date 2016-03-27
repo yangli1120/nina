@@ -67,6 +67,10 @@ public class TimelineHolderFactory {
                 return (T) new DraftImageHolder(itemRoot);
             }
 
+            case TYPE_DRAFT_VIDEO: {
+                return (T) new DraftVideoHolder(itemRoot);
+            }
+
             ////////////////// default /////////////////////
             default:
                 return (T) new TxtHolder(itemRoot);

@@ -58,6 +58,8 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @Bind(R.id.video_preview_fl) View mVideoPreviewFl;
     private PreviewGalleryAdapter mPreviewAdapter;
 
+    private VideoPreviewFragment mVideoPreviewFt;
+
     // if post a reply tweet
     private long replayStatusId;
     private Extractor mTweetExtractor;
@@ -160,19 +162,30 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                     // return selected images or capture video, show preview
                     if(Utils.size(data.getParcelableArrayListExtra(
                             BundleConstants.EXTRA_SELECTED_IMAGES)) > 0) {
+                        // clear view preview
+                        if(!Utils.isNull(mVideoPreviewFt))
+                            getSupportFragmentManager().beginTransaction()
+                                    .remove(mVideoPreviewFt)
+                                    .commitAllowingStateLoss();
+                        mVideoPreviewFl.setVisibility(View.GONE);
+
                         mPhotoPreviewRv.setVisibility(View.VISIBLE);
                         mSelectedImages = data.getParcelableArrayListExtra(
                                 BundleConstants.EXTRA_SELECTED_IMAGES);
                         mPreviewAdapter.setData(mSelectedImages);
                     } else if(!TextUtils.isEmpty(data.getStringExtra(
                             BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE))) {
+                        // clear selected images if have
+                        mSelectedImages = null;
+                        mPhotoPreviewRv.setVisibility(View.GONE);
+
                         String videoFilepath = data.getStringExtra(
                                 BundleConstants.EXTRA_VIDEO_RECORD_FINAL_FILE);
                         mVideoPreviewFl.setVisibility(View.VISIBLE);
-                        VideoPreviewFragment videoFt = new VideoPreviewFragment();
-                        videoFt.setVideo(new File(videoFilepath));
+                        mVideoPreviewFt = new VideoPreviewFragment();
+                        mVideoPreviewFt.setVideo(new File(videoFilepath));
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.video_preview_fl, videoFt,
+                                .replace(R.id.video_preview_fl, mVideoPreviewFt,
                                         VideoPreviewFragment.class.getSimpleName())
                                 .commitAllowingStateLoss();
                     }
@@ -226,18 +239,25 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     protected void postTweet() {
         // TODO post a tweet, txt, photo, or video
         PostTweetBean.Builder builder = new PostTweetBean.Builder();
-        if(!Utils.isNull(mSelectedImages)) {
+        // set selected photos if have
+        if(Utils.size(mSelectedImages) > 0) {
             List<String> photoFiles = new ArrayList<>(mSelectedImages.size());
             for(MediaStoreImageBean item : mSelectedImages)
                 photoFiles.add(item.filepath);
             builder.setPhotoFiles(photoFiles);
         }
+        // set tweet text
         if(!TextUtils.isEmpty(mTweetEt.getEditableText().toString()))
             builder.setStatus(mTweetEt.getEditableText().toString());
         if(replayStatusId > 0
                 && !TextUtils.isEmpty(mTweetExtractor.extractReplyScreenname(
                     mTweetEt.getEditableText().toString())))
             builder.setReplyStatusId(replayStatusId);
+        // set selected video file if have
+        DebugHelper.log("postTweet(), mVideoPreviewFt is null? " + Utils.isNull(mVideoPreviewFt)
+                + ", video path: " + mVideoPreviewFt.getVideo());
+        if(!Utils.isNull(mVideoPreviewFt))
+            builder.setVideoFile(mVideoPreviewFt.getVideo());
         PostTweetBean postTweet = builder.build();
         mBatmanService.postTweet(postTweet);
 
@@ -251,7 +271,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     private void updateSendButton() {
         mSendBtn.setEnabled(!TextUtils.isEmpty(mTweetEt.getEditableText().toString())
-                || Utils.size(mSelectedImages) > 0);
+                || Utils.size(mSelectedImages) > 0
+                || (!Utils.isNull(mVideoPreviewFt)
+                        && !TextUtils.isEmpty(mVideoPreviewFt.getVideo())));
     }
 
 }

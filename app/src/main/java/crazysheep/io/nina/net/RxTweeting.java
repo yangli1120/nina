@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.ByteArrayOutputStream;
@@ -79,6 +80,142 @@ public class RxTweeting {
     /////////////////////////////////////////////////////////////
 
     /**
+     * create Func1 for DO nothing
+     * */
+    private static Func1<PostTweetBean, PostTweetBean> createNothingFunc1() {
+        return new Func1<PostTweetBean, PostTweetBean>() {
+            @Override
+            public PostTweetBean call(PostTweetBean postTweetBean) {
+                return postTweetBean;
+            }
+        };
+    }
+
+    /**
+     * create Func1 for upload photo
+     * */
+    private static Func1<PostTweetBean, PostTweetBean> createUploadPhotoFunc1() {
+        return new Func1<PostTweetBean, PostTweetBean>() {
+            @Override
+            public PostTweetBean call(PostTweetBean postTweetBean) {
+                // upload photo file and set media ids to post tweet bean if need
+                String[] uploadParams;
+                int uploadedFileCount = -1;
+                while (!Utils.isNull(uploadParams = uploadParams(postTweetBean))) {
+                    uploadedFileCount++;
+                    DebugHelper.log(String.format(
+                            "============== %d start upload photo file %s ==================",
+                            uploadedFileCount, uploadParams[0]));
+
+                    try {
+                        Response<UploadMediaDto> response = HttpClient.getInstance()
+                                .getTwitterService()
+                                .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
+                                        uploadBody(postTweetBean))
+                                .execute();
+
+                        if(response.code() == HttpConstants.CODE_200
+                                && !Utils.isNull(response.body())) {
+                            // update post tweet bean media ids and remove uploaded file
+                            // from post tweet bean
+                            handleUploadResult(postTweetBean, response);
+                        } else {
+                            String err = "upload file \"" + uploadParams[0]
+                                    + "\" failed, response: " + printResponse(response);
+                            DebugHelper.log(err);
+                            throw Exceptions.propagate(new Throwable(err));
+                        }
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                        DebugHelper.log("upload file failed, error: " + ioe.toString());
+
+                        throw  Exceptions.propagate(ioe);
+                    }
+                }
+
+                return postTweetBean;
+            }
+        };
+    }
+
+    /**
+     * create Func1 for upload video
+     * */
+    private static Func1<PostTweetBean, PostTweetBean> createUploadVideoFunc1() {
+        return new Func1<PostTweetBean, PostTweetBean>() {
+            @Override
+            public PostTweetBean call(PostTweetBean postTweetBean) {
+                // upload video file
+                String[] uploadParams;
+                if(!Utils.isNull(uploadParams = uploadParams(postTweetBean))) {
+                    DebugHelper.log("============ start upload video %s ====================");
+
+                    try {
+                        // first step: init
+                        Response<UploadMediaDto> initResponse = HttpClient.getInstance()
+                                .getTwitterService()
+                                .uploadVideoInit(
+                                        HttpConstants.UPLOAD_MEDIA_URL,
+                                        HttpConstants.UPLOAD_VIDEO_COMMAND_INIT,
+                                        HttpConstants.UPLOAD_VIDEO_MEDIA_TYPE,
+                                        FileUtils.sizeOf(new File(uploadParams[0])))
+                                .execute();
+                        if(!HttpConstants.is2xx(initResponse.code()))
+                            throw Exceptions.propagate(new Throwable(
+                                    String.format("\nupload video init step failed, response: %s",
+                                            printResponse(initResponse))));
+
+                        DebugHelper.log(
+                                String.format("\nupload video init step success, response: %s",
+                                        printResponse(initResponse)));
+                        // second step, append(upload video file really)
+                        Response<Object> appendResponse = HttpClient.getInstance()
+                                .getTwitterService()
+                                .uploadVideoAppend(
+                                        HttpConstants.UPLOAD_MEDIA_URL,
+                                        HttpConstants.UPLOAD_VIDEO_COMMAND_APPEND,
+                                        initResponse.body().media_id,
+                                        0,
+                                        uploadBody(postTweetBean))
+                                .execute();
+                        if(!HttpConstants.is2xx(appendResponse.code()))
+                            throw Exceptions.propagate(new Throwable(
+                                    String.format("\nupload video append step failed: response: %s",
+                                            printResponse(appendResponse))));
+
+                        DebugHelper.log(
+                                String.format("\nupload video append step success, response: %s",
+                                        printResponse(appendResponse)));
+                        // final step, finalize
+                        Response<UploadMediaDto> finalResponse = HttpClient.getInstance()
+                                .getTwitterService()
+                                .uploadVideoFinalize(
+                                        HttpConstants.UPLOAD_MEDIA_URL,
+                                        HttpConstants.UPLOAD_VIDEO_COMMAND_FINALIZE,
+                                        initResponse.body().media_id)
+                                .execute();
+                        if(!HttpConstants.is2xx(finalResponse.code()))
+                            throw Exceptions.propagate(new Throwable(
+                                    String.format("\nupload video finalize step failed, response: %s",
+                                            printResponse(finalResponse))));
+
+                        DebugHelper.log(
+                                String.format("\nupload video finalize step success, response %s",
+                                        printResponse(finalResponse)));
+                        return handleUploadResult(postTweetBean, finalResponse);
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+
+                        throw Exceptions.propagate(ioe);
+                    }
+                }
+
+                return postTweetBean;
+            }
+        };
+    }
+
+    /**
      * post a tweet background
      *
      * @param postTweet The tweet to post
@@ -94,47 +231,8 @@ public class RxTweeting {
         return Observable.just(postTweet)
                 .subscribeOn(Schedulers.io())
                 // second step, check if post tweet have media file to upload to twitter sever
-                .map(new Func1<PostTweetBean, PostTweetBean>() {
-                    @Override
-                    public PostTweetBean call(PostTweetBean postTweetBean) {
-                        // TODO upload media file and set media ids to post tweet bean if need
-                        String[] uploadParams;
-                        int uploadedFileCount = -1;
-                        while (!Utils.isNull(uploadParams = uploadParams(postTweetBean))) {
-                            uploadedFileCount++;
-                            DebugHelper.log(String.format(
-                                    "============== %d start upload file %s ==================",
-                                    uploadedFileCount, uploadParams[0]));
-
-                            try {
-                                Response<UploadMediaDto> response = HttpClient.getInstance()
-                                        .getTwitterService()
-                                        .uploadPhoto(HttpConstants.UPLOAD_MEDIA_URL,
-                                                uploadBody(postTweetBean))
-                                        .execute();
-
-                                if(response.code() == HttpConstants.CODE_200
-                                        && !Utils.isNull(response.body())) {
-                                    // update post tweet bean media ids and remove uploaded file
-                                    // from post tweet bean
-                                    handleUploadResult(postTweetBean, response);
-                                } else {
-                                    String err = "upload file \"" + uploadParams[0]
-                                            + "\" failed, response: " + printResponse(response);
-                                    DebugHelper.log(err);
-                                    throw Exceptions.propagate(new Throwable(err));
-                                }
-                            } catch (IOException ioe) {
-                                ioe.printStackTrace();
-                                DebugHelper.log("upload file failed, error: " + ioe.toString());
-
-                                throw  Exceptions.propagate(ioe);
-                            }
-                        }
-
-                        return postTweetBean;
-                    }
-                })
+                .map(havePhotos(postTweet) ? createUploadPhotoFunc1()
+                        : (haveVideo(postTweet) ? createUploadVideoFunc1() : createNothingFunc1()))
                 // final step, every thing is ready, post tweet
                 .map(new Func1<PostTweetBean, TweetDto>() {
                     @Override
@@ -200,8 +298,8 @@ public class RxTweeting {
         if(havePhotos(postTweetBean)) {
             return new String[] {postTweetBean.getPhotoFiles().get(0), "application/octet-stream"};
         } else if(haveVideo(postTweetBean)) {
-            // TODO upload video
-            return null;
+            // upload video
+            return new String[] {postTweetBean.getVideoFile(), "multipart/form-data"};
         } else {
             return null; // no file to upload
         }
@@ -231,7 +329,16 @@ public class RxTweeting {
             }
         } else if(haveVideo(postTweetBean)) {
             // TODO create video request body
-            return null;
+            File videoFile = new File(uploadParams[0]);
+            if(!videoFile.exists())
+                throw Exceptions.propagate(new Throwable(
+                        String.format("video file\"%s\" not exist", videoFile.getAbsolutePath())));
+            else if (videoFile.length() > HttpConstants.MAX_UPLOAD_VIDEO_SIZE)
+                throw Exceptions.propagate(new Throwable(
+                        String.format("video file \"%s\" is large than 15M, cannot upload",
+                                videoFile.getAbsolutePath())));
+            else
+                return RequestBody.create(MediaType.parse(uploadParams[1]), videoFile);
         } else {
             throw new RuntimeException("RxTweeting.uploadBody(), create request body failed");
         }
