@@ -68,7 +68,7 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
     @Bind(R.id.tweet_content_tv) TextView contentTv;
     @Bind(R.id.draft_remove_iv) ImageView removeIv;
     @Bind(R.id.draft_posting_pb) ProgressBar postingPb;
-    @Bind(R.id.draft_tap_to_re_send_tv) TextView tabToReSendTv;
+    @Bind(R.id.draft_resend_iv) ImageView tabToReSendTv;
 
     protected PostTweetBean mPostTweetBean;
 
@@ -118,7 +118,7 @@ public abstract class DraftBaseHolder extends BaseHolder<PostTweetBean> implemen
                 showRemoveDraftDialog();
             }break;
 
-            case R.id.draft_tap_to_re_send_tv: {
+            case R.id.draft_resend_iv: {
                 // re-send this tweet draft
                 EventBus.getDefault().post(new EventReSendDraft(mPostTweetBean));
             }break;

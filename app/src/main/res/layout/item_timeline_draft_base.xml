@@ -58,6 +58,16 @@
                     android:textColor="?color_text_secondary"/>
             </LinearLayout>
             <ImageView
+                android:id="@id/draft_resend_iv"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@id/draft_remove_iv"
+                android:adjustViewBounds="true"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_resend_white_24dp"
+                android:visibility="gone"
+                android:background="@drawable/button_bg"/>
+            <ImageView
                 android:id="@id/draft_remove_iv"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"
@@ -76,30 +86,14 @@
         </RelativeLayout>
 
         <!-- tweet status text -->
-        <FrameLayout
+        <TextView
+            android:id="@id/tweet_content_tv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@id/tweet_content_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_14"
-                android:textColor="?color_text_primary"
-                android:paddingTop="@dimen/space_8"
-                android:paddingBottom="@dimen/space_8"/>
-
-            <TextView
-                android:id="@id/draft_tap_to_re_send_tv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#5599cdf5"
-                android:gravity="center"
-                android:padding="@dimen/space_10"
-                android:text="@string/tap_to_re_send"
-                android:textSize="@dimen/text_14"
-                android:textColor="@android:color/white"/>
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_14"
+            android:textColor="?color_text_primary"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"/>
 
         <!-- content -->
         <FrameLayout

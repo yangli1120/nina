@@ -254,8 +254,6 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                     mTweetEt.getEditableText().toString())))
             builder.setReplyStatusId(replayStatusId);
         // set selected video file if have
-        DebugHelper.log("postTweet(), mVideoPreviewFt is null? " + Utils.isNull(mVideoPreviewFt)
-                + ", video path: " + mVideoPreviewFt.getVideo());
         if(!Utils.isNull(mVideoPreviewFt))
             builder.setVideoFile(mVideoPreviewFt.getVideo());
         PostTweetBean postTweet = builder.build();
