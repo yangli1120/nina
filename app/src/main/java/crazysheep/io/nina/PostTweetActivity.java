@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -30,23 +32,28 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.GalleryActivity.Options;
 import crazysheep.io.nina.adapter.PreviewGalleryAdapter;
+import crazysheep.io.nina.bean.ConfigurationDto;
 import crazysheep.io.nina.bean.MediaStoreImageBean;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.VideoPreviewFragment;
+import crazysheep.io.nina.net.NiceCallback;
+import crazysheep.io.nina.prefs.TwitterConfigPrefs;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.ImeUtils;
 import crazysheep.io.nina.utils.Utils;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
+import retrofit2.Response;
 
 /**
  * create a tweet
  *
  * Created by crazysheep on 16/2/17.
  */
-public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatcher {
+public class PostTweetActivity extends BaseSwipeBackActivity
+        implements TextWatcher, BaseActivity.ITwitterServiceActivity {
 
     public static final int REQUEST_CHOOSE_IMAGE_OR_CAPTURE_VIDEO = 100;
 
@@ -56,9 +63,14 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     @Bind(R.id.send_tweet_btn) Button mSendBtn;
     @Bind(R.id.image_preview_rv) RecyclerView mPhotoPreviewRv;
     @Bind(R.id.video_preview_fl) View mVideoPreviewFl;
+    @Bind(R.id.tweet_words_count_tv) TextView mTextCountTv;
     private PreviewGalleryAdapter mPreviewAdapter;
 
     private VideoPreviewFragment mVideoPreviewFt;
+
+    private TwitterConfigPrefs mConfigPrefs;
+    private TypedValue typedValue = new TypedValue();
+    private List<String> findUrls;
 
     // if post a reply tweet
     private long replayStatusId;
@@ -93,6 +105,9 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
         metionedScreenNames = getIntent().getStringArrayListExtra(
                 BundleConstants.EXTRA_METIONED_NAMES);
         mTweetExtractor = new Extractor();
+        mConfigPrefs = new TwitterConfigPrefs(this);
+        if(!mConfigPrefs.isDataValid())
+            requestUrlConfig();
 
         setSupportActionBar(mToolbar);
         if(!Utils.isNull(getSupportActionBar())) {
@@ -218,7 +233,21 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
     public void afterTextChanged(Editable s) {
         mSendBtn.setEnabled(!TextUtils.isEmpty(s.toString()));
 
-        // TODO check if words length is too long that twitter forbid a tweet status length more than 140
+        updateSendButton();
+
+        // check if words length is too long that twitter forbid a tweet status length more than 140
+        String text = s.toString();
+        findUrls = mTweetExtractor.extractURLs(text);
+        if(Utils.size(findUrls) > 0)
+            for(String url : findUrls)
+                text = text.replace(url, "");
+        int textCount = 140 - text.length() - mConfigPrefs.getShortUrlLength()
+                * Utils.size(mTweetExtractor.extractURLs(s.toString()));
+        getTheme().resolveAttribute(R.attr.color_text_secondary, typedValue, true);
+        mTextCountTv.setTextColor(textCount >= 0
+                ? typedValue.data : Color.RED);
+        mTextCountTv.setText(String.valueOf(textCount));
+        mSendBtn.setEnabled(textCount >= 0);
     }
 
     @OnClick(R.id.add_image_iv)
@@ -237,7 +266,7 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
 
     @OnClick(R.id.send_tweet_btn)
     protected void postTweet() {
-        // TODO post a tweet, txt, photo, or video
+        // post a tweet, txt, photo, or video
         PostTweetBean.Builder builder = new PostTweetBean.Builder();
         // set selected photos if have
         if(Utils.size(mSelectedImages) > 0) {
@@ -272,6 +301,21 @@ public class PostTweetActivity extends BaseSwipeBackActivity implements TextWatc
                 || Utils.size(mSelectedImages) > 0
                 || (!Utils.isNull(mVideoPreviewFt)
                         && !TextUtils.isEmpty(mVideoPreviewFt.getVideo())));
+    }
+
+    private void requestUrlConfig() {
+        mTwitter.config()
+                .enqueue(new NiceCallback<ConfigurationDto>(this) {
+                    @Override
+                    public void onRespond(Response<ConfigurationDto> response) {
+                        mConfigPrefs.setShortUrlLength(response.body().short_url_length);
+                        mConfigPrefs.setShortUrlLengthHttps(response.body().short_url_length_https);
+                    }
+
+                    @Override
+                    public void onFailed(Throwable t) {
+                    }
+                });
     }
 
 }

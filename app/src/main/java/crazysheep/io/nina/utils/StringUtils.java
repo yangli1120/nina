@@ -1,6 +1,10 @@
 package crazysheep.io.nina.utils;
 
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,6 +36,21 @@ public class StringUtils {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+
+        return s;
+    }
+
+    /**
+     * set string spannable
+     * */
+    public static String span(String s, int color) {
+        if(!TextUtils.isEmpty(s)) {
+            SpannableString ss = new SpannableString(s);
+            ss.setSpan(new ForegroundColorSpan(color), 0, s.length(),
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            return ss.toString();
+        }
 
         return s;
     }

@@ -2,6 +2,7 @@ package crazysheep.io.nina.net;
 
 import java.util.List;
 
+import crazysheep.io.nina.bean.ConfigurationDto;
 import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
 import crazysheep.io.nina.bean.SearchResultDto;
@@ -154,5 +155,10 @@ public interface TwitterService {
 
     @GET("search/tweets.json")
     Call<SearchResultDto> search(@Query("q") String q);
+
+    ///////////////////// help //////////////////////////
+
+    @GET("help/configuration.json")
+    Call<ConfigurationDto> config();
 
 }

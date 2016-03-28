@@ -2,7 +2,13 @@ package crazysheep.io.nina.holder.timeline;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +28,16 @@ import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.bean.TweetDto;
+import crazysheep.io.nina.bean.TweetMediaDto;
+import crazysheep.io.nina.bean.UrlDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.TimeUtils;
+import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.TwitterLikeImageView;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Response;
@@ -153,7 +163,31 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                 TimeUtils.getTimeFromDate(mTweetDto.created_at.trim())));
 
         /* content layout should be render by sub-holder */
-        contentTv.setText(mTweetDto.text);
+        if(!TextUtils.isEmpty(mTweetDto.text) && !Utils.isNull(mTweetDto.entities)
+                && Utils.size(mTweetDto.entities.getUrls()) > 0) {
+            String text = mTweetDto.text;
+            if(!Utils.isNull(mTweetDto.entities.media))
+                for(TweetMediaDto mediaDto : mTweetDto.entities.getMedias())
+                    if(text.contains(mediaDto.url))
+                        text = text.replace(mediaDto.url, "");
+
+            for (UrlDto urlDto : mTweetDto.entities.getUrls())
+                text = text.replace(urlDto.url, urlDto.display_url);
+            SpannableString ss = new SpannableString(text);
+            int startIndex;
+            for(UrlDto urlDto : mTweetDto.entities.getUrls()) {
+                startIndex = text.indexOf(urlDto.display_url);
+                ss.setSpan(
+                        new ForegroundColorSpan(
+                                ContextCompat.getColor(mContext, R.color.url_highlight)),
+                                startIndex,
+                                startIndex + urlDto.display_url.length(),
+                                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
+            contentTv.setText(ss);
+        } else {
+            contentTv.setText(mTweetDto.text);
+        }
 
         /* bottom action bar */
         replyLl.setOnClickListener(new View.OnClickListener() {
