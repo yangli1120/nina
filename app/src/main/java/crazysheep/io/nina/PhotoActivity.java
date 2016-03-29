@@ -1,5 +1,6 @@
 package crazysheep.io.nina;
 
+import android.animation.ArgbEvaluator;
 import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -42,6 +43,8 @@ public class PhotoActivity extends BaseActivity {
     private String photoUrl;
     private int[] thumbnailSizes;
 
+    private ArgbEvaluator mArgbEvaluator = new ArgbEvaluator();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +68,9 @@ public class PhotoActivity extends BaseActivity {
             @Override
             public void onDrag(float elasticOffset, float elasticOffsetPixels,
                                float rawOffset, float rawOffsetPixels) {
+                rawOffset = rawOffset <= 0.3f ? 0f : rawOffset;
+                mDragDismissFl.setBackgroundColor((int)mArgbEvaluator.evaluate(
+                        rawOffset, Color.BLACK, Color.TRANSPARENT));
             }
 
             @Override

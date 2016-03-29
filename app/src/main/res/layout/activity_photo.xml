@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
     app:dragDismissDistance="112dp"
-    app:dragDismissScale="0.95">
+    app:dragDismissScale="0.75">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
