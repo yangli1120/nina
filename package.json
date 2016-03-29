@@ -19,6 +19,6 @@
   "homepage": "https://github.com/YoungLeeForeverBoy/nina#readme",
   "dependencies": {
     "react": "^0.14.7",
-    "react-native": "^0.22.2"
+    "react-native": "^0.23.0-rc1"
   }
 }

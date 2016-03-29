@@ -87,8 +87,8 @@ android {
 
 ext {
     supportLibVersion = "23.2.0"
-    retrofitVersion = "2.0.0-beta4"
-    leakcanaryVersion = "1.4-beta1"
+    retrofitVersion = "2.0.0"
+    leakcanaryVersion = "1.4-beta2"
     dagger2Version = "2.0.2"
 }
 
@@ -179,7 +179,7 @@ dependencies {
     // sliding up panel
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     // react native!
-    compile 'com.facebook.react:react-native:+'
+    compile 'com.facebook.react:react-native:0.20.+'
     // apache common io, google's guava is too large...
     compile "commons-io:commons-io:2.4"
     // merge mp4 file
