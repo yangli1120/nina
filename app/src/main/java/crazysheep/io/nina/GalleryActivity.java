@@ -164,7 +164,7 @@ public class GalleryActivity extends BaseSwipeBackActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(
-                    android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
+                    android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         }
         GridLayoutManager layoutMgr = new GridLayoutManager(this, 3);
         mGalleryRv.setLayoutManager(layoutMgr);

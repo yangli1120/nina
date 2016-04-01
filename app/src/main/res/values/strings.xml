@@ -53,7 +53,10 @@
     <string name="camera_record_next">next</string>
     <string name="camera_record_done">done</string>
     <string name="toast_not_recorded_video_file">have no recorded video file</string>
+    <string name="toast_record_video_duration_too_short">record video duration is too short</string>
+    <string name="btn_delete">delete</string>
     <string name="dialog_give_up_record_video">give up current record video?</string>
+    <string name="dialog_max_record_duration">record video max duration is %s</string>
 
     <!-- dialog -->
     <string name="ok_btn">OK</string>

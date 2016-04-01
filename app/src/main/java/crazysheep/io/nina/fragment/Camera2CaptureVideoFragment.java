@@ -25,15 +25,18 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
 
@@ -56,9 +59,11 @@ import crazysheep.io.nina.utils.Camera2Utils;
 import crazysheep.io.nina.utils.DebugHelper;
 import crazysheep.io.nina.utils.DialogUtils;
 import crazysheep.io.nina.utils.RxVideo;
+import crazysheep.io.nina.utils.SystemUIHelper;
 import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.utils.VideoRecorderHelper;
+import crazysheep.io.nina.widget.ExProgressBar;
 
 /**
  * use camera2 api capture video
@@ -70,11 +75,15 @@ public class Camera2CaptureVideoFragment extends Fragment
         implements TextureView.SurfaceTextureListener, BaseActivity.OnBackPressedListener {
 
     private static final int REQUEST_VIDEO_PREVIEW = 1;
+    private static int MAX_VIDEO_DURATION = 30; // 30s
+    private static int MIN_VIDEO_DURATION = 5; // 5s
 
     @Bind(R.id.video_auto_fit_tv) TextureView mTextureView;
     @Bind(R.id.action_ll) View mActionLl;
     @Bind(R.id.capture_btn) Button mCaptureBtn;
     @Bind(R.id.capture_done_btn) Button mCaptureDoneBtn;
+    @Bind(R.id.ex_pb) ExProgressBar mExPb;
+    @Bind(R.id.delete_tv) TextView mDeleteTv;
 
     private Size mVideoSize;
 
@@ -85,7 +94,6 @@ public class Camera2CaptureVideoFragment extends Fragment
     private HandlerThread mBackgroundHandlerThread;
     private Handler mBackgroundHandler;
 
-    private boolean isRecordingVideo = false;
     private VideoRecorderHelper mRecorderHelper;
 
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
@@ -153,6 +161,52 @@ public class Camera2CaptureVideoFragment extends Fragment
                 mTextureView.setLayoutParams(params);
             }
         });
+        // hack mActionFl
+        if(SystemUIHelper.hasNavBar(getResources())
+                && SystemUIHelper.isNavBarTranslucent(getResources()))
+            mActionLl.setPadding(mActionLl.getPaddingLeft(), mActionLl.getPaddingTop(),
+                    mActionLl.getPaddingRight(),
+                    mActionLl.getPaddingBottom() + SystemUIHelper.getNavBarSize(getResources()));
+
+        mCaptureBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (MotionEventCompat.getActionMasked(event)) {
+                    case MotionEvent.ACTION_DOWN: {
+                        if(mExPb.isReachMaxProgress())
+                            showMaxDurationDialog();
+                        else
+                           startRecord();
+                    }
+                    break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL: {
+                        stopRecord();
+                    }
+                    break;
+                }
+
+                return true;
+            }
+        });
+        // setup exprogressbar
+        mExPb.setMaxProgress(MAX_VIDEO_DURATION);
+        mExPb.setMinProgress(0);
+        mExPb.setWarningProgress(MIN_VIDEO_DURATION);
+        mExPb.setOnProgressListener(new ExProgressBar.OnProgressListener() {
+            @Override
+            public void onStart(int currentProgress) {
+            }
+
+            @Override
+            public void onEnd(int maxProgress) {
+                // reach max record duration
+                stopRecord();
+
+                showMaxDurationDialog();
+            }
+        });
 
         return contentView;
     }
@@ -198,28 +252,12 @@ public class Camera2CaptureVideoFragment extends Fragment
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.capture_btn)
-    protected void clickCapture() {
-        DebugHelper.toast(getActivity(), isRecordingVideo ? "stop" : "start");
-        isRecordingVideo = !isRecordingVideo;
-        mCaptureBtn.setBackgroundResource(isRecordingVideo
-                ? R.drawable.capture_button_pressed : R.drawable.video_record_btn);
-        mCaptureBtn.setText(getString(isRecordingVideo
-                ? R.string.camera_stop_record : R.string.camera_start_record));
-        mCaptureBtn.setTextColor(isRecordingVideo ? Color.RED : Color.WHITE);
-
-        if(isRecordingVideo) {
-            try {
-                mRecorderHelper.startRecording();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-
-                DebugHelper.log("start record video failed: " + Log.getStackTraceString(e));
-            }
-        } else {
-            mRecorderHelper.stopRecording();
-            startPreview(); // start preview again
-        }
+    @OnClick(R.id.delete_tv)
+    protected void clickDelete() {
+        if(!mExPb.isPrepareDelete())
+            mExPb.prepareDelete();
+        else
+            mExPb.delete();
     }
 
     @SuppressWarnings("unused, unchecked")
@@ -227,6 +265,11 @@ public class Camera2CaptureVideoFragment extends Fragment
     protected void clickNextStep() {
         if(Utils.size(mRecorderHelper.getRecordedFiles()) <= 0) {
             ToastUtils.t(getActivity(), getString(R.string.toast_not_recorded_video_file));
+
+            return;
+        }
+        if(mExPb.isInvalid()) {
+            ToastUtils.t(getActivity(), getString(R.string.toast_record_video_duration_too_short));
 
             return;
         }
@@ -452,4 +495,45 @@ public class Camera2CaptureVideoFragment extends Fragment
 
         return true;
     }
+
+    private void startRecord() {
+        try {
+            mRecorderHelper.startRecording();
+
+            mExPb.start();
+            mCaptureBtn.setBackgroundResource(R.drawable.capture_button_pressed);
+            mCaptureBtn.setText(getString(R.string.camera_stop_record));
+            mCaptureBtn.setTextColor(Color.RED);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+
+            ToastUtils.t(getActivity(), "start record failed");
+            DebugHelper.log("start record video failed: "
+                    + Log.getStackTraceString(e));
+        }
+    }
+
+    private void stopRecord() {
+        if(mRecorderHelper.isRecording()) {
+            mRecorderHelper.stopRecording();
+            startPreview(); // start preview again
+            mExPb.stop();
+            mCaptureBtn.setBackgroundResource(R.drawable.video_record_btn);
+            mCaptureBtn.setText(getString(R.string.camera_start_record));
+            mCaptureBtn.setTextColor(Color.WHITE);
+        }
+    }
+
+    private void showMaxDurationDialog() {
+        DialogUtils.showConfirmDialog(getActivity(),
+                getString(R.string.dialog_max_record_duration, MAX_VIDEO_DURATION), null,
+                new DialogUtils.SimpleButtonAction() {
+                    @Override
+                    public String getTitle() {
+                        return getString(R.string.ok_btn);
+                    }
+                },
+                null);
+    }
+
 }

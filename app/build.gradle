@@ -86,10 +86,11 @@ android {
 }
 
 ext {
-    supportLibVersion = "23.2.0"
+    supportLibVersion = "23.2.1"
     retrofitVersion = "2.0.0"
     leakcanaryVersion = "1.4-beta2"
     dagger2Version = "2.0.2"
+    rxbindingVersion = "0.4.0"
 }
 
 dependencies {
@@ -107,7 +108,6 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile "com.android.support:support-annotations:${supportLibVersion}"
     compile "com.android.support:support-v13:${supportLibVersion}"
-    compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:percent:${supportLibVersion}"
     // network layer: okhttp3 + retrofit2
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
@@ -117,6 +117,8 @@ dependencies {
     // rx java
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'io.reactivex:rxandroid:1.0.1'
+    // rx binding
+    compile "com.jakewharton.rxbinding:rxbinding:${rxbindingVersion}"
     // leakcanary
     debugCompile "com.squareup.leakcanary:leakcanary-android:${leakcanaryVersion}"
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}"
