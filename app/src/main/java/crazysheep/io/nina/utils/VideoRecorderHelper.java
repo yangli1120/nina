@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import crazysheep.io.nina.compat.APICompat;
+import crazysheep.io.nina.io.RxFile;
 import crazysheep.io.nina.prefs.UserPrefs;
 
 /**
@@ -240,6 +241,13 @@ public class VideoRecorderHelper {
         mMediaRecorder.reset();
         mVideoPartIndex++; // new to next video part file
         isRecording = false;
+    }
+
+    public void markDeleteLastPart() {
+        if(Utils.size(mRecordedFiles) > 1) {
+            File deleteFile = mRecordedFiles.remove(mRecordedFiles.size() - 2);
+            RxFile.delete(deleteFile, null);
+        }
     }
 
     public boolean isRecording() {

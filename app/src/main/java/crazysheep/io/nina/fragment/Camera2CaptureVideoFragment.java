@@ -2,6 +2,7 @@ package crazysheep.io.nina.fragment;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -95,6 +96,7 @@ public class Camera2CaptureVideoFragment extends Fragment
     private Handler mBackgroundHandler;
 
     private VideoRecorderHelper mRecorderHelper;
+    private Dialog mLoadingDlg;
 
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -254,10 +256,12 @@ public class Camera2CaptureVideoFragment extends Fragment
     @SuppressWarnings("unused")
     @OnClick(R.id.delete_tv)
     protected void clickDelete() {
-        if(!mExPb.isPrepareDelete())
+        if(!mExPb.isPrepareDelete()) {
             mExPb.prepareDelete();
-        else
+        } else {
             mExPb.delete();
+            mRecorderHelper.markDeleteLastPart();
+        }
     }
 
     @SuppressWarnings("unused, unchecked")
@@ -279,35 +283,42 @@ public class Camera2CaptureVideoFragment extends Fragment
 
         final String targetFilePath = new File(mRecorderHelper.getSessionFileDir(), "final.mp4")
                 .getAbsolutePath();
-        if(Utils.size(mRecorderHelper.getRecordedFilesPath()) > 1)
+        if(Utils.size(mRecorderHelper.getRecordedFilesPath()) > 1) {
+            mLoadingDlg = DialogUtils.showLoadingDialog(getActivity());
             RxVideo.merge(mRecorderHelper.getRecordedFilesPath(),
                     targetFilePath,
                     new RxVideo.Callback() {
                         @Override
                         public void onSuccess(List<String> sources, String targetFilePath) {
+                            DialogUtils.dismissDialog(mLoadingDlg);
                             startForResult(targetFilePath);
                         }
 
                         @Override
                         public void onFailed(String err) {
+                            DialogUtils.dismissDialog(mLoadingDlg);
                             DebugHelper.log(err);
                         }
                     });
-        else if(Utils.size(mRecorderHelper.getRecordedFilesPath()) == 1)
+        } else if(Utils.size(mRecorderHelper.getRecordedFilesPath()) == 1) {
+            mLoadingDlg = DialogUtils.showLoadingDialog(getActivity());
             RxFile.copy(mRecorderHelper.getRecordedFiles().get(0).getAbsolutePath(), targetFilePath,
                     new RxFile.Callback() {
                         @Override
                         public void onSuccess() {
+                            DialogUtils.dismissDialog(mLoadingDlg);
                             startForResult(targetFilePath);
                         }
 
                         @Override
                         public void onFailed(String err) {
+                            DialogUtils.dismissDialog(mLoadingDlg);
                             DebugHelper.log(err);
                         }
                     });
-        else
+        } else {
             ToastUtils.t(getActivity(), getString(R.string.toast_not_recorded_video_file));
+        }
     }
 
     private void startForResult(String targetFilePath) {
@@ -515,6 +526,14 @@ public class Camera2CaptureVideoFragment extends Fragment
 
     private void stopRecord() {
         if(mRecorderHelper.isRecording()) {
+            // camera api2 issue, see{@link https://github.com/googlesamples/android-Camera2Video/issues/2}
+            try {
+                // Abort all pending captures.
+                mPreviewSession.abortCaptures();
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+
             mRecorderHelper.stopRecording();
             startPreview(); // start preview again
             mExPb.stop();

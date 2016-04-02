@@ -78,6 +78,19 @@ public class DialogUtils {
     }
 
     /**
+     * show a loading dialog
+     * */
+    public static Dialog showLoadingDialog(@NonNull Activity activity) {
+        Dialog dialog = new MaterialDialog.Builder(activity)
+                .progress(true, 0)
+                .content("please waiting...")
+                .build();
+        showDialog(activity, dialog);
+
+        return dialog;
+    }
+
+    /**
      * show a item list dialog
      */
     public static Dialog showListDialog(@NonNull Activity activity, String title,
