@@ -6,9 +6,8 @@ import android.support.v4.app.Fragment;
 
 import java.util.List;
 
-import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.PermissionConstants;
-import crazysheep.io.nina.fragment.Camera2CaptureVideoFragment;
+import crazysheep.io.nina.fragment.CameraCaptureVideoFragment;
 import crazysheep.io.nina.utils.ToastUtils;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -64,12 +63,10 @@ public class CaptureVideoActivity extends BaseActivity {
     }
 
     private void initUI() {
-        if(APICompat.api21()) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_ft, new Camera2CaptureVideoFragment(),
-                            Camera2CaptureVideoFragment.class.getSimpleName())
-                    .commitAllowingStateLoss();
-        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_ft, new CameraCaptureVideoFragment(),
+                        CameraCaptureVideoFragment.class.getSimpleName())
+                .commitAllowingStateLoss();
     }
 
 }

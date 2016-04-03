@@ -2,6 +2,7 @@ package crazysheep.io.nina.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
 import android.util.SparseIntArray;
@@ -229,6 +230,12 @@ public class VideoRecorderHelper {
             mMediaRecorder.setOrientationHint(orientation);
         }
         mMediaRecorder.prepare();
+    }
+
+    public void prepareRecording(@NonNull Camera camera) throws IOException {
+        camera.unlock();
+        mMediaRecorder.setCamera(camera);
+        prepareRecording();
     }
 
     public void startRecording() throws IllegalStateException {

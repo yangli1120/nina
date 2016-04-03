@@ -44,4 +44,8 @@ public class APICompat {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
+    public static boolean api18() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
+
 }
