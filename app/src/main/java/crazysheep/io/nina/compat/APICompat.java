@@ -10,6 +10,11 @@ import android.os.Build;
 public class APICompat {
 
     /**
+     * api 23, equal {@link android.os.Build.VERSION_CODES.M}
+     * */
+    public static final int M = Build.VERSION_CODES.M;
+
+    /**
      * api 21, equal {@link android.os.Build.VERSION_CODES.LOLLIPOP}
      * */
     public static final int L = Build.VERSION_CODES.LOLLIPOP;
@@ -27,6 +32,17 @@ public class APICompat {
      * */
     public static boolean L() {
         return api21();
+    }
+
+    /**
+     * is current api beyond android Marshmallow
+     * */
+    public static boolean M() {
+        return api23();
+    }
+
+    public static boolean api23() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
     public static boolean api21() {

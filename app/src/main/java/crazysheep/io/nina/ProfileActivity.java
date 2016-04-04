@@ -1,23 +1,33 @@
 package crazysheep.io.nina;
 
+import android.annotation.TargetApi;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.TextViewCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.Bind;
@@ -26,6 +36,7 @@ import butterknife.OnClick;
 import crazysheep.io.nina.adapter.FragmentPagerBaseAdapter;
 import crazysheep.io.nina.adapter.ProfilePagerAdapter;
 import crazysheep.io.nina.bean.UserDto;
+import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.ProfileLikeFragment;
 import crazysheep.io.nina.fragment.ProfileMediaFragment;
@@ -74,6 +85,9 @@ public class ProfileActivity extends BaseSwipeBackActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // if api >= 23, I want have a light style status bar, so disable translucent status bar
+        if(APICompat.api23())
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
@@ -167,7 +181,25 @@ public class ProfileActivity extends BaseSwipeBackActivity
             Glide.clear(mHeaderIv);
             Glide.with(this)
                     .load(user.profile_background_image_url_https)
+                    .asBitmap()
                     .error(R.color.colorPrimary)
+                    .listener(new RequestListener<String, Bitmap>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<Bitmap> target,
+                                                   boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(
+                                Bitmap resource, String model, Target<Bitmap> target,
+                                boolean isFromMemoryCache, boolean isFirstResource) {
+                            if(APICompat.api23())
+                                colorizeStatusBar(resource);
+
+                            return false;
+                        }
+                    })
                     .into(mHeaderIv);
 
             mFab.setImageResource(user.following
@@ -191,6 +223,27 @@ public class ProfileActivity extends BaseSwipeBackActivity
                     getString(R.string.profile_following,
                             StringUtils.formatCount(user.friends_count)));
         }
+    }
+
+    @TargetApi(APICompat.M)
+    private void colorizeStatusBar(Bitmap bitmap) {
+        Palette.from(bitmap)
+                .generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        Palette.Swatch maxSwatch = Collections.max(palette.getSwatches(),
+                                new Comparator<Palette.Swatch>() {
+                                    @Override
+                                    public int compare(Palette.Swatch lhs, Palette.Swatch rhs) {
+                                        return lhs.getPopulation() - rhs.getPopulation();
+                                    }
+                                });
+                        if(ColorUtils.calculateContrast(Color.WHITE, maxSwatch.getRgb()) <= 5d)
+                            getWindow().getDecorView().setSystemUiVisibility(
+                                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                            | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    }
+                });
     }
 
     @SuppressWarnings("unused")
