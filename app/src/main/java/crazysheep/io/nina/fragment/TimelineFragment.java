@@ -153,7 +153,7 @@ public class TimelineFragment extends BaseNetworkFragment {
         mTimelineRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestFirstPage();
+                requestFirstPage(true);
             }
         });
         mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
@@ -203,18 +203,19 @@ public class TimelineFragment extends BaseNetworkFragment {
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean aBoolean) {
-                        requestFirstPage();
+                        requestFirstPage(false);
                     }
                 });
     }
 
     @SuppressWarnings("unchecked")
-    private void requestFirstPage() {
+    private void requestFirstPage(boolean force) {
         if(!Utils.isNull(mTimelineObser))
             mTimelineObser.unsubscribeOn(AndroidSchedulers.mainThread());
 
         mTimelineObser = mRxTwitter
-                .getHomeTimeline(HttpCache.CACHE_IF_HIT, null, PAGE_SIZE)
+                .getHomeTimeline(force ? HttpCache.CACHE_NETWORK : HttpCache.CACHE_IF_HIT, null,
+                        PAGE_SIZE)
                 .subscribeOn(Schedulers.io())
                 .map(new Func1<List<TweetDto>, List<ITweet>>() {
                     @Override
@@ -301,7 +302,7 @@ public class TimelineFragment extends BaseNetworkFragment {
     @Override
     protected void onErrorClick() {
         showLoading();
-        requestFirstPage();
+        requestFirstPage(false);
     }
 
     @Override
