@@ -16,7 +16,7 @@ buildscript {
         maven { url '$projectDir/../../../node_modules/react-native/android' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.0.0'
         // the latest version of the android-apt plugin
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 
@@ -53,6 +53,9 @@ android {
         // Gradle Plugin 1.5
         // disable limited support for vector drawables fro Android Studio 1.4
         generatedDensities = []
+
+        // espresso
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     // Gradle Plugin 1.5
@@ -171,7 +174,7 @@ dependencies {
     // java verbal expressions
     compile 'ru.lanwen.verbalregex:java-verbal-expressions:1.4'
     // chris banes' photoview
-    compile 'com.commit451:PhotoView:1.2.4'
+    compile 'com.commit451:PhotoView:1.2.5'
     // elasticdragdismisslayout, born from awesome "plaid"
     compile 'com.commit451:elasticdragdismisslayout:1.0.2'
     // circle reveal animation support api14+
