@@ -2,13 +2,11 @@ package crazysheep.io.nina.holder.timeline;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +25,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
+import crazysheep.io.nina.WebViewActivity;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.TweetMediaDto;
 import crazysheep.io.nina.bean.UrlDto;
@@ -35,10 +34,11 @@ import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
-import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.TimeUtils;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.TwitterLikeImageView;
+import crazysheep.io.nina.widget.text.LinkTouchMovementMethod;
+import crazysheep.io.nina.widget.text.TouchableSpan;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Response;
 
@@ -175,18 +175,31 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                 text = text.replace(urlDto.url, urlDto.display_url);
             SpannableString ss = new SpannableString(text);
             int startIndex;
-            for(UrlDto urlDto : mTweetDto.entities.getUrls()) {
+            for(final UrlDto urlDto : mTweetDto.entities.getUrls()) {
                 startIndex = text.indexOf(urlDto.display_url);
                 ss.setSpan(
-                        new ForegroundColorSpan(
-                                ContextCompat.getColor(mContext, R.color.url_highlight)),
-                                startIndex,
-                                startIndex + urlDto.display_url.length(),
-                                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        new TouchableSpan(
+                                ContextCompat.getColor(mContext, R.color.url_highlight),
+                                ContextCompat.getColor(mContext, R.color.url_highlight_pressed),
+                                ContextCompat.getColor(mContext, android.R.color.darker_gray)) {
+                            @Override
+                            public void onClick(View widget) {
+                                // use chrome if could, otherwise use local shit webview
+                                ActivityUtils.start(mContext,
+                                        ActivityUtils.prepare(mContext, WebViewActivity.class)
+                                                .putExtra(BundleConstants.EXTRA_OPEN_WEB_URL,
+                                                        urlDto.url));
+                            }
+                        },
+                        startIndex,
+                        startIndex + urlDto.display_url.length(),
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
             contentTv.setText(ss);
+            contentTv.setMovementMethod(LinkTouchMovementMethod.get());
         } else {
             contentTv.setText(mTweetDto.text);
+            contentTv.setMovementMethod(null);
         }
 
         /* bottom action bar */

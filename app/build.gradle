@@ -50,18 +50,8 @@ android {
 
         multiDexEnabled true
 
-        // Gradle Plugin 1.5
-        // disable limited support for vector drawables fro Android Studio 1.4
-        generatedDensities = []
-
         // espresso
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-
-    // Gradle Plugin 1.5
-    // disable limited support for vector drawables fro Android Studio 1.4
-    aaptOptions {
-        additionalParameters "--no-version-vectors"
     }
 
     packagingOptions {
@@ -89,7 +79,7 @@ android {
 }
 
 ext {
-    supportLibVersion = "23.2.1"
+    supportLibVersion = "23.3.0"
     retrofitVersion = "2.0.0"
     leakcanaryVersion = "1.4-beta2"
     dagger2Version = "2.0.2"
@@ -112,6 +102,7 @@ dependencies {
     compile "com.android.support:support-annotations:${supportLibVersion}"
     compile "com.android.support:support-v13:${supportLibVersion}"
     compile "com.android.support:percent:${supportLibVersion}"
+    compile "com.android.support:customtabs:${supportLibVersion}"
     // network layer: okhttp3 + retrofit2
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"

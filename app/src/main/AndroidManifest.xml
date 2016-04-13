@@ -30,6 +30,8 @@
             android:value="4f271d2cd1768bac3e7d396f967addc30efafb6c" />
         <!-- active android -->
         <meta-data android:name="AA_DB_NAME" android:value="christine.nina.db" />
+        <meta-data android:name="AA_MODELS"
+            android:value="crazysheep.io.nina.bean.PostTweetBean" />
         <meta-data android:name="AA_DB_VERSION" android:value="1" />
 
         <activity android:name=".SplashActivity"
@@ -67,6 +69,9 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
         <activity android:name=".RecordVideoPreviewActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.DayNight"/>
+        <activity android:name=".WebViewActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
 

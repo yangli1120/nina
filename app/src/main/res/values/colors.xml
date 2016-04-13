@@ -9,6 +9,7 @@
 
     <color name="divide_line">#c0c0c0</color>
     <color name="url_highlight">#2b7bb9</color>
+    <color name="url_highlight_pressed">#1d73b6</color>
     <!-- day theme color -->
     <color name="color_day_text_primary">#878787</color>
     <color name="color_day_text_secondary">#c0c0c0</color>

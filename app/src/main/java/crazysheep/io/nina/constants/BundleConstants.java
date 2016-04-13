@@ -20,5 +20,6 @@ public class BundleConstants {
     public static final String EXTRA_METIONED_NAMES = "extra_metioned_names";
     public static final String EXTRA_VIDEO_RECORD_FILE = "extra_video_record_file";
     public static final String EXTRA_VIDEO_RECORD_FINAL_FILE = "extra_video_record_final_file";
+    public static final String EXTRA_OPEN_WEB_URL = "extra_open_web_url";
 
 }
