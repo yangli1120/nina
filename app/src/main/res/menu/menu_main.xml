@@ -12,5 +12,10 @@
             android:title="go to react native world"
             app:showAsAction="always"
             android:icon="@drawable/ic_new_world_black_24dp" />
+        <item android:id="@+id/nav_scalpel_debug"
+            android:title="scalpel debug"
+            app:showAsAction="always"
+            android:icon="@drawable/ic_build_black_24dp"
+            app:actionLayout="@layout/nav_item_switch_theme"/>
     </group>
 </menu>

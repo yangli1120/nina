@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.jakewharton.scalpel.ScalpelFrameLayout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,7 +44,9 @@ public class MainActivity extends BaseActivity
 
     @Bind(R.id.drawer) DrawerLayout mDrawer;
     @Bind(R.id.nav_layout) NavigationView mNav;
+    @Bind(R.id.scalpel_fl) ScalpelFrameLayout mScalpelFl;
     private SwitchCompat mThemeSwitchBtn;
+    private SwitchCompat mScalpelSwitchBtn;
     private CircleImageView mAvatarCiv;
     private TextView mUserNameTv;
     private TextView mUserScreenNameTv;
@@ -115,6 +118,13 @@ public class MainActivity extends BaseActivity
             case R.id.nav_react_native: {
                 ActivityUtils.start(this, HelloReactNativeActivity.class);
             }break;
+
+            case R.id.nav_scalpel_debug: {
+                mScalpelSwitchBtn.setChecked(!mScalpelSwitchBtn.isChecked());
+                mScalpelFl.setLayerInteractionEnabled(mScalpelSwitchBtn.isChecked());
+                mScalpelFl.setDrawViews(mScalpelSwitchBtn.isChecked());
+                mScalpelFl.setDrawIds(mScalpelSwitchBtn.isChecked());
+            }break;
         }
         return true;
     }
@@ -129,6 +139,9 @@ public class MainActivity extends BaseActivity
         mThemeSwitchBtn = ButterKnife.findById(
                 mNav.getMenu().findItem(R.id.nav_night_theme).getActionView(), R.id.theme_switch);
         mThemeSwitchBtn.setChecked(mSettingPrefs.isNightTheme());
+        mScalpelSwitchBtn = ButterKnife.findById(
+                mNav.getMenu().findItem(R.id.nav_scalpel_debug).getActionView(), R.id.theme_switch);
+        mScalpelSwitchBtn.setChecked(false);
 
         mUserNameTv.setText(mUserPrefs.getUsername());
         mUserScreenNameTv.setText(getString(R.string.screen_name, mUserPrefs.getUserScreenName()));

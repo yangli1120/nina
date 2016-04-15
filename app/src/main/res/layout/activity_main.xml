@@ -8,7 +8,8 @@
     tools:context=".MainActivity"
     tools:openDrawer="start">
 
-    <FrameLayout
+    <com.jakewharton.scalpel.ScalpelFrameLayout
+        android:id="@+id/scalpel_fl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -16,7 +17,7 @@
             android:id="@+id/content_ft"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </FrameLayout>
+    </com.jakewharton.scalpel.ScalpelFrameLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_layout"

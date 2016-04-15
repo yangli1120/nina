@@ -5,7 +5,9 @@ import android.content.Context;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDelegate;
+import android.view.Gravity;
 
+import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
@@ -51,6 +53,14 @@ public class BaseApplication extends com.activeandroid.app.Application {
                 .applicationModule(new ApplicationModule(this))
                 .build();
         mAppComponent.inject(this);
+
+        // init TinyDancer
+        TinyDancer.create()
+                .redFlagPercentage(0.1f)
+                .startingGravity(Gravity.TOP | Gravity.RIGHT)
+                .startingXPosition(200)
+                .startingYPosition(600)
+                .show(this);
 
         // init logger
         Logger.init(TAG);
