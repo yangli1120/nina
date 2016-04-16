@@ -146,7 +146,10 @@ dependencies {
     // circle image view
     compile 'de.hdodenhof:circleimageview:2.0.0'
     // image loader
-    compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile ('com.github.bumptech.glide:okhttp3-integration:1.4.0'){
+        exclude group: 'glide-parent'
+    }
     compile 'com.github.florent37:glidepalette:1.0.6'
     // swipebacklayout
     compile 'me.imid.swipebacklayout.lib:library:1.0.0'
@@ -183,4 +186,6 @@ dependencies {
     // ui debug
     compile "com.jakewharton.scalpel:scalpel:1.1.2"
     debugCompile "com.github.brianPlummer:tinydancer:0.0.9"
+    // replace fucking ProgressBar
+    compile 'com.mikhaellopez:circularprogressbar:1.1.1'
 }

@@ -19,6 +19,7 @@ import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.NinaGlideModel;
 import crazysheep.io.nina.utils.StringUtils;
 import crazysheep.io.nina.utils.Utils;
 import okhttp3.CacheControl;
@@ -80,6 +81,8 @@ public class HttpClient {
                 .addInterceptor(mCacheControlInterceptor)
                 .addNetworkInterceptor(mCacheControlNetworkInterceptor)
                 .addNetworkInterceptor(mUrlEncodeInterceptor)
+                // listener request progress, see{@link NinaGlideModel}
+                .addNetworkInterceptor(new NinaGlideModel.ProgressInterceptor())
                 // use stetho debug network request
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();

@@ -13,11 +13,25 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <ImageView
-            android:id="@+id/image_iv"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:layout_gravity="center"/>
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/image_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"/>
+            <com.mikhaellopez.circularprogressbar.CircularProgressBar
+                android:id="@+id/photo_load_pb"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                app:cpb_background_progressbar_color="@android:color/transparent"
+                app:cpb_progressbar_width="3dp"
+                app:cpb_progressbar_color="@android:color/white"
+                android:visibility="gone"/>
+        </FrameLayout>
     </android.support.v4.widget.NestedScrollView>
 </com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout>

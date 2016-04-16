@@ -9,21 +9,24 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.transition.Transition;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout;
 import com.commit451.elasticdragdismisslayout.ElasticDragDismissListener;
+import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.utils.NinaGlideModel;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.SimpleTransitionListener;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -39,6 +42,7 @@ public class PhotoActivity extends BaseActivity {
 
     @Bind(R.id.drag_dismiss_layout) ElasticDragDismissFrameLayout mDragDismissFl;
     @Bind(R.id.image_iv) ImageView mPhotoIv;
+    @Bind(R.id.photo_load_pb) CircularProgressBar mLoadCpb;
 
     private String photoUrl;
     private int[] thumbnailSizes;
@@ -62,7 +66,7 @@ public class PhotoActivity extends BaseActivity {
             loadThumbnailImage();
             ViewCompat.setTransitionName(mPhotoIv, SHARED_ELEMENT_PHOTO);
         } else {
-            loadFullSizeImage();
+            loadFullSizeImageWithProgress();
         }
         mDragDismissFl.addListener(new ElasticDragDismissListener() {
             @Override
@@ -102,21 +106,52 @@ public class PhotoActivity extends BaseActivity {
         return false;
     }
 
-    private void loadFullSizeImage() {
+    private void loadFullSizeImageWithProgress() {
         Glide.with(this)
                 .load(photoUrl)
                 .dontAnimate()
                 .fitCenter()
-                .into(new SimpleTarget<GlideDrawable>() {
+                .into(new NinaGlideModel.ProgressTarget<String, GlideDrawable>(photoUrl,
+                        new GlideDrawableImageViewTarget(mPhotoIv)) {
+
                     @Override
-                    public void onResourceReady(
-                            GlideDrawable resource,
-                            GlideAnimation<? super GlideDrawable> glideAnimation) {
+                    protected void onDownloaded() {
+                    }
+
+                    @Override
+                    protected void onDelivered() {
+                        mLoadCpb.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    protected void onConnecting() {
+                        mLoadCpb.setVisibility(View.VISIBLE);
+                        mLoadCpb.setProgress(0);
+                    }
+
+                    @Override
+                    protected void onDownloading(long bytesRead, long expectedLength) {
+                        mLoadCpb.setProgress(Math.round(bytesRead * 100f / expectedLength));
+                    }
+
+                    @Override
+                    public void onResourceReady(GlideDrawable resource,
+                                                GlideAnimation<? super GlideDrawable> animation) {
+                        super.onResourceReady(resource, animation);
+
                         mPhotoIv.setImageDrawable(resource);
                         PhotoViewAttacher attacher = new PhotoViewAttacher(mPhotoIv);
                         attacher.update();
                     }
                 });
+    }
+
+    private void loadFullSizeImage() {
+        Glide.with(this)
+                .load(photoUrl)
+                .dontAnimate()
+                .fitCenter()
+                .into(mPhotoIv);
     }
 
     private void loadThumbnailImage() {
