@@ -17,6 +17,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.commit451.elasticdragdismisslayout.ElasticDragDismissFrameLayout;
 import com.commit451.elasticdragdismisslayout.ElasticDragDismissListener;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
@@ -151,7 +152,16 @@ public class PhotoActivity extends BaseActivity {
                 .load(photoUrl)
                 .dontAnimate()
                 .fitCenter()
-                .into(mPhotoIv);
+                .into(new SimpleTarget<GlideDrawable>() {
+                    @Override
+                    public void onResourceReady(
+                            GlideDrawable resource,
+                            GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        mPhotoIv.setImageDrawable(resource);
+                        PhotoViewAttacher attacher = new PhotoViewAttacher(mPhotoIv);
+                        attacher.update();
+                    }
+                });
     }
 
     private void loadThumbnailImage() {
