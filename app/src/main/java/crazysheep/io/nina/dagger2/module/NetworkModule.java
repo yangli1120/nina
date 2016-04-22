@@ -1,6 +1,7 @@
 package crazysheep.io.nina.dagger2.module;
 
-import crazysheep.io.nina.dagger2.scope.DaggerActivity;
+import javax.inject.Singleton;
+
 import crazysheep.io.nina.net.HttpClient;
 import dagger.Module;
 import dagger.Provides;
@@ -20,7 +21,7 @@ public class NetworkModule {
     }
 
     @Provides
-    @DaggerActivity
+    @Singleton
     public HttpClient provideHttpClient() {
         return mHttpClient;
     }

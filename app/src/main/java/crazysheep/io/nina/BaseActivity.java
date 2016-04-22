@@ -11,9 +11,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import crazysheep.io.nina.application.BaseApplication;
-import crazysheep.io.nina.dagger2.component.DaggerBaseComponent;
-import crazysheep.io.nina.dagger2.module.NetworkModule;
-import crazysheep.io.nina.dagger2.module.PrefsModule;
+import crazysheep.io.nina.dagger2.component.DaggerActivityComponent;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
@@ -48,7 +46,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     public static String TAG = BaseActivity.class.getSimpleName();
 
-    @Inject protected Lazy<SettingPrefs> mSettingPrefs;
+    @Inject protected SettingPrefs mSettingPrefs;
     @Inject protected Lazy<HttpClient> mHttpClient;
     protected TwitterService mTwitter;
     protected RxTwitterService mRxTwitter;
@@ -57,10 +55,8 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerBaseComponent.builder()
+        DaggerActivityComponent.builder()
                 .applicationComponent(BaseApplication.from(this).getComponent())
-                .prefsModule(new PrefsModule())
-                .networkModule(new NetworkModule())
                 .build()
                 .inject(this);
 
@@ -81,7 +77,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     protected final void switchTheme() {
-        getDelegate().setLocalNightMode(mSettingPrefs.get().isNightTheme() ?
+        getDelegate().setLocalNightMode(mSettingPrefs.isNightTheme() ?
                 AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
     }
 

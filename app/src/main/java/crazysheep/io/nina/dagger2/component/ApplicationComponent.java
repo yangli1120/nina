@@ -6,6 +6,11 @@ import javax.inject.Singleton;
 
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.dagger2.module.ApplicationModule;
+import crazysheep.io.nina.dagger2.module.NetworkModule;
+import crazysheep.io.nina.dagger2.module.PrefsModule;
+import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.prefs.SettingPrefs;
+import crazysheep.io.nina.prefs.UserPrefs;
 import dagger.Component;
 
 /**
@@ -14,11 +19,22 @@ import dagger.Component;
  * Created by crazysheep on 16/3/9.
  */
 @Singleton
-@Component(modules = {ApplicationModule.class})
+@Component(
+        modules = {
+                ApplicationModule.class, PrefsModule.class, NetworkModule.class
+        }
+)
 public interface ApplicationComponent {
 
-    void inject(BaseApplication baseApplication);
-
+    // ApplicationModule provide
     BaseApplication getContext();
     RefWatcher getRefWatcher();
+
+    // PrefsModule provide
+    UserPrefs getUserPrefs();
+    SettingPrefs getSettingPrefs();
+
+    // NetworkModule provide
+    HttpClient getHttpClient();
+
 }

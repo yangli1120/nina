@@ -8,8 +8,7 @@ import com.squareup.leakcanary.RefWatcher;
 import javax.inject.Inject;
 
 import crazysheep.io.nina.application.BaseApplication;
-import crazysheep.io.nina.dagger2.component.DaggerBaseComponent;
-import crazysheep.io.nina.dagger2.module.NetworkModule;
+import crazysheep.io.nina.dagger2.component.DaggerFragmentComponent;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.TwitterService;
 import dagger.Lazy;
@@ -42,9 +41,8 @@ public class BaseFragment extends Fragment {
 
         TAG = getClass().getSimpleName();
 
-        DaggerBaseComponent.builder()
+        DaggerFragmentComponent.builder()
                 .applicationComponent(BaseApplication.from(getActivity()).getComponent())
-                .networkModule(new NetworkModule())
                 .build()
                 .inject(this);
 

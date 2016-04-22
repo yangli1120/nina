@@ -11,16 +11,15 @@ import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
-import com.squareup.leakcanary.RefWatcher;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
-
-import javax.inject.Inject;
 
 import crazysheep.io.nina.BuildConfig;
 import crazysheep.io.nina.dagger2.component.ApplicationComponent;
 import crazysheep.io.nina.dagger2.component.DaggerApplicationComponent;
 import crazysheep.io.nina.dagger2.module.ApplicationModule;
+import crazysheep.io.nina.dagger2.module.NetworkModule;
+import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpConstants;
 import io.fabric.sdk.android.Fabric;
 
@@ -42,17 +41,19 @@ public class BaseApplication extends com.activeandroid.app.Application {
     public static final String TAG = "nina";
 
     private ApplicationComponent mAppComponent;
-    @Inject protected static BaseApplication mContext;
-    @Inject protected RefWatcher mRefWatcher;
+    protected static BaseApplication mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        mContext = this;
+
         mAppComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
+                .prefsModule(new PrefsModule(this))
+                .networkModule(new NetworkModule())
                 .build();
-        mAppComponent.inject(this);
 
         // init TinyDancer
         TinyDancer.create()

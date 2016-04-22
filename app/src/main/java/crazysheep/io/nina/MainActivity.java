@@ -21,13 +21,14 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jakewharton.scalpel.ScalpelFrameLayout;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
-import crazysheep.io.nina.prefs.SettingPrefs;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
@@ -63,8 +64,7 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    private UserPrefs mUserPrefs;
-    private SettingPrefs mSettingPrefs;
+    @Inject UserPrefs mUserPrefs;
 
     private Call<UserDto> mUserCall;
 
@@ -73,9 +73,6 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        mUserPrefs = new UserPrefs(this);
-        mSettingPrefs = new SettingPrefs(this);
 
         initUI();
 
