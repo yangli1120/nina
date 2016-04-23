@@ -23,6 +23,7 @@
 
     <!-- navigation view -->
     <string name="nav_switch_theme">night theme</string>
+    <string name="dialog_logout_title">Logout?</string>
 
     <!-- profile -->
     <string name="profile_title">profile</string>

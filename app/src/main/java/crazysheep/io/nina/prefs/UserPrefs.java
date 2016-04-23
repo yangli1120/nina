@@ -77,4 +77,8 @@ public class UserPrefs extends BasePrefs {
                 && !TextUtils.isEmpty(getUserScreenName()) && getId() > 0;
     }
 
+    public void logout() {
+        clear();
+    }
+
 }

@@ -186,6 +186,7 @@ dependencies {
     // ui debug
     compile "com.jakewharton.scalpel:scalpel:1.1.2"
     debugCompile "com.github.brianPlummer:tinydancer:0.0.9"
+    compile 'com.github.romainguy:ViewServer:master'
     // replace fucking ProgressBar
     compile 'com.mikhaellopez:circularprogressbar:1.1.1'
 }

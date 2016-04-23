@@ -56,12 +56,12 @@ public class BaseApplication extends com.activeandroid.app.Application {
                 .build();
 
         // init TinyDancer
-        TinyDancer.create()
+        /*TinyDancer.create()
                 .redFlagPercentage(0.1f)
                 .startingGravity(Gravity.TOP | Gravity.RIGHT)
                 .startingXPosition(200)
                 .startingYPosition(600)
-                .show(this);
+                .show(this);*/
 
         // init logger
         Logger.init(TAG);

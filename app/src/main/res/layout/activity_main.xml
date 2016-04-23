@@ -30,5 +30,5 @@
         app:itemBackground="?android:colorBackground"
         app:menu="@menu/menu_main"
         app:headerLayout="@layout/layout_nav_header" />
-
+        
 </android.support.v4.widget.DrawerLayout>

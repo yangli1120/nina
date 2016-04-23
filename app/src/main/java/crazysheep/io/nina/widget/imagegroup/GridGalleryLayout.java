@@ -2,7 +2,6 @@ package crazysheep.io.nina.widget.imagegroup;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
@@ -13,8 +12,6 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import crazysheep.io.nina.BuildConfig;
 
 /**
  * grid gallery widget for tweet timeline
@@ -82,6 +79,7 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @SuppressWarnings("unused")
     public GridGalleryLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
@@ -168,15 +166,6 @@ public class GridGalleryLayout extends ViewGroup implements View.OnClickListener
         // layout child
         for(int position = 0; position < getChildCount(); position++)
             layoutChild(position, 0, 0, r - l, b - t);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        // for debug
-        if(BuildConfig.DEBUG)
-            canvas.drawText("child count: " + getChildCount(), 50, 50, mPaint);
     }
 
     private void layoutChild(int position, int l, int t, int r, int b) {

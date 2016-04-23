@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.android.debug.hv.ViewServer;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -72,6 +74,22 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
             mTwitter = mHttpClient.get().getTwitterService();
             mRxTwitter = mHttpClient.get().getRxTwitterService();
         }
+
+        ViewServer.get(this).addWindow(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ViewServer.get(this).setFocusedWindow(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        ViewServer.get(this).removeWindow(this);
     }
 
     protected final Activity getActivity() {

@@ -2,6 +2,7 @@ package crazysheep.io.nina;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +31,7 @@ import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.DialogUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
@@ -48,6 +51,7 @@ public class MainActivity extends BaseActivity
     private CircleImageView mAvatarCiv;
     private TextView mUserNameTv;
     private TextView mUserScreenNameTv;
+    private ImageView mLogoutIv;
 
     private BatmanService mService;
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -126,6 +130,8 @@ public class MainActivity extends BaseActivity
         //see{@link https://code.google.com/p/android/issues/detail?id=190226}
         mUserNameTv = ButterKnife.findById(mNav.getHeaderView(0), R.id.user_name_tv);
         mUserScreenNameTv = ButterKnife.findById(mNav.getHeaderView(0), R.id.user_screen_name_tv);
+        mLogoutIv = ButterKnife.findById(mNav.getHeaderView(0), R.id.logout_iv);
+        mLogoutIv.setOnClickListener(this);
         mAvatarCiv = ButterKnife.findById(mNav.getHeaderView(0), R.id.avatar_iv);
         mAvatarCiv.setOnClickListener(this);
         mThemeSwitchBtn = ButterKnife.findById(
@@ -208,6 +214,31 @@ public class MainActivity extends BaseActivity
                                                 mUserPrefs.getUsername()));
                     }
                 });
+            }break;
+
+            case R.id.logout_iv: {
+                DialogUtils.showConfirmDialog(this, getString(R.string.dialog_logout_title), null,
+                        new DialogUtils.ButtonAction() {
+                            @Override
+                            public String getTitle() {
+                                return getString(R.string.ok_btn);
+                            }
+
+                            @Override
+                            public void onClick(DialogInterface dialog) {
+                                // logout
+                                mUserPrefs.logout();
+
+                                ActivityUtils.start(getActivity(), SplashActivity.class);
+                                finish();
+                            }
+                        },
+                        new DialogUtils.SimpleButtonAction() {
+                            @Override
+                            public String getTitle() {
+                                return getString(R.string.cancel_btn);
+                            }
+                        });
             }break;
         }
     }
