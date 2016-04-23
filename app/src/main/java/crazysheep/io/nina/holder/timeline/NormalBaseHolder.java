@@ -21,15 +21,19 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.WebViewActivity;
+import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.bean.TweetMediaDto;
 import crazysheep.io.nina.bean.UrlDto;
 import crazysheep.io.nina.constants.BundleConstants;
+import crazysheep.io.nina.dagger2.component.DaggerViewHolderComponent;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.prefs.UserPrefs;
@@ -109,13 +113,13 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
     @Bind(R.id.action_retweet_iv) ImageView retweetIv;
     @Bind(R.id.action_retweet_count_tv) TextView retweetCountTv;
     @Bind(R.id.action_like_ll) View likeLl;
-    @Bind(R.id.action_like_iv)
-    TwitterLikeImageView likeIv;
+    @Bind(R.id.action_like_iv) TwitterLikeImageView likeIv;
     @Bind(R.id.action_like_count_tv) TextView likeCountTv;
 
     protected Context mContext;
     protected TweetDto mTweetDto;
-    protected UserPrefs mUserPrefs;
+    @Inject UserPrefs mUserPrefs;
+    @Inject HttpClient mHttpClient;
 
     public NormalBaseHolder(@NonNull ViewGroup parent) {
         super(parent);
@@ -127,7 +131,11 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         contentFl.addView(contentView, params);
 
         mContext = parent.getContext();
-        mUserPrefs = new UserPrefs(mContext);
+
+        DaggerViewHolderComponent.builder()
+                .applicationComponent(BaseApplication.from(mContext).getComponent())
+                .build()
+                .inject(this);
     }
 
     public abstract int getContentViewRes();
@@ -237,13 +245,11 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                 @Override
                 public void onClick(View v) {
                     if (!mTweetDto.retweeted)
-                        HttpClient.getInstance()
-                                .getTwitterService()
+                        mHttpClient.getTwitterService()
                                 .retweet(mTweetDto.id)
                                 .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
                     else
-                        HttpClient.getInstance()
-                                .getTwitterService()
+                        mHttpClient.getTwitterService()
                                 .unretweet(mTweetDto.id)
                                 .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
 
@@ -260,8 +266,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
             @Override
             public void onClick(View v) {
                 if(mTweetDto.favorited) {
-                    HttpClient.getInstance()
-                            .getTwitterService()
+                    mHttpClient.getTwitterService()
                             .like(mTweetDto.id)
                             .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                                 @Override
@@ -276,8 +281,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                             });
                     likeIv.unlike();
                 } else {
-                    HttpClient.getInstance()
-                            .getTwitterService()
+                    mHttpClient.getTwitterService()
                             .unlike(mTweetDto.id)
                             .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                                 @Override

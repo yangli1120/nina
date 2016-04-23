@@ -1,10 +1,11 @@
 package crazysheep.io.nina.dagger2.component;
 
+import android.content.Context;
+
 import com.squareup.leakcanary.RefWatcher;
 
 import javax.inject.Singleton;
 
-import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.dagger2.module.ApplicationModule;
 import crazysheep.io.nina.dagger2.module.NetworkModule;
 import crazysheep.io.nina.dagger2.module.PrefsModule;
@@ -27,7 +28,7 @@ import dagger.Component;
 public interface ApplicationComponent {
 
     // ApplicationModule provide
-    BaseApplication getContext();
+    Context getContext();
     RefWatcher getRefWatcher();
 
     // PrefsModule provide

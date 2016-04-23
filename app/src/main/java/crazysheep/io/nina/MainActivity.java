@@ -21,15 +21,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.jakewharton.scalpel.ScalpelFrameLayout;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.bean.UserDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
-import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
@@ -63,8 +60,6 @@ public class MainActivity extends BaseActivity
         public void onServiceDisconnected(ComponentName name) {
         }
     };
-
-    @Inject UserPrefs mUserPrefs;
 
     private Call<UserDto> mUserCall;
 

@@ -16,6 +16,7 @@ import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.prefs.SettingPrefs;
+import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.Utils;
 import dagger.Lazy;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -46,6 +47,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     public static String TAG = BaseActivity.class.getSimpleName();
 
+    @Inject protected UserPrefs mUserPrefs;
     @Inject protected SettingPrefs mSettingPrefs;
     @Inject protected Lazy<HttpClient> mHttpClient;
     protected TwitterService mTwitter;

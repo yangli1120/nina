@@ -41,8 +41,8 @@ public abstract class BaseNetworkFragment extends BaseFragment implements View.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTwitter = HttpClient.getInstance().getTwitterService();
-        mRxTwitter = HttpClient.getInstance().getRxTwitterService();
+        mTwitter = mHttpClient.get().getTwitterService();
+        mRxTwitter = mHttpClient.get().getRxTwitterService();
     }
 
     @Nullable

@@ -52,7 +52,7 @@ public class BaseApplication extends com.activeandroid.app.Application {
         mAppComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .prefsModule(new PrefsModule(this))
-                .networkModule(new NetworkModule())
+                .networkModule(new NetworkModule(this))
                 .build();
 
         // init TinyDancer

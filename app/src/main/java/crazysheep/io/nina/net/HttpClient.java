@@ -43,15 +43,19 @@ public class HttpClient {
 
     private static HttpClient mHttpClient;
 
-    public static HttpClient getInstance() {
+    public static HttpClient getInstance(@NonNull Context context) {
         if(Utils.isNull(mHttpClient))
             synchronized (HttpClient.class) {
                 if (Utils.isNull(mHttpClient)) {
-                    mHttpClient = new HttpClient();
+                    mHttpClient = new HttpClient(context);
                 }
             }
 
         return mHttpClient;
+    }
+
+    public static HttpClient getInstance() {
+        return getInstance(BaseApplication.getAppContext());
     }
 
     /////////////////////////////////////////////////////////////
@@ -61,15 +65,15 @@ public class HttpClient {
     private TwitterService mTwitterService;
     private RxTwitterService mRxTwitterService;
 
-    private HttpClient() {
-        UserPrefs userPrefs = new UserPrefs(BaseApplication.getAppContext());
+    private HttpClient(@NonNull Context context) {
+        UserPrefs userPrefs = new UserPrefs(context.getApplicationContext());
         OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(
                 HttpConstants.NINA_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_SECRET);
         consumer.setTokenWithSecret(userPrefs.getAuthToken(), userPrefs.getSecret());
 
         mOkHttpClient = new OkHttpClient.Builder()
                 // ssl socket factory for twitter
-                .sslSocketFactory(getSSLSocketFactory(BaseApplication.getAppContext()))
+                .sslSocketFactory(getSSLSocketFactory(context.getApplicationContext()))
                 // config timeout
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
