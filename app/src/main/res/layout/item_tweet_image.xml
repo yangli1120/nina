@@ -2,5 +2,4 @@
 <crazysheep.io.nina.widget.imagegroup.GridGalleryLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@id/tweet_gallery_ggl"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/place_holder_bg"/>
+    android:layout_height="wrap_content" />

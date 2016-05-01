@@ -76,6 +76,7 @@ public class ImageHolder extends NormalBaseHolder implements GridGalleryLayout.O
         // in timeline, photo should use small size to save memory, make timeline smooth
         Glide.with(mContext)
                 .load(mediaDto.media_url_https)
+                .placeholder(R.color.place_holder_bg)
                 .override(mediaDto.sizes.medium.w, mediaDto.sizes.medium.h)
                 .centerCrop()
                 .into(view);

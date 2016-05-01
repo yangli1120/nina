@@ -9,12 +9,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,6 +34,7 @@ import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DialogUtils;
+import crazysheep.io.nina.utils.DrawableUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
 import crazysheep.io.nina.utils.Utils;
@@ -153,6 +156,23 @@ public class MainActivity extends BaseActivity
                 .commitAllowingStateLoss();
 
         mNav.setNavigationItemSelectedListener(this);
+
+        // tint root layout background refer to current theme
+        if(mSettingPrefs.isNightTheme()) {
+            // if is night theme, tint drawer background with colorPrimary,
+            // timeline UI will have overdraw 1x
+            int bgColor;
+            TypedValue typedValue = new TypedValue();
+            getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            bgColor = typedValue.data;
+
+            mDrawer.setBackground(DrawableUtils.tint(
+                    ContextCompat.getDrawable(this, R.drawable.tint_bg), bgColor));
+        } else {
+            // if is day theme, set null drawable background, so that timeline UI have no overdraw,
+            // the best performance
+            mDrawer.setBackground(null);
+        }
     }
 
     public void setToolbar(@NonNull Toolbar toolbar) {

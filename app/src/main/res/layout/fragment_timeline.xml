@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:theme="@style/AppTheme.DayNight"
-    android:background="?android:colorBackground"
     tools:context=".MainActivity">
 
     <android.support.design.widget.AppBarLayout
