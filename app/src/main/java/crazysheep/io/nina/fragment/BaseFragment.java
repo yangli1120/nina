@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.dagger2.component.DaggerFragmentComponent;
 import crazysheep.io.nina.net.HttpClient;
+import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import dagger.Lazy;
 
@@ -34,6 +35,7 @@ public class BaseFragment extends Fragment {
     @Inject protected Lazy<HttpClient> mHttpClient;
     @Inject protected RefWatcher mRefWatcher;
     protected TwitterService mTwitter;
+    protected RxTwitterService mRxTwitter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,8 +48,10 @@ public class BaseFragment extends Fragment {
                 .build()
                 .inject(this);
 
-        if(this instanceof INetworkFragment)
+        if(this instanceof INetworkFragment) {
             mTwitter = mHttpClient.get().getTwitterService();
+            mRxTwitter = mHttpClient.get().getRxTwitterService();
+        }
     }
 
     @Override

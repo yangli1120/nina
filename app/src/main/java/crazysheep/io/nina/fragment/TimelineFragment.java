@@ -20,6 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.activeandroid.Model;
 import com.activeandroid.query.Select;
@@ -67,7 +69,7 @@ import rx.schedulers.Schedulers;
  *
  * Created by crazysheep on 16/1/22.
  */
-public class TimelineFragment extends BaseNetworkFragment {
+public class TimelineFragment extends BaseFragment {
 
     private static final int REQUEST_POST_TWEET = 111;
 
@@ -77,6 +79,9 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
     @Bind(R.id.data_rv) SwipeRecyclerView mTimelineRv;
+    @Bind(R.id.loading_pb) ProgressBar mLoadingPb;
+    @Bind(R.id.error_layout) View mErrorLayout;
+    @Bind(R.id.error_msg_tv) TextView mErrorMsgTv;
 
     private TimelineAdapter mAdapter;
 
@@ -97,7 +102,8 @@ public class TimelineFragment extends BaseNetworkFragment {
 
     @Nullable
     @Override
-    protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_timeline, container, false);
         ButterKnife.bind(this, contentView);
 
@@ -115,6 +121,8 @@ public class TimelineFragment extends BaseNetworkFragment {
         EventBus.getDefault().register(this);
         getActivity().bindService(new Intent(getActivity(), BatmanService.class), mConnection,
                 Context.BIND_AUTO_CREATE);
+
+        mRxTwitter = mHttpClient.get().getRxTwitterService();
     }
 
     @Override
@@ -300,12 +308,6 @@ public class TimelineFragment extends BaseNetworkFragment {
     }
 
     @Override
-    protected void onErrorClick() {
-        showLoading();
-        requestFirstPage(false);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -384,6 +386,29 @@ public class TimelineFragment extends BaseNetworkFragment {
                         .putStringArrayListExtra(BundleConstants.EXTRA_METIONED_NAMES,
                                 event.getMetionedNames())
                         .putExtra(BundleConstants.EXTRA_REPLY_STATUS_ID, event.getReplyStatusId()));
+    }
+
+    /////////////////////////// network state /////////////////////////
+
+    private void showLoading() {
+        mLoadingPb.setVisibility(View.VISIBLE);
+        mErrorLayout.setVisibility(View.GONE);
+    }
+
+    private void hideLoading() {
+        mLoadingPb.setVisibility(View.GONE);
+    }
+
+    private void showError() {
+        mLoadingPb.setVisibility(View.GONE);
+        mErrorLayout.setVisibility(View.VISIBLE);
+    }
+
+    @SuppressWarnings("unused")
+    @OnClick(R.id.error_layout)
+    protected void clickError() {
+        showLoading();
+        requestFirstPage(true);
     }
 
 }

@@ -61,10 +61,5 @@
     <item name="action_like_ll" type="id" />
     <item name="action_like_iv" type="id" />
     <item name="action_like_count_tv" type="id" />
-    <item name="_base_network_ft_content_fl" type="id" />
-    <item name="_base_network_ft_error_msg_tv" type="id" />
-    <item name="_base_network_ft_loading_fl" type="id" />
-    <item name="_base_network_ft_loading_msg_tv" type="id" />
-    <item name="_base_network_ft_error_stub" type="id" />
 
 </resources>
