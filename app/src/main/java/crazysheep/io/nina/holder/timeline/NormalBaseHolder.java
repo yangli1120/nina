@@ -27,6 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
+import crazysheep.io.nina.TweetDetailActivity;
 import crazysheep.io.nina.WebViewActivity;
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.TweetDto;
@@ -100,6 +101,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
 
     ///////////////////////////////////////////////////////
 
+    @Bind(R.id.holder_root) View rootView;
     @Bind(R.id.author_avatar_iv) CircleImageView avatarIv;
     @Bind(R.id.retweet_author_tv) TextView retweetAuthorTv;
     @Bind(R.id.author_name_tv) TextView authorNameTv;
@@ -123,6 +125,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
 
     public NormalBaseHolder(@NonNull ViewGroup parent) {
         super(parent);
+
         View contentView = LayoutInflater.from(parent.getContext())
                 .inflate(getContentViewRes(), parent, false);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
@@ -144,6 +147,8 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
      * base holder implement common ui, sub-holder implement itself ui
      * */
     public void bindData(int position, @NonNull final TweetDto tweetDto) {
+        rootView.setOnClickListener(this);
+
         mTweetDto = tweetDto.isRetweeted() ? tweetDto.retweeted_status : tweetDto;
 
         /* top header */
@@ -321,6 +326,13 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
                                 .putExtra(BundleConstants.EXTRA_USER_SCREEN_NAME,
                                         mTweetDto.user.screen_name)
                                 .putExtra(BundleConstants.EXTRA_USER_NAME, mTweetDto.user.name));
+            }break;
+
+            case R.id.holder_root: {
+                // tweet detail
+                ActivityUtils.start(mContext,
+                        ActivityUtils.prepare(mContext, TweetDetailActivity.class)
+                                .putExtra(BundleConstants.EXTRA_TWEET, mTweetDto));
             }break;
         }
     }

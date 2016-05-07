@@ -74,6 +74,9 @@
         <activity android:name=".WebViewActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
+        <activity android:name=".TweetDetailActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.DayNight"/>
 
         <service android:name=".service.BatmanService" android:exported="false" />
     </application>
