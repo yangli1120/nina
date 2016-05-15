@@ -132,7 +132,7 @@ public class TweetRenderHelper {
      * render tweet bottom bar
      * */
     public static void renderBottomBar(
-            @NonNull final Activity mContext, @NonNull final HttpClient mHttpClient,
+            @NonNull final Activity context, @NonNull final HttpClient httpClient,
             @NonNull boolean isMyOwnTweet, @NonNull final TweetDto tweetDto,
             @NonNull View replyLl, @NonNull View retweetLl, @NonNull final ImageView retweetIv,
             @NonNull TextView retweetCountTv,
@@ -140,26 +140,23 @@ public class TweetRenderHelper {
             @NonNull final TwitterLikeImageView likeIv) {
         final TweetDto mTweetDto = tweetDto.isRetweeted() ? tweetDto.retweeted_status : tweetDto;
 
-        replyLl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Extractor extractor = new Extractor();
-                ArrayList<String> metionedNames = new ArrayList<>();
-                if (tweetDto.isRetweeted()) {
-                    metionedNames.add(tweetDto.retweeted_status.user.screen_name);
-                    for (String metionedName : extractor.extractMentionedScreennames(
-                            tweetDto.retweeted_status.text))
-                        if (!metionedNames.contains(metionedName))
-                            metionedNames.add(metionedName);
-                }
-                if (!metionedNames.contains(mTweetDto.user.screen_name))
-                    metionedNames.add(mTweetDto.user.screen_name);
-                for (String metionedName : extractor.extractMentionedScreennames(tweetDto.text))
+        replyLl.setOnClickListener((v) -> {
+            Extractor extractor = new Extractor();
+            ArrayList<String> metionedNames = new ArrayList<>();
+            if (tweetDto.isRetweeted()) {
+                metionedNames.add(tweetDto.retweeted_status.user.screen_name);
+                for (String metionedName : extractor.extractMentionedScreennames(
+                        tweetDto.retweeted_status.text))
                     if (!metionedNames.contains(metionedName))
                         metionedNames.add(metionedName);
-
-                EventBus.getDefault().post(new EventReplyTweet(metionedNames, tweetDto.id));
             }
+            if (!metionedNames.contains(mTweetDto.user.screen_name))
+                metionedNames.add(mTweetDto.user.screen_name);
+            for (String metionedName : extractor.extractMentionedScreennames(tweetDto.text))
+                if (!metionedNames.contains(metionedName))
+                    metionedNames.add(metionedName);
+
+            EventBus.getDefault().post(new EventReplyTweet(metionedNames, tweetDto.id));
         });
         // if this tweet is own by myself, cannot retweet
         if(isMyOwnTweet) {
@@ -170,61 +167,55 @@ public class TweetRenderHelper {
             retweetIv.setImageResource(mTweetDto.retweeted ? R.drawable.ic_retweeted_green_24dp
                     : R.drawable.ic_retweet_grey_24dp);
 
-            retweetLl.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!mTweetDto.retweeted)
-                        mHttpClient.getTwitterService()
-                                .retweet(mTweetDto.id)
-                                .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
-                    else
-                        mHttpClient.getTwitterService()
-                                .unretweet(mTweetDto.id)
-                                .enqueue(new NiceCallback.EmptyNiceCallback<TweetDto>());
+            retweetLl.setOnClickListener((v) -> {
+                if (!mTweetDto.retweeted)
+                    httpClient.getTwitterService()
+                            .retweet(mTweetDto.id)
+                            .enqueue(new NiceCallback.EmptyNiceCallback<>());
+                else
+                    httpClient.getTwitterService()
+                            .unretweet(mTweetDto.id)
+                            .enqueue(new NiceCallback.EmptyNiceCallback<>());
 
-                    mTweetDto.retweeted = !mTweetDto.retweeted;
-                    retweetIv.setImageResource(mTweetDto.retweeted
-                            ? R.drawable.ic_retweeted_green_24dp : R.drawable.ic_retweet_grey_24dp);
-                }
+                mTweetDto.retweeted = !mTweetDto.retweeted;
+                retweetIv.setImageResource(mTweetDto.retweeted
+                        ? R.drawable.ic_retweeted_green_24dp : R.drawable.ic_retweet_grey_24dp);
             });
         }
         retweetCountTv.setText(String.valueOf(tweetDto.retweet_count));
 
         // like action
-        likeLl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mTweetDto.favorited) {
-                    mHttpClient.getTwitterService()
-                            .like(mTweetDto.id)
-                            .enqueue(new NiceCallback<TweetDto>(mContext) {
-                                @Override
-                                public void onRespond(Response<TweetDto> response) {
-                                    EventBus.getDefault().post(
-                                            new EventLikeStatus(response.body()));
-                                }
+        likeLl.setOnClickListener((v) -> {
+            if(mTweetDto.favorited) {
+                httpClient.getTwitterService()
+                        .like(mTweetDto.id)
+                        .enqueue(new NiceCallback<TweetDto>(context) {
+                            @Override
+                            public void onRespond(Response<TweetDto> response) {
+                                EventBus.getDefault().post(
+                                        new EventLikeStatus(response.body()));
+                            }
 
-                                @Override
-                                public void onFailed(Throwable t) {
-                                }
-                            });
-                    likeIv.unlike();
-                } else {
-                    mHttpClient.getTwitterService()
-                            .unlike(mTweetDto.id)
-                            .enqueue(new NiceCallback<TweetDto>(mContext) {
-                                @Override
-                                public void onRespond(Response<TweetDto> response) {
-                                    EventBus.getDefault().post(
-                                            new EventUnLikeStatus(response.body()));
-                                }
+                            @Override
+                            public void onFailed(Throwable t) {
+                            }
+                        });
+                likeIv.unlike();
+            } else {
+                httpClient.getTwitterService()
+                        .unlike(mTweetDto.id)
+                        .enqueue(new NiceCallback<TweetDto>(context) {
+                            @Override
+                            public void onRespond(Response<TweetDto> response) {
+                                EventBus.getDefault().post(
+                                        new EventUnLikeStatus(response.body()));
+                            }
 
-                                @Override
-                                public void onFailed(Throwable t) {
-                                }
-                            });
-                    likeIv.like();
-                }
+                            @Override
+                            public void onFailed(Throwable t) {
+                            }
+                        });
+                likeIv.like();
             }
         });
         likeCountTv.setText(String.valueOf(mTweetDto.favorite_count));

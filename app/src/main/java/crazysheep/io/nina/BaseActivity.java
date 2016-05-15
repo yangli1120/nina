@@ -3,8 +3,11 @@ package crazysheep.io.nina;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.TypedValue;
+import android.widget.FrameLayout;
 
 import com.android.debug.hv.ViewServer;
 
@@ -12,6 +15,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.dagger2.component.DaggerActivityComponent;
 import crazysheep.io.nina.net.HttpClient;
@@ -19,6 +24,7 @@ import crazysheep.io.nina.net.RxTwitterService;
 import crazysheep.io.nina.net.TwitterService;
 import crazysheep.io.nina.prefs.SettingPrefs;
 import crazysheep.io.nina.prefs.UserPrefs;
+import crazysheep.io.nina.utils.DrawableUtils;
 import crazysheep.io.nina.utils.Utils;
 import dagger.Lazy;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -49,6 +55,8 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
 
     public static String TAG = BaseActivity.class.getSimpleName();
 
+    private FrameLayout mRootFl;
+
     @Inject protected UserPrefs mUserPrefs;
     @Inject protected SettingPrefs mSettingPrefs;
     @Inject protected Lazy<HttpClient> mHttpClient;
@@ -65,6 +73,7 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
                 .inject(this);
 
         // init theme
+        mRootFl = ButterKnife.findById(this, android.R.id.content);
         if(Utils.isNull(savedInstanceState))
             switchTheme();
 
@@ -99,6 +108,23 @@ public class BaseActivity extends AppCompatActivity implements EasyPermissions.P
     protected final void switchTheme() {
         getDelegate().setLocalNightMode(mSettingPrefs.isNightTheme() ?
                 AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+        // tint root layout background refer to current theme
+        if(mSettingPrefs.isNightTheme()) {
+            // if is night theme, tint root background with colorPrimary,
+            // UI will have overdraw 1x
+            int bgColor;
+            TypedValue typedValue = new TypedValue();
+            getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            bgColor = typedValue.data;
+
+            mRootFl.setBackground(DrawableUtils.tint(
+                    ContextCompat.getDrawable(this, R.drawable.tint_bg), bgColor));
+        } else {
+            // if is day theme, set null drawable background, so that UI have no overdraw,
+            // the best performance
+            mRootFl.setBackground(null);
+        }
     }
 
     @Override

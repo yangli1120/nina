@@ -19,13 +19,15 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.adapter.TweetDetailAdapter;
-import crazysheep.io.nina.bean.SearchResultDto;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TweetDetailFragment;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
+import crazysheep.io.nina.utils.IntentUtils;
 import crazysheep.io.nina.utils.RxUtils;
+import crazysheep.io.nina.utils.SystemUIHelper;
+import crazysheep.io.nina.utils.TimeUtils;
 import crazysheep.io.nina.utils.TweetRenderHelper;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.TwitterLikeImageView;
@@ -34,7 +36,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -49,6 +50,7 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
     @Bind(R.id.data_rv) RecyclerView mDataRv;
     @Bind(R.id.nested_sv) NestedScrollView mNestedSv;
     @Bind(R.id.tweet_content_fl) FrameLayout mDetailFl;
+    @Bind(R.id.tweet_time_tv) TextView mTimeTv;
     @Bind(R.id.author_avatar_iv) CircleImageView mAvatarIv;
     @Bind(R.id.author_name_tv) TextView mAuthorTv;
     @Bind(R.id.author_screen_name_tv) TextView mAuthorScreenTv;
@@ -60,6 +62,7 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
     @Bind(R.id.action_like_ll) View mLikeLl;
     @Bind(R.id.action_like_count_tv) TextView mLikeCountTv;
     @Bind(R.id.action_like_iv) TwitterLikeImageView mLikeIv;
+    @Bind(R.id.action_share_ll) View mShareLl;
 
     private TweetDetailAdapter mAdapter;
     private TweetDto mTweetDto;
@@ -91,12 +94,15 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
         mAuthorTv.setText(mTweetDto.user.name);
         mAuthorScreenTv.setText(mTweetDto.user.screen_name);
         mContentTv.setText(mTweetDto.text);
+        mTimeTv.setText(TimeUtils.formatDate(TimeUtils.getTimeFromDate(mTweetDto.created_at),
+                "yy/MM/dd HH:mm"));
 
         // render bottom bar
         TweetRenderHelper.renderBottomBar(this, mHttpClient.get(),
                 new UserPrefs(this).getUserScreenName().equals(mTweetDto.user.screen_name),
                 mTweetDto,
                 mReplyLl, mRetweetLl, mRetweetIv, mRetweetCountTv, mLikeLl, mLikeCountTv, mLikeIv);
+        mShareLl.setOnClickListener((v) -> IntentUtils.shareText(getActivity(), mTweetDto.text));
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(BundleConstants.EXTRA_TWEET, mTweetDto);
@@ -112,29 +118,19 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
         mDataRv.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new TweetDetailAdapter(this, null);
         mDataRv.setAdapter(mAdapter);
+        // hack translucent NavigationBar
+        SystemUIHelper.hackTranslucentNavBar(getResources(), mDataRv);
 
-        mNestedSv.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mNestedSv.scrollTo(0, 0);
-            }
+        mNestedSv.postDelayed(() -> {
+            mNestedSv.scrollTo(0, 0);
         }, 100);
 
         final List<TweetDto> replies = new ArrayList<>();
         mSearchSub = mRxTwitter.reply(String.format("@%s", mTweetDto.user.screen_name))
                 .subscribeOn(Schedulers.io())
-                .flatMap(new Func1<SearchResultDto, Observable<TweetDto>>() {
-                    @Override
-                    public Observable<TweetDto> call(SearchResultDto searchResultDto) {
-                        return Observable.from(searchResultDto.getStatuses());
-                    }
-                })
-                .filter(new Func1<TweetDto, Boolean>() {
-                    @Override
-                    public Boolean call(TweetDto tweetDto) {
-                        return mTweetDto.idStr.equals(tweetDto.in_reply_to_status_id_str);
-                    }
-                })
+                .flatMap(searchResultDto -> Observable.from(searchResultDto.getStatuses())
+                )
+                .filter(tweetDto -> mTweetDto.idStr.equals(tweetDto.in_reply_to_status_id_str))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TweetDto>() {
                     @Override

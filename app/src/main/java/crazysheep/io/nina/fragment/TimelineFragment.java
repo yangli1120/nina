@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -46,7 +45,6 @@ import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.constants.EventBusConstants;
 import crazysheep.io.nina.holder.timeline.DraftBaseHolder;
-import crazysheep.io.nina.holder.timeline.NormalBaseHolder;
 import crazysheep.io.nina.net.HttpCache;
 import crazysheep.io.nina.net.RxTweeting;
 import crazysheep.io.nina.service.BatmanService;
@@ -179,13 +177,7 @@ public class TimelineFragment extends BaseFragment {
         itemTouchHelper.attachToRecyclerView(mTimelineRv.getRefreshableView());
 
         // hack translucent NavigationBar
-        if(SystemUIHelper.hasNavBar(getResources())
-                && SystemUIHelper.isNavBarTranslucent(getResources())) {
-            RecyclerView rv = mTimelineRv.getRefreshableView();
-            rv.setClipToPadding(false);
-            rv.setPadding(rv.getPaddingLeft(), rv.getPaddingTop(), rv.getPaddingRight(),
-                    rv.getPaddingBottom() + SystemUIHelper.getNavBarSize(getResources()));
-        }
+        SystemUIHelper.hackTranslucentNavBar(getResources(), mTimelineRv.getRefreshableView());
     }
 
     // when we back to app, make drafts post state is 'post_failed'

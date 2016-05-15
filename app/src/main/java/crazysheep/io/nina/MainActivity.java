@@ -156,23 +156,6 @@ public class MainActivity extends BaseActivity
                 .commitAllowingStateLoss();
 
         mNav.setNavigationItemSelectedListener(this);
-
-        // tint root layout background refer to current theme
-        if(mSettingPrefs.isNightTheme()) {
-            // if is night theme, tint drawer background with colorPrimary,
-            // timeline UI will have overdraw 1x
-            int bgColor;
-            TypedValue typedValue = new TypedValue();
-            getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
-            bgColor = typedValue.data;
-
-            mDrawer.setBackground(DrawableUtils.tint(
-                    ContextCompat.getDrawable(this, R.drawable.tint_bg), bgColor));
-        } else {
-            // if is day theme, set null drawable background, so that timeline UI have no overdraw,
-            // the best performance
-            mDrawer.setBackground(null);
-        }
     }
 
     public void setToolbar(@NonNull Toolbar toolbar) {

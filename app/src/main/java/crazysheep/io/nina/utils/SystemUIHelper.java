@@ -3,6 +3,7 @@ package crazysheep.io.nina.utils;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 
 /**
@@ -61,6 +62,17 @@ public class SystemUIHelper {
     public static boolean isNavBarTranslucent(@NonNull Resources resources) {
         int id = resources.getIdentifier("config_enableTranslucentDecor", "bool", "android");
         return id > 0 && resources.getBoolean(id);
+    }
+
+    /**
+     * set padding for RecyclerView under translucent NavigationBar
+     * */
+    public static void hackTranslucentNavBar(@NonNull Resources res, @NonNull RecyclerView rv) {
+        if(hasNavBar(res) && isNavBarTranslucent(res)) {
+            rv.setClipToPadding(false);
+            rv.setPadding(rv.getPaddingLeft(), rv.getPaddingTop(), rv.getPaddingRight(),
+                    rv.getPaddingBottom() + SystemUIHelper.getNavBarSize(res));
+        }
     }
 
 }
