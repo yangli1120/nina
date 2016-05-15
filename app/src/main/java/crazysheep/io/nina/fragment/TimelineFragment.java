@@ -53,6 +53,7 @@ import crazysheep.io.nina.service.BatmanService;
 import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.SystemUIHelper;
+import crazysheep.io.nina.utils.TweetRenderHelper;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.recyclerviewhelper.SimpleItemTouchHelperCallback;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
@@ -380,7 +381,7 @@ public class TimelineFragment extends BaseFragment {
 
     @SuppressWarnings("unused")
     @Subscribe
-    public void onEvent(@NonNull NormalBaseHolder.EventReplyTweet event) {
+    public void onEvent(@NonNull TweetRenderHelper.EventReplyTweet event) {
         ActivityUtils.startResult(this, REQUEST_POST_TWEET,
                 ActivityUtils.prepare(getActivity(), PostTweetActivity.class)
                         .putStringArrayListExtra(BundleConstants.EXTRA_METIONED_NAMES,

@@ -17,11 +17,11 @@ import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.dagger2.component.DaggerAdapterComponent;
 import crazysheep.io.nina.holder.timeline.BaseHolder;
-import crazysheep.io.nina.holder.timeline.NormalBaseHolder;
 import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.net.NiceCallback;
 import crazysheep.io.nina.utils.L;
+import crazysheep.io.nina.utils.TweetRenderHelper;
 import crazysheep.io.nina.widget.recyclerviewhelper.ItemTouchHelperAdapter;
 import retrofit2.Response;
 
@@ -120,7 +120,7 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
 
     @SuppressWarnings("unused, unchecked")
     @Subscribe
-    public void onEvent(NormalBaseHolder.EventLikeStatus event) {
+    public void onEvent(TweetRenderHelper.EventLikeStatus event) {
         for(TweetDto tweetDto : getTweets())
             if(event.getTweetDto().id == tweetDto.id) {
                 tweetDto.favorite_count++;
@@ -131,7 +131,7 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
 
     @SuppressWarnings("unused, unchecked")
     @Subscribe
-    public void onEvent(NormalBaseHolder.EventUnLikeStatus event) {
+    public void onEvent(TweetRenderHelper.EventUnLikeStatus event) {
         for(TweetDto tweetDto : getTweets())
             if(tweetDto.id == event.getTweetDto().id) {
                 tweetDto.favorited = false;

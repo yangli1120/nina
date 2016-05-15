@@ -4,6 +4,7 @@ import java.util.List;
 
 import crazysheep.io.nina.bean.LocationDto;
 import crazysheep.io.nina.bean.PlaceTrendResultDto;
+import crazysheep.io.nina.bean.SearchResultDto;
 import crazysheep.io.nina.bean.TweetDto;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -35,5 +36,10 @@ public interface RxTwitterService {
     @GET("trends/closest.json")
     Observable<List<LocationDto>> closest(@Query("lat") double latitude,
                                           @Query("long") double longitude);
+
+    ///////////////////////// searchReply //////////////////////////
+
+    @GET("search/tweets.json?result_type=recent&count=100")
+    Observable<SearchResultDto> reply(@Query("q") String q);
 
 }

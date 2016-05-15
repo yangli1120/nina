@@ -39,70 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <!-- bottom action bar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
-            <LinearLayout
-                android:id="@id/action_reply_ll"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/button_bg"
-                android:orientation="horizontal"
-                android:gravity="center">
-                <ImageView
-                    android:id="@id/action_reply_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_reply_grey_24dp"
-                    android:scaleType="center" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@id/action_retweet_ll"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/button_bg"
-                android:orientation="horizontal"
-                android:gravity="center">
-                <ImageView
-                    android:id="@id/action_retweet_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_retweet_grey_24dp"
-                    android:scaleType="center" />
-                <TextView
-                    android:id="@id/action_retweet_count_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?color_text_secondary"
-                    android:layout_marginLeft="5dp"
-                    android:textSize="@dimen/text_12" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@id/action_like_ll"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/button_bg"
-                android:orientation="horizontal"
-                android:gravity="center">
-                <crazysheep.io.nina.widget.TwitterLikeImageView
-                    android:id="@id/action_like_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_unlike_grey_24dp"
-                    android:scaleType="center" />
-                <TextView
-                    android:id="@id/action_like_count_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?color_text_secondary"
-                    android:layout_marginLeft="5dp"
-                    android:textSize="@dimen/text_12" />
-            </LinearLayout>
-        </LinearLayout>
+        <include layout="@layout/layout_item_bottom_bar" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
