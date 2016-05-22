@@ -23,11 +23,14 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:padding="10dp">
+            android:layout_marginBottom="5dp">
 
             <!-- tweet detail -->
-            <include layout="@layout/layout_tweet_header"/>
+            <include layout="@layout/layout_tweet_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
 
             <TextView
                 android:id="@id/tweet_content_tv"
@@ -35,13 +38,17 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:textSize="@dimen/text_14"
                 android:textColor="?color_text_primary" />
 
             <FrameLayout
                 android:id="@+id/tweet_content_fl"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
             
             <TextView
                 android:id="@+id/tweet_time_tv"
@@ -50,13 +57,16 @@
                 android:gravity="center_vertical"
                 android:textColor="?color_text_secondary"
                 android:textSize="17sp"
-                />
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
 
             <!-- tweet detail bottom bar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp">
 
                 <LinearLayout
                     android:id="@id/action_reply_ll"
@@ -141,6 +151,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="vertical"/>
+            <FrameLayout
+                android:id="@+id/loading_fl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </FrameLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

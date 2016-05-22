@@ -50,7 +50,8 @@ public class TweetDetailAdapter extends RecyclerViewBaseAdapter<TweetDetailAdapt
                 .into(holder.mAvatarIv);
 
         holder.mAuthorNameTv.setText(tweetDto.user.name);
-        holder.mAuthorScreenNameTv.setText(tweetDto.user.screen_name);
+        holder.mAuthorScreenNameTv.setText(mContext.getString(R.string.screen_name,
+                tweetDto.user.screen_name));
         holder.mTimeTv.setText(TimeUtils.formatTimestamp(mContext,
                 TimeUtils.getTimeFromDate(tweetDto.created_at.trim())));
         // content text

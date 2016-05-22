@@ -63,6 +63,7 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
     @Bind(R.id.action_like_count_tv) TextView mLikeCountTv;
     @Bind(R.id.action_like_iv) TwitterLikeImageView mLikeIv;
     @Bind(R.id.action_share_ll) View mShareLl;
+    @Bind(R.id.loading_fl) View mLoadingFl;
 
     private TweetDetailAdapter mAdapter;
     private TweetDto mTweetDto;
@@ -126,6 +127,7 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
         }, 100);
 
         final List<TweetDto> replies = new ArrayList<>();
+        showLoading(true);
         mSearchSub = mRxTwitter.reply(String.format("@%s", mTweetDto.user.screen_name))
                 .subscribeOn(Schedulers.io())
                 .flatMap(searchResultDto -> Observable.from(searchResultDto.getStatuses())
@@ -135,6 +137,7 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
                 .subscribe(new Observer<TweetDto>() {
                     @Override
                     public void onCompleted() {
+                        showLoading(false);
                         mAdapter.setData(replies);
                     }
 
@@ -164,6 +167,10 @@ public class TweetDetailActivity extends BaseSwipeBackActivity
             }break;
         }
         return true;
+    }
+
+    private void showLoading(boolean show) {
+        mLoadingFl.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
 }
