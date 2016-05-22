@@ -11,11 +11,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
-import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.ITweet;
 import crazysheep.io.nina.bean.PostTweetBean;
 import crazysheep.io.nina.bean.TweetDto;
-import crazysheep.io.nina.dagger2.component.DaggerAdapterComponent;
 import crazysheep.io.nina.holder.timeline.BaseHolder;
 import crazysheep.io.nina.holder.timeline.TimelineHolderFactory;
 import crazysheep.io.nina.net.HttpClient;
@@ -33,15 +31,8 @@ import retrofit2.Response;
 public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapter<T, ITweet>
         implements ItemTouchHelperAdapter {
 
-    private HttpClient mHttpClient;
-
     public TimelineAdapter(@NonNull Context context, List<ITweet> data) {
         super(context, data);
-
-        mHttpClient = DaggerAdapterComponent.builder()
-                .applicationComponent(BaseApplication.from(mContext).getComponent())
-                .build()
-                .getHttpClient();
     }
 
     @Override
@@ -91,7 +82,7 @@ public class TimelineAdapter<T extends BaseHolder> extends RecyclerViewBaseAdapt
         } else if(iTweet instanceof TweetDto) {
             TweetDto tweetDto = (TweetDto) iTweet;
             // request to delete this tweet
-            mHttpClient.getTwitterService()
+            HttpClient.getInstance().getTwitterService()
                     .detroyTweet(tweetDto.id)
                     .enqueue(new NiceCallback<TweetDto>((Activity)mContext) {
                         @Override

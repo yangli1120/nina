@@ -11,11 +11,12 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
-import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.net.HttpCache.CacheConfig;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.L;
@@ -39,23 +40,13 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
  *
  * Created by crazysheep on 16/1/22.
  */
+@Singleton
 public class HttpClient {
 
     private static HttpClient mHttpClient;
 
-    public static HttpClient getInstance(@NonNull Context context) {
-        if(Utils.isNull(mHttpClient))
-            synchronized (HttpClient.class) {
-                if (Utils.isNull(mHttpClient)) {
-                    mHttpClient = new HttpClient(context);
-                }
-            }
-
-        return mHttpClient;
-    }
-
     public static HttpClient getInstance() {
-        return getInstance(BaseApplication.getAppContext());
+        return mHttpClient;
     }
 
     /////////////////////////////////////////////////////////////
@@ -65,8 +56,8 @@ public class HttpClient {
     private TwitterService mTwitterService;
     private RxTwitterService mRxTwitterService;
 
-    private HttpClient(@NonNull Context context) {
-        UserPrefs userPrefs = new UserPrefs(context.getApplicationContext());
+    @Inject
+    protected HttpClient(@NonNull Context context, @NonNull UserPrefs userPrefs) {
         OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(
                 HttpConstants.NINA_CONSUMER_KEY, HttpConstants.NINA_CONSUMER_SECRET);
         consumer.setTokenWithSecret(userPrefs.getAuthToken(), userPrefs.getSecret());
@@ -98,6 +89,8 @@ public class HttpClient {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(mOkHttpClient)
                 .build();
+
+        mHttpClient = this;
     }
 
     public OkHttpClient getOkHttpClient() {

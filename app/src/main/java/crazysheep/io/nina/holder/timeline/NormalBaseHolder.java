@@ -12,17 +12,13 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.ProfileActivity;
 import crazysheep.io.nina.R;
 import crazysheep.io.nina.TweetDetailActivity;
-import crazysheep.io.nina.application.BaseApplication;
 import crazysheep.io.nina.bean.TweetDto;
 import crazysheep.io.nina.constants.BundleConstants;
-import crazysheep.io.nina.dagger2.component.DaggerViewHolderComponent;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.prefs.UserPrefs;
 import crazysheep.io.nina.utils.ActivityUtils;
@@ -58,8 +54,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
 
     protected Context mContext;
     protected TweetDto mTweetDto;
-    @Inject UserPrefs mUserPrefs;
-    @Inject HttpClient mHttpClient;
+    private UserPrefs mUserPrefs;
 
     public NormalBaseHolder(@NonNull ViewGroup parent) {
         super(parent);
@@ -72,11 +67,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         contentFl.addView(contentView, params);
 
         mContext = parent.getContext();
-
-        DaggerViewHolderComponent.builder()
-                .applicationComponent(BaseApplication.from(mContext).getComponent())
-                .build()
-                .inject(this);
+        mUserPrefs = new UserPrefs(mContext);
     }
 
     public abstract int getContentViewRes();
@@ -117,7 +108,7 @@ public abstract class NormalBaseHolder extends BaseHolder<TweetDto>
         TweetRenderHelper.renderTxt(mContext, mTweetDto, contentTv);
 
         /* bottom action bar */
-        TweetRenderHelper.renderBottomBar((Activity)mContext, mHttpClient,
+        TweetRenderHelper.renderBottomBar((Activity)mContext, HttpClient.getInstance(),
                 mUserPrefs.getUserScreenName().equals(mTweetDto.user.screen_name), tweetDto,
                 replyLl, retweetLl, retweetIv, retweetCountTv, likeLl, likeCountTv, likeIv);
     }

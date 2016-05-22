@@ -18,24 +18,16 @@ import dagger.Provides;
 @Module
 public class PrefsModule {
 
-    private UserPrefs mUserPrefs;
-    private SettingPrefs mSettingPrefs;
-
-    public PrefsModule(@NonNull Context context) {
-        mUserPrefs = new UserPrefs(context);
-        mSettingPrefs = new SettingPrefs(context);
+    @Provides
+    @Singleton
+    public UserPrefs provideUserPrefs(@NonNull Context context) {
+        return new UserPrefs(context);
     }
 
     @Provides
     @Singleton
-    public UserPrefs provideUserPrefs() {
-        return mUserPrefs;
-    }
-
-    @Provides
-    @Singleton
-    public SettingPrefs provideSettingPrefs() {
-        return mSettingPrefs;
+    public SettingPrefs provideSettingPrefs(@NonNull Context context) {
+        return new SettingPrefs(context);
     }
 
 }

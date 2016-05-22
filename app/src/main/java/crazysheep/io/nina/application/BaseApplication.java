@@ -5,9 +5,7 @@ import android.content.Context;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDelegate;
-import android.view.Gravity;
 
-import com.codemonkeylabs.fpslibrary.TinyDancer;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.stetho.Stetho;
 import com.orhanobut.logger.Logger;
@@ -18,7 +16,6 @@ import crazysheep.io.nina.BuildConfig;
 import crazysheep.io.nina.dagger2.component.ApplicationComponent;
 import crazysheep.io.nina.dagger2.component.DaggerApplicationComponent;
 import crazysheep.io.nina.dagger2.module.ApplicationModule;
-import crazysheep.io.nina.dagger2.module.NetworkModule;
 import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpConstants;
 import io.fabric.sdk.android.Fabric;
@@ -51,8 +48,6 @@ public class BaseApplication extends com.activeandroid.app.Application {
 
         mAppComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
-                .prefsModule(new PrefsModule(this))
-                .networkModule(new NetworkModule(this))
                 .build();
 
         // init TinyDancer

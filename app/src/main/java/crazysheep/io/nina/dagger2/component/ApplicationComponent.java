@@ -7,7 +7,6 @@ import com.squareup.leakcanary.RefWatcher;
 import javax.inject.Singleton;
 
 import crazysheep.io.nina.dagger2.module.ApplicationModule;
-import crazysheep.io.nina.dagger2.module.NetworkModule;
 import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.prefs.SettingPrefs;
@@ -22,7 +21,7 @@ import dagger.Component;
 @Singleton
 @Component(
         modules = {
-                ApplicationModule.class, PrefsModule.class, NetworkModule.class
+                ApplicationModule.class, PrefsModule.class,
         }
 )
 public interface ApplicationComponent {
