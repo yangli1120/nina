@@ -13,7 +13,7 @@ buildscript {
         maven { url '$projectDir/../../../node_modules/react-native/android' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
         // the latest version of the android-apt plugin
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         // retrolambda
@@ -78,11 +78,15 @@ android {
 }
 
 ext {
-    supportLibVersion = "23.3.0"
+    supportLibVersion = "23.4.0"
     retrofitVersion = "2.0.0"
     leakcanaryVersion = "1.4-beta2"
     dagger2Version = "2.2"
     rxbindingVersion = "0.4.0"
+
+    // test dependencies
+    espressoVersion = "2.2.2"
+    testSupportLibVersion = "23.1.1"
 }
 
 dependencies {
@@ -91,6 +95,31 @@ dependencies {
     // use robolectric do unit test
     testCompile "org.robolectric:robolectric:3.1-SNAPSHOT"
     testCompile "org.assertj:assertj-core:1.7.0"
+    // Espresso UI Testing
+    androidTestCompile ("com.android.support.test.espresso:espresso-core:${espressoVersion}") {
+        exclude module: 'support-annotations'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'jsr305'
+    }
+    androidTestCompile ("com.android.support.test.espresso:espresso-contrib:${espressoVersion}") {
+        exclude module: 'support-annotations'
+        exclude module: 'appcompat-v7'
+        exclude module: 'design'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'jsr305'
+    }
+    androidTestCompile ("com.android.support.test.espresso:espresso-intents:${espressoVersion}") {
+        exclude module: 'support-annotations'
+        exclude module: 'support-v4'
+        exclude module: 'support-v13'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'jsr305'
+    }
+
     // Support Libraries
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:cardview-v7:${supportLibVersion}"
