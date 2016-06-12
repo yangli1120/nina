@@ -4,7 +4,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
+import android.widget.TextView;
+
+import java.lang.reflect.Field;
+
+import javax.annotation.Nonnull;
 
 /**
  * helper class for system ui
@@ -73,6 +79,25 @@ public class SystemUIHelper {
             rv.setPadding(rv.getPaddingLeft(), rv.getPaddingTop(), rv.getPaddingRight(),
                     rv.getPaddingBottom() + SystemUIHelper.getNavBarSize(res));
         }
+    }
+
+    /**
+     * get toolbar home TextView
+     * */
+    public static TextView hackToolbarHomeTextView(@Nonnull Toolbar toolbar) {
+        TextView tv = null;
+
+        try {
+            Field field = toolbar.getClass().getDeclaredField("mTitleTextView");
+            field.setAccessible(true);
+            tv = (TextView) field.get(toolbar);
+        } catch (NoSuchFieldException nsfe) {
+            nsfe.printStackTrace();
+        } catch (IllegalAccessException iae) {
+            iae.printStackTrace();
+        }
+
+        return tv;
     }
 
 }

@@ -38,7 +38,7 @@ allprojects {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "crazysheep.io.nina"
@@ -93,8 +93,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     // use robolectric do unit test
-    testCompile "org.robolectric:robolectric:3.1-SNAPSHOT"
-    testCompile "org.assertj:assertj-core:1.7.0"
+    //testCompile "org.robolectric:robolectric:3.1-SNAPSHOT"
+    //testCompile "org.assertj:assertj-core:1.7.0"
     // Espresso UI Testing
     androidTestCompile ("com.android.support.test.espresso:espresso-core:${espressoVersion}") {
         exclude module: 'support-annotations'

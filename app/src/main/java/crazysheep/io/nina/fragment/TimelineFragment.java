@@ -9,14 +9,17 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -55,11 +58,9 @@ import crazysheep.io.nina.utils.TweetRenderHelper;
 import crazysheep.io.nina.utils.Utils;
 import crazysheep.io.nina.widget.recyclerviewhelper.SimpleItemTouchHelperCallback;
 import crazysheep.io.nina.widget.swiperefresh.SwipeRecyclerView;
-import crazysheep.io.nina.widget.swiperefresh.SwipeRefreshBase;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -81,6 +82,8 @@ public class TimelineFragment extends BaseFragment {
     @Bind(R.id.loading_pb) ProgressBar mLoadingPb;
     @Bind(R.id.error_layout) View mErrorLayout;
     @Bind(R.id.error_msg_tv) TextView mErrorMsgTv;
+
+    private GestureDetectorCompat mGestureDetector;
 
     private TimelineAdapter mAdapter;
 
@@ -151,24 +154,36 @@ public class TimelineFragment extends BaseFragment {
 
     private void initUI() {
         if(getActivity() instanceof MainActivity)
-            ((MainActivity)getActivity()).setToolbar(mToolbar);
+            ((MainActivity) getActivity()).setToolbar(mToolbar);
+
+        // handle toolbar home button double click, scroll to timeline top position
+        final GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDown(MotionEvent e) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        if(!Utils.isNull(mTimelineRv)
+                                && mTimelineRv.getRefreshableView().getChildCount() > 0) {
+                            mTimelineRv.getRefreshableView().smoothScrollToPosition(0);
+                        }
+                        return true;
+                    }
+                });
+        View homeTv = SystemUIHelper.hackToolbarHomeTextView(mToolbar);
+        if (!Utils.isNull(homeTv)) {
+            homeTv.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+        }
 
         mAdapter = new TimelineAdapter(getActivity(), null);
         mTimelineRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mTimelineRv.setItemAnimator(new DefaultItemAnimator());
         mTimelineRv.setAdapter(mAdapter);
-        mTimelineRv.setOnRefreshListener(new SwipeRefreshBase.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                requestFirstPage(true);
-            }
-        });
-        mTimelineRv.setOnLoadMoreListener(new SwipeRefreshBase.OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                requestNextPage();
-            }
-        });
+        mTimelineRv.setOnRefreshListener(() -> requestFirstPage(true));
+        mTimelineRv.setOnLoadMoreListener(this::requestNextPage);
 
         // let recyclerview support swipe dismiss
         SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -185,27 +200,21 @@ public class TimelineFragment extends BaseFragment {
         showLoading();
         Observable.just(true)
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean aBoolean) {
-                        List<PostTweetBean> drafts = new Select()
-                                .all()
-                                .from(PostTweetBean.class)
-                                .execute();
-                        if (Utils.size(drafts) > 0)
-                            for (PostTweetBean postTweet : drafts) {
-                                postTweet.setFailed();
-                                postTweet.save();
-                            }
-                        return true;
-                    }
+                .map((aBoolean) -> {
+                    List<PostTweetBean> drafts = new Select()
+                            .all()
+                            .from(PostTweetBean.class)
+                            .execute();
+                    if (Utils.size(drafts) > 0)
+                        for (PostTweetBean postTweet : drafts) {
+                            postTweet.setFailed();
+                            postTweet.save();
+                        }
+                    return true;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        requestFirstPage(false);
-                    }
+                .subscribe((aBoolean) -> {
+                    requestFirstPage(false);
                 });
     }
 
@@ -218,12 +227,7 @@ public class TimelineFragment extends BaseFragment {
                 .getHomeTimeline(force ? HttpCache.CACHE_NETWORK : HttpCache.CACHE_IF_HIT, null,
                         PAGE_SIZE)
                 .subscribeOn(Schedulers.io())
-                .map(new Func1<List<TweetDto>, List<ITweet>>() {
-                    @Override
-                    public List<ITweet> call(List<TweetDto> tweetDtos) {
-                        return new ArrayList<ITweet>(tweetDtos);
-                    }
-                });
+                .map(tweetDtos -> new ArrayList<>(tweetDtos));
         final List<ITweet> draftsAndTweets = new ArrayList<>();
         Observable.merge(queryDrafts(), mTimelineObser)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -264,17 +268,14 @@ public class TimelineFragment extends BaseFragment {
                 .map(new Func1<List<TweetDto>, List<ITweet>>() {
                     @Override
                     public List<ITweet> call(List<TweetDto> tweetDtos) {
-                        return new ArrayList<ITweet>(tweetDtos);
+                        return new ArrayList<>(tweetDtos);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread());
-        mTimelineObser.subscribe(new Action1<List<ITweet>>() {
-            @Override
-            public void call(List<ITweet> iTweets) {
-                if (iTweets.size() > 0) {
-                    iTweets.remove(0); // remove repeat one
-                    mAdapter.addData(iTweets);
-                }
+        mTimelineObser.subscribe(iTweets -> {
+            if (iTweets.size() > 0) {
+                iTweets.remove(0); // remove repeat one
+                mAdapter.addData(iTweets);
             }
         });
     }
