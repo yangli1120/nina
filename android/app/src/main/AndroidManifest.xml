@@ -65,7 +65,7 @@
         <activity android:name=".CaptureVideoActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
-        <activity android:name=".HelloReactNativeActivity"
+        <activity android:name=".ReactNativeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
         <activity android:name=".RecordVideoPreviewActivity"

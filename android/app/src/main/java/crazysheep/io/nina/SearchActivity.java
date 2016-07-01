@@ -147,7 +147,7 @@ public class SearchActivity extends BaseSwipeBackActivity
         ImageView iconIv = ButterKnife.findById(mSearchView,
                 android.support.v7.appcompat.R.id.search_mag_icon);
         iconIv.setImageResource(
-                android.support.v7.appcompat.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+                android.support.v7.appcompat.R.drawable.abc_ic_ab_back_material);
         iconIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
