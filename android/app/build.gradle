@@ -11,7 +11,7 @@ buildscript {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "$projectDir/node_modules/react-native/android" }
+        maven { url "$projectDir/../../node_modules/react-native/android" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
@@ -36,8 +36,12 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "$projectDir/node_modules/react-native/android" }
+        maven { url "$projectDir/../../node_modules/react-native/android" }
     }
+}
+
+retrolambda {
+    jvmArgs '-noverify'
 }
 
 android {
@@ -71,7 +75,7 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -92,6 +96,9 @@ ext {
     leakcanaryVersion = "1.4-beta2"
     dagger2Version = "2.2"
     rxbindingVersion = "0.4.0"
+
+    // react-native
+    reactnativeVersion = "0.28.0"
 
     // test dependencies
     espressoVersion = "2.2.2"
@@ -215,7 +222,7 @@ dependencies {
     // sliding up panel
     compile 'com.sothree.slidinguppanel:library:3.3.0'
     // react native!
-    compile 'com.facebook.react:react-native:0.20.+'
+    compile "com.facebook.react:react-native:${reactnativeVersion}"
     // apache common io, google's guava is too large...
     compile "commons-io:commons-io:2.4"
     // merge mp4 file

@@ -1,11 +1,16 @@
 'use strict';
 
 import React, {
+  Component,
+} from 'react';
+import {
   Text,
-  View
+  View,
+  StyleSheet,
+  AppRegistry,
 } from 'react-native';
 
-class MyAwesomeApp extends React.Component {
+class Nina extends Component {
   render() {
     return (
       <View style={styles.container}>
@@ -14,7 +19,8 @@ class MyAwesomeApp extends React.Component {
     )
   }
 }
-var styles = React.StyleSheet.create({
+
+var styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -26,4 +32,4 @@ var styles = React.StyleSheet.create({
   },
 });
 
-React.AppRegistry.registerComponent('MyAwesomeApp', () => MyAwesomeApp);
+AppRegistry.registerComponent('Nina', () => Nina);

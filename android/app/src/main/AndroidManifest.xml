@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
@@ -45,6 +46,7 @@
         </activity>
         <activity android:name=".MainActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:theme="@style/AppTheme.DayNight"/>
         <activity android:name=".ProfileActivity"
             android:label="@string/app_name"
@@ -65,9 +67,6 @@
         <activity android:name=".CaptureVideoActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
-        <activity android:name=".ReactNativeActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.DayNight"/>
         <activity android:name=".RecordVideoPreviewActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
@@ -77,6 +76,11 @@
         <activity android:name=".TweetDetailActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.DayNight"/>
+        <!-- react native host activity -->
+        <activity android:name=".ReactNativeActivity"
+                  android:label="@string/app_name"
+                  android:theme="@style/AppTheme.DayNight"/>
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 
         <service android:name=".service.BatmanService" android:exported="false" />
     </application>

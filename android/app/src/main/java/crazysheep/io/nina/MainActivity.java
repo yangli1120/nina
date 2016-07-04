@@ -1,12 +1,15 @@
 package crazysheep.io.nina;
 
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,6 +29,7 @@ import com.jakewharton.scalpel.ScalpelFrameLayout;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import crazysheep.io.nina.bean.UserDto;
+import crazysheep.io.nina.compat.APICompat;
 import crazysheep.io.nina.constants.BundleConstants;
 import crazysheep.io.nina.fragment.TimelineFragment;
 import crazysheep.io.nina.net.NiceCallback;
@@ -34,6 +38,7 @@ import crazysheep.io.nina.utils.ActivityUtils;
 import crazysheep.io.nina.utils.DialogUtils;
 import crazysheep.io.nina.utils.L;
 import crazysheep.io.nina.utils.RxWorker;
+import crazysheep.io.nina.utils.ToastUtils;
 import crazysheep.io.nina.utils.Utils;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -42,6 +47,8 @@ import retrofit2.Response;
 public class MainActivity extends BaseActivity
         implements BaseActivity.ITwitterServiceActivity, View.OnClickListener,
                    NavigationView.OnNavigationItemSelectedListener {
+
+    private final int REQUEST_CODE_OVERLAY_PERMISSION = 1234;
 
     @Bind(R.id.drawer) DrawerLayout mDrawer;
     @Bind(R.id.nav_layout) NavigationView mNav;
@@ -91,6 +98,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
+    @TargetApi(APICompat.M)
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_night_theme: {
@@ -112,7 +120,15 @@ public class MainActivity extends BaseActivity
             }break;
 
             case R.id.nav_react_native: {
-                ActivityUtils.start(this, ReactNativeActivity.class);
+                // android M need request ACTION_MANAGE_OVERLAY_PERMISSION for react native
+                // see{@link https://github.com/facebook/react-native/issues/3150}
+                if(APICompat.api23() && !Settings.canDrawOverlays(this)) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getPackageName()));
+                    ActivityUtils.startResult(this, REQUEST_CODE_OVERLAY_PERMISSION, intent);
+                } else {
+                    ActivityUtils.start(this, ReactNativeActivity.class);
+                }
             }break;
 
             case R.id.nav_scalpel_debug: {
@@ -123,6 +139,23 @@ public class MainActivity extends BaseActivity
             }break;
         }
         return true;
+    }
+
+    @Override
+    @TargetApi(APICompat.M)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CODE_OVERLAY_PERMISSION: {
+                if (!Settings.canDrawOverlays(this)) {
+                    // SYSTEM_ALERT_WINDOW permission not granted...
+                    ToastUtils.t(this, "permission denied");
+                } else {
+                    ActivityUtils.start(this, ReactNativeActivity.class);
+                }
+            }break;
+        }
     }
 
     private void initUI() {
