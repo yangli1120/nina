@@ -78,8 +78,11 @@
             android:theme="@style/AppTheme.DayNight"/>
         <!-- react native host activity -->
         <activity android:name=".ReactNativeActivity"
-                  android:label="@string/app_name"
-                  android:theme="@style/AppTheme.DayNight"/>
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.DayNight"/>
+        <activity android:name=".ReactNativeFragmentActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.DayNight"/>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
 
         <service android:name=".service.BatmanService" android:exported="false" />

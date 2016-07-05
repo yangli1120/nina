@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity
                             Uri.parse("package:" + getPackageName()));
                     ActivityUtils.startResult(this, REQUEST_CODE_OVERLAY_PERMISSION, intent);
                 } else {
-                    ActivityUtils.start(this, ReactNativeActivity.class);
+                    ActivityUtils.start(this, ReactNativeFragmentActivity.class);
                 }
             }break;
 
@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity
                     // SYSTEM_ALERT_WINDOW permission not granted...
                     ToastUtils.t(this, "permission denied");
                 } else {
-                    ActivityUtils.start(this, ReactNativeActivity.class);
+                    ActivityUtils.start(this, ReactNativeFragmentActivity.class);
                 }
             }break;
         }

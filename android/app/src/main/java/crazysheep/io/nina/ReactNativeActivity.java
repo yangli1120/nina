@@ -75,4 +75,11 @@ public class ReactNativeActivity extends Activity implements DefaultHardwareBack
     public void invokeDefaultOnBackPressed() {
         super.onBackPressed();
     }
+
+    @Override
+    public void onBackPressed() {
+        if(!mRNContainer.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
 }
