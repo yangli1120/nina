@@ -11,6 +11,7 @@ import crazysheep.io.nina.dagger2.module.PrefsModule;
 import crazysheep.io.nina.net.HttpClient;
 import crazysheep.io.nina.prefs.SettingPrefs;
 import crazysheep.io.nina.prefs.UserPrefs;
+import crazysheep.io.nina.reactnative.ReactNativeContainer;
 import dagger.Component;
 
 /**
@@ -37,4 +38,6 @@ public interface ApplicationComponent {
     // NetworkModule provide
     HttpClient getHttpClient();
 
+    // React Native module provide
+    ReactNativeContainer getReactNativeContainer();
 }
